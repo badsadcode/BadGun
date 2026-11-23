@@ -27,6 +27,7 @@ export function bipod(ctx: BuildContext): void {
 
 /** Bolt-action handle on the right side, with a round knob. */
 export function boltHandle(ctx: BuildContext): void {
+  if (ctx.b.has('BoltHandle')) return;
   const { L } = ctx;
   const z = L.rec.z0 + 0.05;
   const x0 = -L.rec.width / 2;

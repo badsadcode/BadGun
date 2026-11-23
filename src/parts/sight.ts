@@ -5,6 +5,7 @@
 import { AXIS_X, AXIS_Y, Vec2, box, cylinder, lathe, tube, ring, dome } from '../core/geometry.js';
 import type { Component } from '../core/weapon.js';
 import { BuildContext, put, side } from './context.js';
+import { leafSight } from './era.js';
 
 /** Builds the optic; returns the sight-line height and the optic's rear z. */
 type OpticBuilder = (ctx: BuildContext, c: Component, y: number, z: number) => { eyeY: number; rearZ: number };
@@ -28,7 +29,10 @@ function lenses(ctx: BuildContext, c: Component, y: number, z: number, back: [nu
 
 const irons: OpticBuilder = (ctx, c, y, z) => {
   const { L } = ctx;
-  if (ctx.style.traits.rails && !L.extra.beadSight && ctx.rng('irons').chance(0.5)) return carryHandleIrons(ctx, c, y);
+  const carry = ctx.style.traits.rails || (ctx.style.traits.era ?? 0) >= 1960;
+  // Carry handles belong on flat-topped aluminium-style receivers.
+  const odds = (ctx.style.traits.era ?? 0) >= 1960 ? 0.85 : 0.5;
+  if (carry && !L.extra.beadSight && ['angular', 'plated'].includes(ctx.chosen.receiver) && ctx.rng('irons').chance(odds)) return carryHandleIrons(ctx, c, y);
   const rz = L.rec.z0 + 0.03;
   put(ctx, c, 'Detail', box([0, y + 0.004, rz], [0.018, 0.008, 0.022], ctx.bevel(0.0015)));
   for (const s of [1, -1]) put(ctx, c, 'Detail', box([s * 0.0065, y + 0.014, rz], [0.003, 0.014, 0.008], ctx.bevel(0.0008)));
@@ -176,7 +180,9 @@ const runeSight: OpticBuilder = (ctx, c, y, z) => {
   return { eyeY: yc, rearZ: z - 0.05 };
 };
 
-const OPTICS: Record<string, OpticBuilder> = { irons, reddot, scope, holo, brass, tube: tube_, rune: runeSight };
+const leaf: OpticBuilder = (ctx, c, y) => leafSight(ctx, c, y);
+
+const OPTICS: Record<string, OpticBuilder> = { irons, reddot, scope, holo, brass, tube: tube_, rune: runeSight, leaf };
 export const OPTIC_NAMES = Object.keys(OPTICS);
 
 export function buildOptic(ctx: BuildContext, choice: string): void {

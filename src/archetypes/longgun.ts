@@ -19,6 +19,7 @@ import { STOCKS } from '../parts/stock.js';
 import { EXTRA_BARRELS, EXTRA_GRIPS, EXTRA_HANDGUARDS, EXTRA_MAGAZINES, EXTRA_RECEIVERS, EXTRA_STOCKS } from '../parts/extra.js';
 import { bipod, boltHandle, carryHandle, foregrip, sideSaddle } from '../parts/accessory.js';
 import { PLATED_GRIPS, PLATED_RECEIVERS } from '../parts/plated.js';
+import { ERA_HANDGUARDS, ERA_MAGAZINES, ERA_RECEIVERS, ERA_STOCKS, bayonet, heatShield } from '../parts/era.js';
 import { OPTIC_NAMES, buildOptic } from '../parts/sight.js';
 import { VARIETY_BARRELS, VARIETY_GRIPS, VARIETY_HANDGUARDS, VARIETY_MAGAZINES, VARIETY_STOCKS } from '../parts/variety.js';
 import { FANTASY_BARRELS, FANTASY_GRIPS, FANTASY_HANDGUARDS, FANTASY_MAGAZINES, FANTASY_RECEIVERS, FANTASY_STOCKS } from '../parts/fantasy.js';
@@ -29,13 +30,13 @@ const noop: PartBuilder = () => {};
 
 export const LONGGUN_PARTS: Record<string, Record<string, PartBuilder>> = {
   config: { standard: noop, bullpup: noop, lever: noop, machinepistol: noop, boxfed: noop },
-  receiver: { ...RECEIVERS, ...EXTRA_RECEIVERS, ...SCRAP_RECEIVERS, ...FANTASY_RECEIVERS, ...PLATED_RECEIVERS },
+  receiver: { ...RECEIVERS, ...EXTRA_RECEIVERS, ...SCRAP_RECEIVERS, ...FANTASY_RECEIVERS, ...PLATED_RECEIVERS, ...ERA_RECEIVERS },
   barrel: { ...BARRELS, ...EXTRA_BARRELS, ...VARIETY_BARRELS, ...SCRAP_BARRELS, ...FANTASY_BARRELS },
-  handguard: { ...HANDGUARDS, ...EXTRA_HANDGUARDS, ...VARIETY_HANDGUARDS, ...SCRAP_HANDGUARDS, ...FANTASY_HANDGUARDS },
+  handguard: { ...HANDGUARDS, ...EXTRA_HANDGUARDS, ...VARIETY_HANDGUARDS, ...SCRAP_HANDGUARDS, ...FANTASY_HANDGUARDS, ...ERA_HANDGUARDS },
   muzzle: MUZZLES,
-  stock: { ...STOCKS, ...EXTRA_STOCKS, ...VARIETY_STOCKS, ...SCRAP_STOCKS, ...FANTASY_STOCKS },
+  stock: { ...STOCKS, ...EXTRA_STOCKS, ...VARIETY_STOCKS, ...SCRAP_STOCKS, ...FANTASY_STOCKS, ...ERA_STOCKS },
   grip: { ...GRIPS, ...EXTRA_GRIPS, ...SCRAP_GRIPS, ...FANTASY_GRIPS, ...VARIETY_GRIPS, ...PLATED_GRIPS },
-  magazine: { ...MAGAZINES, ...EXTRA_MAGAZINES, ...VARIETY_MAGAZINES, ...SCRAP_MAGAZINES, ...FANTASY_MAGAZINES },
+  magazine: { ...MAGAZINES, ...EXTRA_MAGAZINES, ...VARIETY_MAGAZINES, ...SCRAP_MAGAZINES, ...FANTASY_MAGAZINES, ...ERA_MAGAZINES },
 };
 
 /** Proportions per archetype. Values are meters; `L` = length param, `B` = bulk param. */
@@ -154,7 +155,7 @@ function longGunLayout(id: string, chosen: Record<string, string>, p: Params, rn
   const barrelEnd = hg1 + bare + rng.range(0, 0.03);
   const rb = pr.barrelRadius(bulk) * rbK;
   const gripZ = trigZ - 0.026;
-  const boxMag = !['tube', 'none', 'pan'].includes(chosen.magazine);
+  const boxMag = !['tube', 'none', 'pan', 'internal', 'top'].includes(chosen.magazine);
 
   return {
     rec: { z0, z1, top, bottom, width },
@@ -180,7 +181,8 @@ function longGunFixup(id: string, chosen: Record<string, string>, forced: Set<st
   };
   const breakAction = chosen.barrel === 'double' || chosen.barrel === 'overunder';
   // A one-piece stock replaces grip + handguard; it can't be a bullpup or wrap double barrels.
-  if (chosen.stock === 'sporter') {
+  const onePiece = (st: string) => st === 'sporter' || st === 'military';
+  if (onePiece(chosen.stock)) {
     if (breakAction || chosen.config === 'bullpup') set('stock', breakAction ? 'classic' : 'butt');
     else {
       set('handguard', 'bare');
@@ -201,7 +203,7 @@ function longGunFixup(id: string, chosen: Record<string, string>, forced: Set<st
   } else if (chosen.config === 'lever') {
     set('magazine', 'tube');
     if (!['forend', 'filigree', 'slim', 'plank', 'taped', 'cage'].includes(chosen.handguard)) set('handguard', id === 'shotgun' ? 'forend' : 'slim');
-    if (['butt', 'collapsible', 'sporter', 'wire', 'thumbhole'].includes(chosen.stock)) set('stock', 'classic');
+    if (['butt', 'collapsible', 'sporter', 'military', 'wire', 'thumbhole'].includes(chosen.stock)) set('stock', 'classic');
     if (chosen.grip === 'integral') set('grip', 'wood');
   } else if (chosen.config === 'boxfed') {
     if (['tube', 'none', 'pan', 'ammobox'].includes(chosen.magazine)) set('magazine', 'straight');
@@ -214,12 +216,12 @@ function longGunFixup(id: string, chosen: Record<string, string>, forced: Set<st
     if (chosen.handguard === 'splinter' || chosen.handguard === 'pump') set('handguard', 'slim');
   }
   if (chosen.config === 'machinepistol') {
-    if (chosen.magazine !== 'straight') set('magazine', 'straight');
+    if (chosen.magazine !== 'straight' && chosen.magazine !== 'stick') set('magazine', 'straight');
     if (!['wire', 'collapsible', 'none', 'skeletal', 'pipe', 'frame'].includes(chosen.stock)) set('stock', 'wire');
   }
-  if (id === 'shotgun' && chosen.stock === 'sporter') set('stock', 'fixed');
+  if (id === 'shotgun' && onePiece(chosen.stock)) set('stock', 'fixed');
   // Final pass: earlier rules may have swapped the stock, so re-check the one-piece pairing.
-  if (chosen.stock !== 'sporter') {
+  if (!onePiece(chosen.stock)) {
     if (chosen.handguard === 'bare') set('handguard', 'slim');
     if (chosen.grip === 'integral') set('grip', 'polymer');
   }
@@ -227,9 +229,9 @@ function longGunFixup(id: string, chosen: Record<string, string>, forced: Set<st
   if (chosen.grip === 'loop' && (chosen.config === 'machinepistol' || chosen.config === 'lever')) set('grip', chosen.config === 'lever' ? 'wood' : 'polymer');
   if (chosen.config === 'bullpup') {
     set('stock', 'butt');
-    if (chosen.magazine === 'pan') set('magazine', 'straight');
+    if (chosen.magazine === 'pan' || chosen.magazine === 'top') set('magazine', 'straight');
   } else if (chosen.stock === 'butt') set('stock', 'fixed');
-  if (chosen.magazine === 'pan') set('sight', 'none');
+  if (chosen.magazine === 'pan' || chosen.magazine === 'top') set('sight', 'none');
 }
 
 function buildLongGun(id: ArchetypeId, ctx: BuildContext, chosen: Record<string, string>): void {
@@ -253,6 +255,13 @@ function buildLongGun(id: ArchetypeId, ctx: BuildContext, chosen: Record<string,
   } else if (id === 'shotgun') {
     if (roll < 0.25 + ctx.p.detail * 0.6) sideSaddle(ctx);
   }
+
+  // Period details: fixed bayonets and trench-shotgun heat shields.
+  const st = ctx.style.traits;
+  if (st.bayonet && ['rifle', 'shotgun'].includes(id) && chosen.config !== 'bullpup' && ctx.rng('bayonet').chance(st.bayonet)) {
+    bayonet(ctx, (st.era ?? 2000) < 1925 ? 0.32 : (st.era ?? 2000) < 1950 ? 0.22 : 0.17);
+  }
+  if (id === 'shotgun' && chosen.handguard === 'pump' && (st.era ?? 2000) < 1975 && ctx.rng('heatshield').chance(0.5)) heatShield(ctx);
 
   // Vertical foregrip on suitable handguards.
   let support: Vec3 | null = null;
@@ -355,9 +364,9 @@ export const smg = longGun(
   'SMG',
   'Compact submachine guns: short barrel, long magazine, light stock.',
   (_s, kind, w) => {
-    if (kind === 'stock') return { ...w, wire: (w?.wire ?? 0) + 0.6 };
     if (kind === 'muzzle') return { ...w, suppressor: (w?.suppressor ?? 0) + 0.4 };
     if (kind === 'handguard') return without(w, ['cage']) ?? w;
+    if (kind === 'stock') return { ...(without(w, ['military', 'sporter']) ?? {}), wire: (w?.wire ?? 0) + 0.6 };
     if (kind === 'barrel') return { ...(without(w, ['double', 'overunder']) ?? {}), finned: (w?.finned ?? 0) + 0.3 };
     if (kind === 'magazine') return without(w, ['pan']) ?? w;
     return w;
@@ -374,7 +383,7 @@ export const shotgun = longGun(
     if (kind === 'handguard') return { pump: 1 };
     if (kind === 'muzzle') return { ...only(w, ['crown', 'bell', 'brake', 'compensator', 'emitter'], {}), none: 1.2 };
     if (kind === 'barrel') return { ...(without(w, ['coiled', 'rails', 'finned']) ?? {}), double: 0.9, overunder: 0.6 };
-    if (kind === 'stock') return { ...(without(w, ['wire', 'sporter']) ?? {}), none: (w?.none ?? 0) + 0.15 };
+    if (kind === 'stock') return { ...(without(w, ['wire', 'sporter', 'military']) ?? {}), none: (w?.none ?? 0) + 0.15 };
     return w;
   },
   (s) => ({ ...(without(s.optics, ['scope', 'brass']) ?? {}), none: 0.6, irons: 0.6 }),
@@ -385,7 +394,7 @@ export const sniper = longGun(
   'Sniper',
   'Bolt-action marksman rifles: long heavy barrel, scope, bipod.',
   (_s, kind, w) => {
-    if (kind === 'magazine') return only(w, ['straight', 'cell', 'canister', 'crystal'], { straight: 1 });
+    if (kind === 'magazine') return only(w, ['straight', 'cell', 'canister', 'crystal', 'internal'], { straight: 1 });
     if (kind === 'barrel') return { ...only(w, ['heavy', 'fluted', 'bull', 'banded', 'shrouded', 'rails'], { heavy: 1 }), fluted: 0.8 };
     if (kind === 'muzzle') return { ...(without(w, ['bell', 'flash']) ?? {}), suppressor: 0.6, heavybrake: _s.traits.rails ? 0.6 : 0.15 };
     if (kind === 'stock') return { ...(without(w, ['wire', 'collapsible']) ?? {}), sporter: 1.4 };
@@ -399,10 +408,10 @@ export const lmg = longGun(
   'LMG',
   'Light machine guns: heavy barrel, big magazine or ammo box, bipod.',
   (_s, kind, w) => {
-    if (kind === 'magazine') return { ...only(w, ['drum', 'canister', 'cell', 'can', 'orb', 'crystal'], {}), ammobox: 1, pan: 0.5 };
+    if (kind === 'magazine') return { ...only(w, ['drum', 'canister', 'cell', 'can', 'orb', 'crystal', 'top'], {}), ammobox: 1, pan: 0.5 };
     if (kind === 'handguard') return { ...w, jacket: (w?.jacket ?? 0) + 0.7 };
     if (kind === 'barrel') return { ...(without(w, ['fluted', 'double', 'overunder']) ?? {}), heavy: 1 };
-    if (kind === 'stock') return without(w, ['wire', 'sporter']) ?? w;
+    if (kind === 'stock') return without(w, ['wire', 'sporter', 'military']) ?? w;
     return w;
   },
   (s) => without(s.optics, ['scope']) ?? { irons: 1 },

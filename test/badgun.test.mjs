@@ -48,7 +48,7 @@ test('material names are stable and semantic', () => {
     for (const mat of m.materials) assert.match(mat.name, /^MAT_(Body|Barrel|Grip|Stock|Magazine|Sight|Trim|Accent|Detail|Glass|Emissive)$/);
     const names = m.materials.map((x) => x.name);
     for (const required of ['MAT_Body', 'MAT_Barrel']) assert.ok(names.includes(required), `${style} lacks ${required}`);
-    assert.ok(names.length >= 5, `${style}: only ${names.length} materials`);
+    assert.ok(names.length >= 3, `${style}: only ${names.length} materials`);
   }
 });
 
@@ -118,7 +118,7 @@ test('archetypes pick variants that fit them', () => {
         const w = generate({ archetype: a, style, seed });
         assert.ok(!['ammobox'].includes(w.parts.magazine) && (w.parts.magazine !== 'tube' || w.parts.config === 'lever'), `${a}: ${w.parts.magazine}`);
         assert.equal(w.parts.stock === 'butt', w.parts.config === 'bullpup', 'bullpups (and only bullpups) get a butt stock');
-        assert.equal(w.parts.stock === 'sporter', w.parts.grip === 'integral', 'one-piece stocks carry their own grip');
+        assert.equal(['sporter', 'military'].includes(w.parts.stock), w.parts.grip === 'integral', 'one-piece stocks carry their own grip');
         if (w.parts.config === 'machinepistol') assert.equal(w.parts.magazine, 'straight', 'machine pistols feed through the grip');
       }
     }

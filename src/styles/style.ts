@@ -43,5 +43,9 @@ export interface StyleProfile {
     scrap?: boolean;
     /** Enchanted: glowing runes and crystals. */
     magic?: boolean;
+    /** Historical era (a year, e.g. 1916). Drives period details like leaf sights and carry handles. */
+    era?: number;
+    /** Chance (0..1) that a long gun carries a fixed bayonet. */
+    bayonet?: number;
   };
 }
