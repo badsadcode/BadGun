@@ -1,0 +1,74 @@
+[
+ {
+  "out": "r6/f_modern.png",
+  "recipe": {
+   "archetype": "faction",
+   "style": "modern",
+   "seed": 3
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 1100,
+  "height": 900
+ },
+ {
+  "out": "r6/f_scifi.png",
+  "recipe": {
+   "archetype": "faction",
+   "style": "scifi",
+   "seed": 3
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 1100,
+  "height": 900
+ },
+ {
+  "out": "r6/f_ww2.png",
+  "recipe": {
+   "archetype": "faction",
+   "style": "ww2",
+   "seed": 4
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 1100,
+  "height": 900
+ },
+ {
+  "out": "r6/f_fantasy.png",
+  "recipe": {
+   "archetype": "faction",
+   "style": "fantasy",
+   "seed": 3
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 1100,
+  "height": 900
+ },
+ {
+  "out": "r6/f_scrap.png",
+  "recipe": {
+   "archetype": "faction",
+   "style": "scrap",
+   "seed": 5
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 1100,
+  "height": 900
+ },
+ {
+  "out": "r6/f_steampunk.png",
+  "recipe": {
+   "archetype": "faction",
+   "style": "steampunk",
+   "seed": 2
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 1100,
+  "height": 900
+ }
+]

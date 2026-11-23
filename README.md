@@ -100,6 +100,26 @@ const bytes = toGLB(weapon);                  // Uint8Array, ready for fs.writeF
 const manifest = buildManifest(weapon);       // sockets, parts, materials, bounds, stats
 ```
 
+## Faction families
+
+One seed, one matching arsenal: a generated name, a signature color and livery, an insignia badge on every weapon, a *doctrine* of preferred parts (soft preferences, so each archetype keeps its own rules), shared proportions and a shared finish.
+
+```bash
+node dist/cli.js --faction --style ww2 --seed 4
+```
+
+That writes every member's `.glb`, one `*_arsenal.glb` containing the whole lineup (shared materials), and a `*.faction.json` with all recipes.
+
+```js
+import { generateFaction, factionToGLB } from 'badgun';
+const faction = generateFaction({ style: 'scifi', seed: 3 });
+faction.name;                 // e.g. "Armada of the Last Line"
+faction.members.map((m) => m.weapon);
+const arsenal = factionToGLB(faction);
+```
+
+The building blocks are plain recipe fields you can use yourself: `prefer` (soft part preferences), `family` (share shape genes across recipes) and `insignia`.
+
 ## Recipes
 
 A recipe is the whole description of a weapon. Save it, share it, batch it. A recipe always gives the same weapon *within a version*. When new part variants join a style, unpinned choices may change between versions, so pin `parts` (and `optic`) in recipes you need frozen.
@@ -138,7 +158,7 @@ A recipe is the whole description of a weapon. Save it, share it, batch it. A re
 | Moving parts | node `extras.badgun.motion` = `{ type, axis, range, purpose }` |
 | Manifest | `<name>.json` sidecar + root node `extras.badgun` |
 
-## What's in v0.5
+## What's in v0.6
 
 | Archetype | Part kinds |
 |---|---|

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/005/banner.webp" alt="BadGun Devlog" width="100%">
+  <img src="assets/006/banner.webp" alt="BadGun Devlog" width="100%">
 </p>
 
 # 📓 The BadGun Devlog
@@ -10,6 +10,7 @@ Behind-the-scenes stories from building **BadGun**, a factory that designs weapo
 
 | # | Entry | In one sentence |
 |---|-------|-----------------|
+| 006 | [**Every Army Needs a Look**](006-every-army-needs-a-look.md) | Faction families: one lucky number, one whole matching arsenal. |
 | 005 | [**Wood, Steel & History**](005-wood-steel-and-history.md) | Three new worlds from the 20th century: WW1, WW2 and the Vietnam era. |
 | 004 | [**Runes, Crystals & a Lever**](004-runes-crystals-and-a-lever.md) | World #5 is fantasy, plus lever actions, machine pistols, hunting stocks and more. |
 | 003 | [**Duct Tape, Double Barrels & Bows**](003-duct-tape-double-barrels-and-bows.md) | Every weapon gets its own shape, double barrels, a scavenger world, and the first bows. |

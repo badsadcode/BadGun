@@ -38,5 +38,13 @@
     "date": "2026-11-23",
     "summary": "Three new worlds from the 20th century: World War I, World War II and the Vietnam era.",
     "cover": "assets/005/banner.webp"
+  },
+  {
+    "slug": "006-every-army-needs-a-look",
+    "number": "006",
+    "title": "Every Army Needs a Look",
+    "date": "2026-11-23",
+    "summary": "Faction families: one lucky number, one whole matching arsenal, with a name, a badge and a favorite set of parts.",
+    "cover": "assets/006/banner.webp"
   }
 ]

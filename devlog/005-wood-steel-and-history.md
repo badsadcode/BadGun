@@ -86,5 +86,5 @@ Try the new eras in the **[playground](https://badsadcode.github.io/BadGun/)**: 
 ---
 
 <p align="center">
-  <a href="README.md">← All devlogs</a> · <a href="../README.md">BadGun home</a>
+  <a href="README.md">← All devlogs</a> · <a href="../README.md">BadGun home</a> · <a href="006-every-army-needs-a-look.md">Next: #006 →</a>
 </p>

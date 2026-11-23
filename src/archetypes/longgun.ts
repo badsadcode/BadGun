@@ -308,7 +308,7 @@ function gripOrigin(ctx: BuildContext): Vec3 {
 
 /** Variants that only make sense on one archetype. */
 const SPECIALISTS: Record<string, string[]> = {
-  magazine: ['tube', 'ammobox', 'none'],
+  magazine: ['tube', 'ammobox', 'none', 'top'],
   handguard: ['pump', 'splinter', 'bare'],
   stock: ['butt'],
   grip: ['integral'],
@@ -409,7 +409,7 @@ export const lmg = longGun(
   'LMG',
   'Light machine guns: heavy barrel, big magazine or ammo box, bipod.',
   (_s, kind, w) => {
-    if (kind === 'magazine') return { ...only(w, ['drum', 'canister', 'cell', 'can', 'orb', 'crystal', 'top'], {}), ammobox: 1, pan: 0.5 };
+    if (kind === 'magazine') return { ...only(w, ['drum', 'canister', 'cell', 'can', 'orb', 'crystal'], {}), ammobox: 1, pan: 0.5, top: (_s.parts.magazine?.top ?? 0) * 2.5 };
     if (kind === 'handguard') return { ...w, jacket: (w?.jacket ?? 0) + 0.7 };
     if (kind === 'barrel') return { ...(without(w, ['fluted', 'double', 'overunder']) ?? {}), heavy: 1 };
     if (kind === 'stock') return without(w, ['wire', 'sporter', 'military']) ?? w;

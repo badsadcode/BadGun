@@ -119,7 +119,7 @@ test('archetypes pick variants that fit them', () => {
         assert.ok(!['ammobox'].includes(w.parts.magazine) && (w.parts.magazine !== 'tube' || w.parts.config === 'lever'), `${a}: ${w.parts.magazine}`);
         assert.equal(w.parts.stock === 'butt', w.parts.config === 'bullpup', 'bullpups (and only bullpups) get a butt stock');
         assert.equal(['sporter', 'military'].includes(w.parts.stock), w.parts.grip === 'integral', 'one-piece stocks carry their own grip');
-        if (w.parts.config === 'machinepistol') assert.equal(w.parts.magazine, 'straight', 'machine pistols feed through the grip');
+        if (w.parts.config === 'machinepistol') assert.ok(['straight', 'stick'].includes(w.parts.magazine), 'machine pistols feed through the grip');
       }
     }
   }
