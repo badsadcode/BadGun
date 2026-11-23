@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/008/banner.webp" alt="BadGun Devlog" width="100%">
+  <img src="assets/009/banner.webp" alt="BadGun Devlog" width="100%">
 </p>
 
 # 📓 The BadGun Devlog
@@ -10,6 +10,7 @@ Behind-the-scenes stories from building **BadGun**, a factory that designs weapo
 
 | # | Entry | In one sentence |
 |---|-------|-----------------|
+| 009 | [**Lights, Camera, Reload**](009-lights-camera-reload.md) | The guns finally move: firing, reloading, pumping, drawing. |
 | 008 | [**Ready to Paint**](008-ready-to-paint.md) | Every gun unfolds flat with no overlaps, plus three free texture maps. |
 | 007 | [**Diesel & Neon**](007-diesel-and-neon.md) | Two new worlds: chrome-and-rivets dieselpunk and cable-and-sticker cyberpunk. |
 | 006 | [**Every Army Needs a Look**](006-every-army-needs-a-look.md) | Faction families: one lucky number, one whole matching arsenal. |

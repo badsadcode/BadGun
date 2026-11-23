@@ -1,0 +1,240 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@500;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#121419; --ink:#f1eee8; --dim:#9aa0aa; --orange:#ff6b3d; --yellow:#ffd23d; --cyan:#42e2ff; --brass:#e0b25a; --pink:#ff5fc0; }
+* { box-sizing: border-box; margin: 0; }
+body { background: #333; font-family: 'Space Grotesk', sans-serif; color: var(--ink); padding: 20px; display: grid; gap: 20px; justify-content: start; }
+.card { width: 1200px; position: relative; overflow: hidden; border-radius: 28px; padding: 48px 56px;
+  background:
+    radial-gradient(900px 500px at 80% 30%, rgba(255,107,61,.13), transparent 60%),
+    radial-gradient(700px 400px at 10% 100%, rgba(66,226,255,.08), transparent 60%),
+    linear-gradient(160deg, #181b22, #101216);
+}
+.card::before { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+  background-size: 32px 32px; mask-image: radial-gradient(circle at 60% 40%, #000 30%, transparent 85%); }
+.kicker { font: 700 14px 'JetBrains Mono', monospace; letter-spacing: 3px; color: var(--orange); text-transform: uppercase; }
+h1 { font-size: 76px; line-height: .95; letter-spacing: -3px; font-weight: 700; margin: 18px 0 18px; }
+h1 em { font-style: normal; color: var(--orange); }
+h2 { font-size: 44px; letter-spacing: -1.5px; line-height: 1; margin: 10px 0 8px; }
+.sub { font-size: 22px; color: var(--dim); max-width: 520px; line-height: 1.35; }
+.chip { display: inline-block; font: 700 13px 'JetBrains Mono', monospace; letter-spacing: 2px; padding: 6px 12px; border-radius: 999px; border: 1.5px solid currentColor; }
+.note { font-family: 'Caveat', cursive; font-weight: 700; color: var(--yellow); }
+img { display: block; }
+.logo { position: absolute; right: 40px; bottom: 30px; font: 700 15px 'JetBrains Mono', monospace; color: #5b616c; letter-spacing: 2px; }
+.logo b { color: var(--orange); }
+
+/* banner */
+#banner { height: 560px; }
+#banner .guns { position: absolute; right: -40px; top: 40px; width: 760px; height: 500px; }
+#banner .guns img { position: absolute; filter: drop-shadow(0 30px 30px rgba(0,0,0,.45)); }
+#banner .g1 { width: 600px; right: 110px; top: 10px; opacity: .97; }
+#banner .g2 { width: 700px; right: 40px; top: 150px; }
+#banner .g3 { width: 600px; right: 130px; top: 320px; }
+#banner .stamp { position: absolute; left: 56px; bottom: 48px; display: flex; gap: 10px; }
+#banner .scribble { position: absolute; left: 58px; top: 405px; transform: rotate(-3deg); font-size: 28px; }
+
+/* worlds */
+.world { display: grid; grid-template-columns: 330px 1fr; align-items: center; gap: 20px; padding: 18px 0; border-top: 1px dashed rgba(255,255,255,.1); position: relative; }
+.world:first-of-type { border-top: 0; }
+.world p { color: var(--dim); font-size: 18px; line-height: 1.4; }
+.world img { width: 780px; justify-self: center; filter: drop-shadow(0 18px 22px rgba(0,0,0,.5)); }
+
+/* grids */
+.grid { display: grid; gap: 6px 26px; margin-top: 26px; }
+.grid img { width: 100%; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.colhead { margin-bottom: 4px; }
+.cell { position: relative; padding: 10px 6px; }
+.cell .label { position: absolute; left: 6px; top: 2px; font: 700 13px 'JetBrains Mono', monospace; color: var(--dim); letter-spacing: 1px; }
+
+/* exploded */
+#exploded .stage { position: relative; width: 1088px; margin-top: 30px; }
+#exploded .stage img { width: 100%; filter: drop-shadow(0 16px 18px rgba(0,0,0,.5)); }
+.tag { position: absolute; font-family: 'Caveat', cursive; font-weight: 700; font-size: 30px; color: var(--yellow); white-space: nowrap; transform: rotate(-3deg); }
+.tag::before { content: '↙ '; }
+.tag.r::before { content: ''; } .tag.r::after { content: ' ↘'; }
+.tag.d::before { content: '↖ '; }
+.tag.n::before { content: ''; }
+
+/* stats */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 30px; }
+.stat { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 20px; padding: 22px 24px; }
+.stat .n { font-size: 54px; font-weight: 700; letter-spacing: -2px; color: var(--ink); }
+.stat .n small { font-size: 26px; color: var(--dim); letter-spacing: 0; }
+.stat .t { color: var(--dim); font-size: 17px; line-height: 1.35; margin-top: 4px; }
+.stat.hot { border-color: rgba(255,107,61,.5); background: rgba(255,107,61,.08); }
+.stat.hot .n { color: var(--orange); }
+
+.fam { display: grid; grid-template-columns: 140px repeat(3, 1fr); gap: 4px 18px; align-items: center; margin-top: 26px; }
+.fam .rowlab { font: 700 15px 'JetBrains Mono', monospace; letter-spacing: 2px; color: var(--dim); text-transform: uppercase; }
+.fam img { width: 100%; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.fam .cell { height: 128px; display: flex; align-items: center; justify-content: center; }
+.fam .cell img { max-height: 120px; width: auto; max-width: 100%; }
+.trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 30px; align-items: end; }
+.trio .item img { width: 100%; filter: drop-shadow(0 14px 16px rgba(0,0,0,.5)); }
+.trio .item h3 { font-size: 26px; margin: 14px 0 4px; letter-spacing: -.5px; }
+.trio .item p { color: var(--dim); font-size: 16px; line-height: 1.4; }
+.xb { display: grid; gap: 4px; margin-top: 20px; }
+.xb .row { display: grid; grid-template-columns: 300px 1fr; gap: 20px; align-items: center; }
+.xb .row img { width: 100%; filter: drop-shadow(0 16px 18px rgba(0,0,0,.5)); }
+.xb .row p { color: var(--dim); font-size: 17px; line-height: 1.4; }
+.xb .row h3 { font-size: 28px; margin: 10px 0 6px; }
+.cat { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 30px; margin-top: 26px; }
+.cat .c { position: relative; padding-top: 34px; }
+.cat .c img { width: 100%; filter: drop-shadow(0 12px 14px rgba(0,0,0,.5)); }
+.cat .c .note { position: absolute; left: 4px; top: 0; font-size: 28px; transform: rotate(-2deg); }
+#banner2 { height: 560px; }
+#banner2 .g { position: absolute; filter: drop-shadow(0 26px 26px rgba(0,0,0,.5)); }
+
+.ba { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 26px; }
+.ba .col h3 { font: 700 15px 'JetBrains Mono', monospace; letter-spacing: 3px; margin: 0 0 6px; }
+.ba .col .sub2 { color: var(--dim); font-size: 17px; margin-bottom: 10px; }
+.ba .col img { width: 100%; display: block; margin: 4px 0; filter: drop-shadow(0 8px 10px rgba(0,0,0,.5)); }
+.ba .before { opacity: .92; }
+.bows { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 24px; align-items: start; }
+.bows .b { text-align: center; }
+.bows .b img { height: 520px; width: 100%; object-fit: contain; filter: drop-shadow(0 14px 14px rgba(0,0,0,.5)); }
+.bows .b h3 { font-size: 22px; margin: 10px 0 2px; }
+.bows .b p { color: var(--dim); font-size: 14px; margin: 0; line-height: 1.35; }
+.quad { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 30px; margin-top: 24px; }
+.quad .c { position: relative; padding-top: 36px; }
+.quad .c img { width: 100%; filter: drop-shadow(0 12px 14px rgba(0,0,0,.5)); }
+.quad .c .note { position: absolute; left: 4px; top: 0; font-size: 28px; transform: rotate(-2deg); }
+#banner3 { height: 560px; }
+#banner3 .g { position: absolute; filter: drop-shadow(0 26px 26px rgba(0,0,0,.5)); }
+
+.fam8 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px 22px; margin-top: 24px; align-items: center; }
+.fam8 .c { text-align: center; }
+.fam8 .c img { width: 100%; max-height: 150px; object-fit: contain; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.fam8 .c span { font: 700 13px 'JetBrains Mono', monospace; letter-spacing: 2px; color: var(--dim); }
+.pals { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 30px; margin-top: 24px; }
+.pals .c img { width: 100%; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.pals .c span { font: 700 14px 'JetBrains Mono', monospace; letter-spacing: 2px; }
+.heroes { display: grid; grid-template-columns: 1.6fr 1fr 0.55fr; gap: 20px; align-items: center; margin-top: 20px; }
+.heroes img { width: 100%; filter: drop-shadow(0 16px 18px rgba(0,0,0,.5)); }
+.heroes .note { font-size: 26px; display: block; margin-bottom: 6px; transform: rotate(-2deg); }
+#banner4 { height: 560px; }
+#banner4 .g { position: absolute; filter: drop-shadow(0 26px 26px rgba(0,0,0,.5)); }
+
+.eras { display: grid; grid-template-columns: 120px repeat(3, 1fr); gap: 4px 26px; margin-top: 24px; align-items: center; }
+.eras .rowlab { font: 700 15px 'JetBrains Mono', monospace; letter-spacing: 2px; color: var(--dim); }
+.eras .rowlab small { display: block; font-weight: 500; font-size: 11px; letter-spacing: 1px; margin-top: 2px; }
+.eras .cell { height: 120px; display: flex; align-items: center; justify-content: center; }
+.eras .cell img.pistol { max-height: 86px; }
+.eras .cell img { max-width: 100%; max-height: 112px; filter: drop-shadow(0 8px 10px rgba(0,0,0,.5)); }
+.eras .colhead { font: 700 12px 'JetBrains Mono', monospace; letter-spacing: 2px; color: #6b717c; text-align: center; }
+#banner5 { height: 560px; }
+#banner5 .g { position: absolute; filter: drop-shadow(0 26px 26px rgba(0,0,0,.5)); }
+.cat .c img.small { width: auto; max-height: 200px; margin-left: 60px; }
+
+.fgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px 26px; margin-top: 26px; }
+.fcard { background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.08); border-radius: 22px; padding: 16px 18px 14px; display: flex; flex-direction: column; }
+.fcard .top { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
+.fcard h3 { font-size: 21px; margin: 0; letter-spacing: -.4px; line-height: 1.15; }
+.fcard .meta { font: 600 11px 'JetBrains Mono', monospace; color: var(--dim); letter-spacing: 1px; text-transform: uppercase; margin-top: 3px; }
+.fcard .lineup { height: 330px; display: flex; align-items: center; justify-content: center; }
+.fcard .lineup img { max-width: 100%; max-height: 330px; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.fcard .doc { font: 500 12px 'JetBrains Mono', monospace; color: #9aa0aa; margin-top: 6px; line-height: 1.5; }
+.anat { display: grid; grid-template-columns: 1.15fr 1fr; gap: 30px; margin-top: 20px; align-items: center; }
+.anat img { width: 100%; filter: drop-shadow(0 14px 16px rgba(0,0,0,.5)); }
+.anat ol { margin: 0; padding-left: 22px; font-size: 19px; line-height: 1.45; color: #d9d6cf; }
+.anat ol li { margin: 0 0 12px; }
+.anat ol b { color: #fff; }
+.swatch { display: inline-block; width: 16px; height: 16px; border-radius: 4px; vertical-align: -2px; margin-right: 4px; }
+.badges { display: flex; gap: 16px; margin-top: 8px; }
+#banner6 { height: 560px; }
+#banner6 .g { position: absolute; filter: drop-shadow(0 22px 22px rgba(0,0,0,.5)); }
+
+#banner9 { height: 560px; }
+#banner9 .g { position: absolute; filter: drop-shadow(0 22px 22px rgba(0,0,0,.5)); }
+.strip { display: grid; grid-template-columns: 170px repeat(4, 1fr); gap: 10px; align-items: center; padding: 14px 0; border-top: 1px dashed rgba(255,255,255,.1); }
+.strip:first-of-type { border-top: 0; }
+.strip .lab h3 { font-size: 24px; letter-spacing: -.5px; margin: 0 0 4px; }
+.strip .lab p { font: 600 12px 'JetBrains Mono', monospace; color: var(--dim); letter-spacing: 1px; text-transform: uppercase; }
+.frame { position: relative; background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.07); border-radius: 14px; height: 150px; display: flex; align-items: center; justify-content: center; padding: 8px; }
+.frame img { max-width: 100%; max-height: 132px; filter: drop-shadow(0 8px 10px rgba(0,0,0,.5)); }
+.frame .t { position: absolute; left: 10px; top: 7px; font: 700 11px 'JetBrains Mono', monospace; color: #6b717c; letter-spacing: 1px; }
+.frame .ev { position: absolute; right: 10px; bottom: 7px; font: 700 12px 'JetBrains Mono', monospace; color: var(--yellow); }
+.strip.tall .frame { height: 230px; } .strip.tall .frame img { max-height: 212px; }
+.timeline { margin-top: 30px; position: relative; }
+.tl-gun { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.tl-gun img { width: 100%; filter: drop-shadow(0 8px 10px rgba(0,0,0,.5)); }
+.track { position: relative; height: 120px; margin-top: 20px; }
+.track .bar { position: absolute; left: 0; right: 0; top: 54px; height: 4px; background: rgba(255,255,255,.15); border-radius: 2px; }
+.track .seg { position: absolute; top: 46px; height: 20px; border-radius: 6px; }
+.track .mark { position: absolute; top: 24px; transform: translateX(-50%); text-align: center; }
+.track .mark .dot { width: 14px; height: 14px; border-radius: 50%; background: var(--yellow); margin: 23px auto 0; box-shadow: 0 0 0 4px rgba(255,210,61,.2); }
+.track .mark .name { font: 700 15px 'JetBrains Mono', monospace; color: var(--yellow); position: absolute; top: -6px; left: 50%; transform: translateX(-50%); white-space: nowrap; }
+.track .mark .time { font: 600 12px 'JetBrains Mono', monospace; color: var(--dim); position: absolute; top: 46px; left: 50%; transform: translateX(-50%); white-space: nowrap; }
+.track .tick { position: absolute; top: 72px; font: 600 12px 'JetBrains Mono', monospace; color: #5b616c; transform: translateX(-50%); }
+.legend { display: flex; gap: 22px; margin-top: 4px; color: var(--dim); font-size: 15px; }
+.legend i { display: inline-block; width: 22px; height: 10px; border-radius: 4px; margin-right: 6px; vertical-align: 1px; }
+.cliplist { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 26px; }
+.cliplist .c { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 18px; padding: 18px 20px; }
+.cliplist .c h3 { font: 700 20px 'JetBrains Mono', monospace; margin: 0 0 6px; color: var(--ink); }
+.cliplist .c p { color: var(--dim); font-size: 16px; line-height: 1.4; }
+.cliplist .c .n { float: right; font: 700 13px 'JetBrains Mono', monospace; color: var(--orange); }
+</style></head><body>
+<section class="card" id="banner9">
+  <div class="kicker">Bad Ideas Works · Devlog #009</div>
+  <h1>Lights, Camera,<br><em>Reload.</em></h1>
+  <p class="sub" style="max-width:430px">The guns finally move: firing, reloading, pumping, drawing.</p>
+  <img class="g" src="renders/c_hero2_0.png" style="width:500px; right:50px; top:36px;">
+  <img class="g" src="renders/c_hero_0.png" style="width:300px; right:470px; top:285px;">
+  <div style="position:absolute; left:56px; bottom:48px; display:flex; gap:10px;">
+    <span class="chip" style="color:var(--yellow)">FIRE</span><span class="chip" style="color:var(--cyan)">RELOAD</span><span class="chip" style="color:var(--orange)">CYCLE</span><span class="chip" style="color:#c9ccd2">+7 MORE</span>
+  </div>
+</section>
+
+<section class="card" id="flip9">
+  <div class="kicker">Flipbook</div>
+  <h2>Frame by frame.</h2>
+  <div style="margin-top:22px">
+  <div class="strip"><div class="lab"><h3>Break action</h3><p>Reload</p></div><div class="frame"><span class="t">0.00s</span><img src="renders/c_double_0.png"></div><div class="frame"><span class="t">0.25s</span><img src="renders/c_double_1.png"></div><div class="frame"><span class="t">0.70s</span><img src="renders/c_double_2.png"><span class=ev>♪ open</span></div><div class="frame"><span class="t">1.50s</span><img src="renders/c_double_3.png"><span class=ev>♪ close</span></div></div>
+  <div class="strip"><div class="lab"><h3>Pistol</h3><p>Reload</p></div><div class="frame"><span class="t">0.00s</span><img src="renders/c_pistol_0.png"></div><div class="frame"><span class="t">0.50s</span><img src="renders/c_pistol_1.png"><span class=ev>♪ magOut</span></div><div class="frame"><span class="t">1.30s</span><img src="renders/c_pistol_2.png"><span class=ev>♪ magIn</span></div><div class="frame"><span class="t">1.59s</span><img src="renders/c_pistol_3.png"><span class=ev>slide back</span></div></div>
+  <div class="strip tall"><div class="lab"><h3>Bow</h3><p>Draw · Fire</p></div><div class="frame"><span class="t">0.00s</span><img src="renders/c_bow_0.png"></div><div class="frame"><span class="t">0.50s</span><img src="renders/c_bow_1.png"></div><div class="frame"><span class="t">1.05s</span><img src="renders/c_bow_2.png"><span class=ev>♪ fullDraw</span></div><div class="frame"><span class="t">fire 0.10s</span><img src="renders/c_bow_3.png"><span class=ev>♪ release</span></div></div>
+  <div class="strip"><div class="lab"><h3>Lever &amp; bipod</h3><p>Cycle · BipodDeploy</p></div><div class="frame"><span class="t">0.00s</span><img src="renders/c_lever_0.png"></div><div class="frame"><span class="t">0.25s</span><img src="renders/c_lever_1.png"><span class="ev">♪ down</span></div><div class="frame"><span class="t">0.00s</span><img src="renders/c_lmg_0.png"></div><div class="frame"><span class="t">0.50s</span><img src="renders/c_lmg_1.png"><span class="ev">♪ deployed</span></div></div>
+  </div>
+</section>
+
+<section class="card" id="events9">
+  <div class="kicker">For the sound people</div>
+  <h2>Every clip knows when to go "click".</h2>
+  <p class="sub" style="max-width:900px">A pistol's Reload, with its built-in event markers. A game can play the right sound at exactly the right moment.</p>
+  <div class="timeline">
+    <div class="tl-gun">
+      <img src="renders/c_pistol_0.png"><img src="renders/c_pistol_1.png"><img src="renders/c_pistol_2.png"><img src="renders/c_pistol_3.png">
+    </div>
+    <div class="track"><div class="bar"></div><div class="seg" style="left:5.49%;width:65.93%;background:rgba(66,226,255,.35)"></div><div class="seg" style="left:79.67%;width:12.09%;background:rgba(255,107,61,.55)"></div><div class="mark" style="left:24.73%"><span class="name">♪ magOut</span><div class="dot"></div><span class="time">0.45s</span></div><div class="mark" style="left:71.43%"><span class="name">♪ magIn</span><div class="dot"></div><span class="time">1.30s</span></div><div class="mark" style="left:91.76%"><span class="name">♪ chambered</span><div class="dot"></div><span class="time">1.67s</span></div><span class="tick" style="left:0.00%">0.0s</span><span class="tick" style="left:54.95%">1.0s</span></div>
+    <div class="legend"><span><i style="background:rgba(66,226,255,.6)"></i>magazine out and back in</span><span><i style="background:rgba(255,107,61,.8)"></i>slide racked</span></div>
+  </div>
+</section>
+
+<section class="card" id="clips9">
+  <div class="kicker">The clip menu</div>
+  <h2>Each gun gets the clips that fit it.</h2>
+  <div class="cliplist">
+    <div class="c"><span class="n">100%</span><h3>Fire</h3><p>Trigger, hammer, slide recoil. Bows and crossbows let go of the string.</p></div>
+    <div class="c"><span class="n">75%</span><h3>Reload</h3><p>Magazine out and in, then chamber a round. Doubles break open; crossbows wind the crank.</p></div>
+    <div class="c"><span class="n">42%</span><h3>Cycle</h3><p>Pump, lever, bolt, or rack the slide.</p></div>
+    <div class="c"><span class="n">12%</span><h3>Cock &amp; Spin</h3><p>Thumb the hammer back. Give a revolver's cylinder a flashy spin.</p></div>
+    <div class="c"><span class="n">bows</span><h3>Draw</h3><p>String and arrow come back while the limbs bend.</p></div>
+    <div class="c"><span class="n">extras</span><h3>Bipod, stock…</h3><p>Swing the bipod legs out, fold or extend the stock, fold the carry handle.</p></div>
+  </div>
+</section>
+
+<section class="card" id="stats9">
+  <div class="kicker">By the numbers</div>
+  <h2>Devlog #009, in digits.</h2>
+  <div class="stats">
+    <div class="stat hot"><div class="n">10</div><div class="t">kinds of animation clip</div></div>
+    <div class="stat"><div class="n">60</div><div class="t">frames per second in every clip</div></div>
+    <div class="stat"><div class="n">0.06<small> s</small></div><div class="t">from trigger pull to "shot". Blink and you'll miss it (so the playground has slow motion)</div></div>
+    <div class="stat"><div class="n">2</div><div class="t">hidden bugs caught by watching parts move: a backward lever and a runaway cable</div></div>
+    <div class="stat"><div class="n">2.7</div><div class="t">clips per gun, on average</div></div>
+    <div class="stat hot"><div class="n">0</div><div class="t">bee launchers. Not even in slow motion.</div></div>
+  </div>
+  <div class="logo">BAD IDEAS <b>WORKS</b></div>
+</section>
+</body></html>

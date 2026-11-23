@@ -110,8 +110,9 @@ const compound: PartBuilder = (ctx) => {
     const c = ctx.b.component(s > 0 ? 'LimbTop' : 'LimbBottom', { kind: 'limb', variant: 'compound' });
     put(ctx, c, 'Detail', cylinder(camR, -0.007, 0.007, seg, ctx.bevel(0.001)), [0, s * H, T], [0, Math.PI / 2, 0]);
     put(ctx, c, 'Trim', cylinder(0.004, -0.016, 0.016, 8), [0, s * H, T], [0, Math.PI / 2, 0]);
-    // Cable to the opposite limb root.
-    put(ctx, c, 'Detail', rod([0.002, s * H, T + camR * 0.6], [0.002, -s * (R + 0.02), -0.004], 0.0014, 5));
+    // Cable to the opposite limb root. It spans the whole bow, so it lives on
+    // the riser: on a limb it would swing with that limb when the bow flexes.
+    put(ctx, r, 'Detail', rod([0.002, s * H, T + camR * 0.6], [0.002, -s * (R + 0.02), -0.004], 0.0014, 5));
   }
   // Cable guard, sight with glowing pins, stabilizer.
   put(ctx, r, 'Detail', rod([-0.01, -0.03, -0.012], [0.01, -0.03, -0.06], 0.0035, 8));

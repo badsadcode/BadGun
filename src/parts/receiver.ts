@@ -53,7 +53,7 @@ export function triggerAndGuard(ctx: BuildContext, guardSlot: 'Detail' | 'Trim' 
     // Lever action: the guard is part of a lever that swings down to cycle, with a finger loop.
     const lever = b.component('Lever', {
       kind: 'lever', variant: 'loop', pivot: [0, y, g1],
-      motion: { type: 'rotate', axis: [1, 0, 0], range: [0, 0.9], purpose: 'cycle (swing down and back)' },
+      motion: { type: 'rotate', axis: [1, 0, 0], range: [0, -0.9], purpose: 'cycle (swing down and back)' },
     });
     const slot = ctx.style.traits.plumbing || ctx.style.traits.magic ? 'Trim' : guardSlot;
     side(ctx, lever, slot, guard, 0.011, 0.0015);

@@ -269,6 +269,7 @@ async function regenerate(keepCamera = true) {
     current.traverse((o) => { if (o.name.startsWith('SOCKET_')) o.add(socketGizmo()); });
     scene.add(current);
     if (!keepCamera || !frame.done) { frame(current); frame.done = true; }
+    applyPose();
     exploded = false;
     applySocketVisibility();
     applyChecker();
@@ -553,7 +554,9 @@ function setupAnimations(gltf) {
     box.appendChild(b);
   }
   for (const id of ['animHead', 'clips', 'animopts']) $(id).style.display = clips.length ? '' : 'none';
-  // Screenshot mode: freeze a pose, e.g. ?pose=Reload@0.5
+}
+/** Screenshot mode: freeze a pose, e.g. ?pose=Reload@0.5 (after framing the rest pose). */
+function applyPose() {
   const pose = shot && qs.get('pose');
   if (pose && mixer) {
     const [name, t] = pose.split('@');

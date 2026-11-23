@@ -114,5 +114,5 @@ Your game doesn't need to change: the old "wallpaper" unfolding is still the fir
 ---
 
 <p align="center">
-  <a href="README.md">← All devlogs</a> · <a href="../README.md">BadGun home</a>
+  <a href="README.md">← All devlogs</a> · <a href="../README.md">BadGun home</a> · <a href="009-lights-camera-reload.md">Next: #009 →</a>
 </p>
