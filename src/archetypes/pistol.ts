@@ -5,6 +5,7 @@
  * revolver, glow -> blaster), so a brand new style gets sensible handguns
  * without touching this file. Styles can still override via `byArchetype`.
  */
+import { decoPistol, smartgun } from '../parts/punk.js';
 import type { Vec3 } from '../core/geometry.js';
 import type { BuildContext, LongGunLayout } from '../parts/context.js';
 import type { ArchetypeDef, Weights } from './archetype.js';
@@ -21,7 +22,7 @@ export const pistol: ArchetypeDef = {
   id: 'pistol',
   name: 'Pistol',
   description: 'Handguns: slide pistols, revolvers and blasters.',
-  parts: { frame: { ...PISTOL_FRAMES, pipe: pipePistol, flintlock, broomhandle, toggle }, grip: { ...PISTOL_GRIPS, taped: tapedPistolGrip, scroll: scrollGrip, broom: broomGrip }, muzzle: MUZZLES },
+  parts: { frame: { ...PISTOL_FRAMES, deco: decoPistol, smartgun, pipe: pipePistol, flintlock, broomhandle, toggle }, grip: { ...PISTOL_GRIPS, taped: tapedPistolGrip, scroll: scrollGrip, broom: broomGrip }, muzzle: MUZZLES },
   optics: ['none', 'reddot', 'holo', 'rune'],
 
   weights(style, kind): Weights | undefined {
@@ -65,7 +66,7 @@ export const pistol: ArchetypeDef = {
     const top = 0.016 + bulk * 0.004;
     const bottom = -0.022 - bulk * 0.004;
     const gripDepth = (frame === 'revolver' ? 0.036 : 0.045) + bulk * 0.006;
-    const gz = z0 + (frame === 'broomhandle' ? 0.035 : frame === 'toggle' ? 0.05 : frame === 'revolver' || frame === 'cannon' ? 0.03 : frame === 'blaster' || frame === 'loop' ? 0.065 : frame === 'pipe' || frame === 'flare' ? 0.05 : 0.07);
+    const gz = z0 + (frame === 'broomhandle' ? 0.035 : frame === 'toggle' ? 0.05 : frame === 'revolver' || frame === 'cannon' ? 0.03 : frame === 'blaster' || frame === 'loop' || frame === 'deco' || frame === 'smartgun' ? 0.065 : frame === 'pipe' || frame === 'flare' ? 0.05 : 0.07);
     const gy = bottom + 0.002;
     return {
       rec: { z0, z1, top, bottom, width: 0.025 + bulk * 0.006 },
@@ -74,7 +75,7 @@ export const pistol: ArchetypeDef = {
       trigger: { z: gz + 0.022, y: bottom },
       grip: { z: gz, y: gy, angle: (frame === 'revolver' ? 0.42 : 0.26) + rng.range(-0.05, 0.06), length: (frame === 'revolver' ? 0.085 : 0.095) + bulk * 0.014 },
       handguard: { z0: gz + 0.055, z1: z1 - 0.004, radius: 0.014 },
-      barrel: { z0: z0 + 0.02, z1: frame === 'blaster' ? z1 + 0.03 + length * 0.02 : frame === 'revolver' || frame === 'flintlock' || frame === 'flare' || frame === 'broomhandle' || frame === 'toggle' ? z1 : frame === 'loop' ? z1 + 0.025 : frame === 'cannon' ? z1 + 0.012 : z1 + 0.003, radius: 0.0062 + bulk * 0.0015 },
+      barrel: { z0: z0 + 0.02, z1: frame === 'blaster' ? z1 + 0.03 + length * 0.02 : frame === 'revolver' || frame === 'flintlock' || frame === 'flare' || frame === 'broomhandle' || frame === 'toggle' ? z1 : frame === 'loop' ? z1 + 0.025 : frame === 'deco' ? z1 + 0.035 + length * 0.02 : frame === 'smartgun' ? z1 + 0.025 : frame === 'cannon' ? z1 + 0.012 : z1 + 0.003, radius: 0.0062 + bulk * 0.0015 },
       stock: { z0, z1: z0, drop: 0 },
       mountY: top,
       opticZ: z0 + 0.045,

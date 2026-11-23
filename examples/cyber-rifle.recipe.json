@@ -1,0 +1,12 @@
+{
+  "archetype": "rifle",
+  "style": "cyber",
+  "seed": 4,
+  "parts": {
+    "receiver": "chassis",
+    "muzzle": "smart",
+    "magazine": "smartmag",
+    "config": "standard"
+  },
+  "optic": "smart"
+}

@@ -2,6 +2,7 @@
  * Sights and optics. Every rifle gets SOCKET_Optic (the mount point) and
  * SOCKET_ADS (where a camera sits to aim down sights), even with no optic.
  */
+import { lampOptic, smartOptic } from './punk.js';
 import { AXIS_X, AXIS_Y, Vec2, box, cylinder, lathe, tube, ring, dome } from '../core/geometry.js';
 import type { Component } from '../core/weapon.js';
 import { BuildContext, put, side } from './context.js';
@@ -182,7 +183,7 @@ const runeSight: OpticBuilder = (ctx, c, y, z) => {
 
 const leaf: OpticBuilder = (ctx, c, y) => leafSight(ctx, c, y);
 
-const OPTICS: Record<string, OpticBuilder> = { irons, reddot, scope, holo, brass, tube: tube_, rune: runeSight, leaf };
+const OPTICS: Record<string, OpticBuilder> = { irons, reddot, scope, holo, brass, tube: tube_, rune: runeSight, leaf, lamp: lampOptic, smart: smartOptic };
 export const OPTIC_NAMES = Object.keys(OPTICS);
 
 export function buildOptic(ctx: BuildContext, choice: string): void {

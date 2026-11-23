@@ -1,0 +1,11 @@
+{
+  "archetype": "rifle",
+  "style": "diesel",
+  "seed": 3,
+  "parts": {
+    "receiver": "deco",
+    "muzzle": "exhaust",
+    "config": "standard"
+  },
+  "optic": "lamp"
+}

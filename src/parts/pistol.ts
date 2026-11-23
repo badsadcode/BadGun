@@ -46,7 +46,7 @@ export function pistolTrigger(ctx: BuildContext, slot: MaterialSlot, round: bool
 }
 
 /** Magazine hidden in the grip; only the base plate shows. Slides out along the grip. */
-function gripMagazine(ctx: BuildContext, bodySlot: 'Magazine' | 'Emissive' = 'Magazine'): void {
+export function gripMagazine(ctx: BuildContext, bodySlot: 'Magazine' | 'Emissive' = 'Magazine'): void {
   const { L } = ctx;
   const a = L.grip.angle;
   const axis: Vec3 = [0, -Math.cos(a), -Math.sin(a)];

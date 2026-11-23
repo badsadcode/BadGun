@@ -1,6 +1,7 @@
 /**
  * Front assembly: barrel, handguard/forend, muzzle device.
  */
+import { exhaustMuzzle, smartMuzzle } from './punk.js';
 import { Vec2, box, cylinder, extrudeSide, lathe, ring, tube, dome } from '../core/geometry.js';
 import { BuildContext, put, side } from './context.js';
 import { bottleMuzzle, canMuzzle } from './scrap.js';
@@ -304,7 +305,7 @@ const heavybrake: MuzzleBuilder = (ctx, c, a, rb) => {
 /** No muzzle device: the barrel ends bare (the socket still marks the tip). */
 const none: MuzzleBuilder = () => 0;
 
-const MUZZLE_BUILDERS: Record<string, MuzzleBuilder> = { brake, flash, bell, crown, emitter, prongs, suppressor, compensator, heavybrake, none, can: canMuzzle, bottle: bottleMuzzle, crystal: crystalMuzzle, maw: mawMuzzle };
+const MUZZLE_BUILDERS: Record<string, MuzzleBuilder> = { brake, flash, bell, crown, emitter, prongs, suppressor, compensator, heavybrake, none, can: canMuzzle, bottle: bottleMuzzle, crystal: crystalMuzzle, maw: mawMuzzle, exhaust: exhaustMuzzle, smart: smartMuzzle };
 
 export const MUZZLES: Record<string, PartBuilder> = Object.fromEntries(
   Object.entries(MUZZLE_BUILDERS).map(([name, fn]) => [

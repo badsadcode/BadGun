@@ -23,6 +23,7 @@ import { ERA_HANDGUARDS, ERA_MAGAZINES, ERA_RECEIVERS, ERA_STOCKS, bayonet, heat
 import { OPTIC_NAMES, buildOptic } from '../parts/sight.js';
 import { VARIETY_BARRELS, VARIETY_GRIPS, VARIETY_HANDGUARDS, VARIETY_MAGAZINES, VARIETY_STOCKS } from '../parts/variety.js';
 import { FANTASY_BARRELS, FANTASY_GRIPS, FANTASY_HANDGUARDS, FANTASY_MAGAZINES, FANTASY_RECEIVERS, FANTASY_STOCKS } from '../parts/fantasy.js';
+import { CYBER_GRIPS, CYBER_HANDGUARDS, CYBER_MAGAZINES, CYBER_RECEIVERS, CYBER_STOCKS, DIESEL_HANDGUARDS, DIESEL_MAGAZINES, DIESEL_RECEIVERS, DIESEL_STOCKS } from '../parts/punk.js';
 import { SCRAP_BARRELS, SCRAP_GRIPS, SCRAP_HANDGUARDS, SCRAP_MAGAZINES, SCRAP_RECEIVERS, SCRAP_STOCKS } from '../parts/scrap.js';
 
 /** "config" is the overall layout: standard, or bullpup (magazine behind the grip). */
@@ -30,13 +31,13 @@ const noop: PartBuilder = () => {};
 
 export const LONGGUN_PARTS: Record<string, Record<string, PartBuilder>> = {
   config: { standard: noop, bullpup: noop, lever: noop, machinepistol: noop, boxfed: noop },
-  receiver: { ...RECEIVERS, ...EXTRA_RECEIVERS, ...SCRAP_RECEIVERS, ...FANTASY_RECEIVERS, ...PLATED_RECEIVERS, ...ERA_RECEIVERS },
+  receiver: { ...RECEIVERS, ...EXTRA_RECEIVERS, ...SCRAP_RECEIVERS, ...FANTASY_RECEIVERS, ...PLATED_RECEIVERS, ...ERA_RECEIVERS, ...DIESEL_RECEIVERS, ...CYBER_RECEIVERS },
   barrel: { ...BARRELS, ...EXTRA_BARRELS, ...VARIETY_BARRELS, ...SCRAP_BARRELS, ...FANTASY_BARRELS },
-  handguard: { ...HANDGUARDS, ...EXTRA_HANDGUARDS, ...VARIETY_HANDGUARDS, ...SCRAP_HANDGUARDS, ...FANTASY_HANDGUARDS, ...ERA_HANDGUARDS },
+  handguard: { ...HANDGUARDS, ...EXTRA_HANDGUARDS, ...VARIETY_HANDGUARDS, ...SCRAP_HANDGUARDS, ...FANTASY_HANDGUARDS, ...ERA_HANDGUARDS, ...DIESEL_HANDGUARDS, ...CYBER_HANDGUARDS },
   muzzle: MUZZLES,
-  stock: { ...STOCKS, ...EXTRA_STOCKS, ...VARIETY_STOCKS, ...SCRAP_STOCKS, ...FANTASY_STOCKS, ...ERA_STOCKS },
-  grip: { ...GRIPS, ...EXTRA_GRIPS, ...SCRAP_GRIPS, ...FANTASY_GRIPS, ...VARIETY_GRIPS, ...PLATED_GRIPS },
-  magazine: { ...MAGAZINES, ...EXTRA_MAGAZINES, ...VARIETY_MAGAZINES, ...SCRAP_MAGAZINES, ...FANTASY_MAGAZINES, ...ERA_MAGAZINES },
+  stock: { ...STOCKS, ...EXTRA_STOCKS, ...VARIETY_STOCKS, ...SCRAP_STOCKS, ...FANTASY_STOCKS, ...ERA_STOCKS, ...DIESEL_STOCKS, ...CYBER_STOCKS },
+  grip: { ...GRIPS, ...EXTRA_GRIPS, ...SCRAP_GRIPS, ...FANTASY_GRIPS, ...VARIETY_GRIPS, ...PLATED_GRIPS, ...CYBER_GRIPS },
+  magazine: { ...MAGAZINES, ...EXTRA_MAGAZINES, ...VARIETY_MAGAZINES, ...SCRAP_MAGAZINES, ...FANTASY_MAGAZINES, ...ERA_MAGAZINES, ...DIESEL_MAGAZINES, ...CYBER_MAGAZINES },
 };
 
 /** Proportions per archetype. Values are meters; `L` = length param, `B` = bulk param. */
@@ -382,7 +383,7 @@ export const shotgun = longGun(
   (_s, kind, w) => {
     if (kind === 'magazine') return { tube: 1 };
     if (kind === 'handguard') return { pump: 1 };
-    if (kind === 'muzzle') return { ...only(w, ['crown', 'bell', 'brake', 'compensator', 'emitter'], {}), none: 1.2 };
+    if (kind === 'muzzle') return { ...only(w, ['crown', 'bell', 'brake', 'compensator', 'emitter', 'exhaust', 'smart'], {}), none: 1.2 };
     if (kind === 'barrel') return { ...(without(w, ['coiled', 'rails', 'finned']) ?? {}), double: 0.9, overunder: 0.6 };
     if (kind === 'stock') return { ...(without(w, ['wire', 'sporter', 'military']) ?? {}), none: (w?.none ?? 0) + 0.15 };
     return w;

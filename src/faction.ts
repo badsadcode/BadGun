@@ -61,6 +61,8 @@ const COLORS: Record<string, string[]> = {
   scrap: ['#c8501e', '#a8322b', '#d9c23a', '#3b7a9a', '#5a8a3a'],
   fantasy: ['#3dffb0', '#ff7a1a', '#b46bff', '#5fd4ff', '#ff4a6a', '#ffd24a'],
   era: ['#7a2a1d', '#2f4f7a', '#5a6b3a', '#c9b28a', '#8a6a2a'],
+  diesel: ['#b8323a', '#c9a24a', '#2f5c8c', '#d9b23a', '#5a6b3a'],
+  cyber: ['#ff2a6d', '#05d9e8', '#d1f7ff', '#f9f002', '#7b2fff', '#00ff9f'],
 };
 
 const ADJECTIVES = ['Iron', 'Crimson', 'Silent', 'Northern', 'Black', 'Golden', 'Grey', 'Hollow', 'Burning', 'Seventh', 'Last', 'Broken', 'Ashen', 'Restless', 'Copper', 'Midnight'];
@@ -71,6 +73,8 @@ const NOUNS: Record<string, string[]> = {
   scrap: ['Scavengers', 'Rust Riders', 'Junkers', 'Tribe', 'Raiders', 'Wreckers'],
   fantasy: ['Order', 'Circle', 'Covenant', 'Wardens', 'Court', 'Kingdom'],
   era: ['Fusiliers', 'Rangers', 'Regiment', 'Brigade', 'Battalion', 'Grenadiers'],
+  diesel: ['Iron Legion', 'Motor Corps', 'Dieselworks', 'Armored Division', 'Steelworks', 'Expedition'],
+  cyber: ['Syndicate', 'Netrunners', 'Corporation', 'Collective', 'Crew', 'Ghosts'],
 };
 const SHAPES: InsigniaShape[] = ['circle', 'shield', 'diamond', 'star', 'chevron', 'hex', 'triangle'];
 

@@ -2,6 +2,7 @@
  * Crossbows: a tiller (body + flight rail), a prod (the bow), a stock, a
  * grip and an optional optic. Reuses the long-gun stocks, grips and sights.
  */
+import { CYBER_GRIPS, CYBER_STOCKS, DIESEL_STOCKS } from '../parts/punk.js';
 import type { BuildContext, LongGunLayout } from '../parts/context.js';
 import type { ArchetypeDef, Weights } from './archetype.js';
 import { PRODS, TILLERS, stringAndBolt } from '../parts/crossbow.js';
@@ -21,8 +22,8 @@ export const crossbow: ArchetypeDef = {
   parts: {
     tiller: { ...TILLERS, plank: plankTiller },
     prod: PRODS,
-    stock: { ...STOCKS, ...EXTRA_STOCKS, thumbhole: VARIETY_STOCKS.thumbhole, none: VARIETY_STOCKS.none, ...SCRAP_STOCKS },
-    grip: { ...GRIPS, ...EXTRA_GRIPS, ...SCRAP_GRIPS },
+    stock: { ...STOCKS, ...EXTRA_STOCKS, thumbhole: VARIETY_STOCKS.thumbhole, none: VARIETY_STOCKS.none, ...SCRAP_STOCKS, ...DIESEL_STOCKS, ...CYBER_STOCKS },
+    grip: { ...GRIPS, ...EXTRA_GRIPS, ...SCRAP_GRIPS, ...CYBER_GRIPS },
   },
   optics: ['none', ...OPTIC_NAMES],
 

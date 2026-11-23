@@ -47,5 +47,9 @@ export interface StyleProfile {
     era?: number;
     /** Chance (0..1) that a long gun carries a fixed bayonet. */
     bayonet?: number;
+    /** Dieselpunk: streamlined chrome, armor plate, engines. */
+    diesel?: boolean;
+    /** Cyberpunk: neon, cables, smart gear. */
+    cyber?: boolean;
   };
 }
