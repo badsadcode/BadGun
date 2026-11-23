@@ -2,6 +2,7 @@
 // Builds the static playground into site/ (what GitHub Pages serves).
 //   npm run site      (then: PORT=5173 node tools/serve.mjs, and open /site/)
 import { cpSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { buildDevlog } from './devlog.mjs';
 
 const root = new URL('../', import.meta.url);
 const out = new URL('site/', root);
@@ -26,4 +27,8 @@ const html = readFileSync(new URL('tools/preview/index.html', root), 'utf8');
 if (!html.includes("'../../dist/index.js'")) throw new Error('preview import path changed; update build-site.mjs');
 writeFileSync(new URL('index.html', out), html.replace("'../../dist/index.js'", "'./dist/index.js'"));
 writeFileSync(new URL('.nojekyll', out), '');
+
+// The devlog: Markdown entries rendered as designed pages.
+const n = buildDevlog(root, out);
+console.log(`devlog: ${n} entries`);
 console.log('site/ ready');

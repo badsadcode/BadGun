@@ -151,5 +151,5 @@ Until next time. Keep your bad ideas coming. Someone has to engineer them.
 ---
 
 <p align="center">
-  <a href="README.md">← All devlogs</a> · <a href="../README.md">BadGun home</a>
+  <a href="README.md">← All devlogs</a> · <a href="../README.md">BadGun home</a> · <a href="002-seven-weapons-walk-into-a-factory.md">Next: #002 →</a>
 </p>

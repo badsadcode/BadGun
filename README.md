@@ -1,17 +1,18 @@
 <p align="center">
-  <img src="devlog/assets/001/worlds.webp" alt="BadGun: one rifle blueprint in modern, steampunk and sci-fi styles" width="100%">
+  <img src="devlog/assets/002/family.webp" alt="BadGun: seven weapon types in modern, steampunk and sci-fi styles" width="100%">
 </p>
 
 <h1 align="center">BadGun</h1>
 
 <p align="center">
   <b>Procedural, game-ready weapon assets.</b><br>
-  Archetype + style + seed = a reproducible, coherent, already-painted 3D weapon (<code>.glb</code>).
+  Weapon type + style + seed = a reproducible, coherent, already-painted 3D weapon (<code>.glb</code>).<br>
+  Rifles · SMGs · shotguns · snipers · LMGs · pistols · crossbows, in modern, steampunk and sci-fi.
 </p>
 
 <p align="center">
   <a href="https://badsadcode.github.io/BadGun/"><b>🎮 Try the playground</b></a> ·
-  <a href="devlog/README.md">📓 Devlog</a> ·
+  <a href="https://badsadcode.github.io/BadGun/devlog/">📓 Devlog</a> ·
   <a href="#quick-start">🚀 Quick start</a> ·
   <a href="examples/">📦 Example .glb files</a> ·
   <a href="docs/ARCHITECTURE.md">🧠 Architecture</a> ·
@@ -22,11 +23,11 @@
 
 > **Just want to play?** Open the [**playground**](https://badsadcode.github.io/BadGun/), press 🎲 *Surprise me*, and download any gun you like.
 >
-> **New here and not a programmer?** Start with the devlog: [**#001: The Gun Factory Is Open**](devlog/001-the-gun-factory-is-open.md). It explains everything with pictures and zero jargon.
+> **New here and not a programmer?** Read the [**devlog**](https://badsadcode.github.io/BadGun/devlog/). It explains everything with pictures and zero jargon.
 
 ## What it does
 
-- **One blueprint, many worlds.** The archetype (rifle) owns proportions; the style (modern, steampunk, sci-fi) owns design language, part choices and palettes. They're independent, so new styles work with every archetype.
+- **Seven weapon types (archetypes), three worlds.** The archetype (rifle, SMG, shotgun, sniper, LMG, pistol, crossbow) owns proportions and what parts it needs; the style (modern, steampunk, sci-fi) owns design language, part choices and palettes. They're independent, so a new style works with every archetype.
 - **Deterministic.** Same recipe + seed gives a byte-identical `.glb`. Every decision draws from a *named* random stream, so tweaking the stock never reshuffles the barrel.
 - **Painted on arrival.** Style-appropriate PBR materials (base color, metallic, roughness, emissive, glass), with multiple palette variants per style.
 - **Easy to texture.** 11 semantic material slots (`MAT_Body`, `MAT_Grip`, `MAT_Stock`, `MAT_Barrel`, `MAT_Trim`, `MAT_Glass`, `MAT_Emissive`, …), shared across parts and stable across regenerations. Recolor any slot without touching geometry.
@@ -45,6 +46,12 @@ Generate a weapon (writes a `.glb` plus a manifest `.json` to `out/`):
 
 ```bash
 node dist/cli.js --style steampunk --seed 4
+```
+
+Other weapon types:
+
+```bash
+node dist/cli.js --archetype crossbow --style steampunk --seed 1
 ```
 
 Ten variants with consecutive seeds:
@@ -94,7 +101,7 @@ const manifest = buildManifest(weapon);       // sockets, parts, materials, boun
 
 ## Recipes
 
-A recipe is the whole description of a weapon. Save it, share it, batch it:
+A recipe is the whole description of a weapon. Save it, share it, batch it. A recipe always gives the same weapon *within a version*. When new part variants join a style, unpinned choices may change between versions, so pin `parts` (and `optic`) in recipes you need frozen.
 
 ```json
 {
@@ -130,15 +137,17 @@ A recipe is the whole description of a weapon. Save it, share it, batch it:
 | Moving parts | node `extras.badgun.motion` = `{ type, axis, range, purpose }` |
 | Manifest | `<name>.json` sidecar + root node `extras.badgun` |
 
-## What's in v0.1
+## What's in v0.2
 
-| Archetypes | Styles | Part variants |
-|---|---|---|
-| rifle | modern, steampunk, sci-fi | 3 receivers · 6 barrels · 6 muzzles · 3 handguards · 5 stocks · 3 grips · 5 magazines · 5 optics |
+| Archetype | Part kinds |
+|---|---|
+| rifle · smg · shotgun · sniper · lmg | 5 receivers · 8 barrels · 7 handguards · 9 muzzles · 6 stocks · 6 grips · 8 magazines, plus accessories (bipod, bolt handle, carry handle, shell holder) |
+| pistol | 3 frames (slide, revolver, blaster) · 3 grips · muzzles |
+| crossbow | 3 tillers · 3 prods (recurve, compound, energy) · stocks · grips; drawn string + loaded bolt |
 
-Any part works with any style (the style's palette repaints it), so the Frankengun is a supported feature.
+61 part variants and 5 optics in total. Archetypes enforce what they need (shotguns always get a pump and tube magazine, snipers a scope and bolt handle). Otherwise any part works with any style, and the style's palette repaints it, so the Frankengun is a supported feature.
 
-**Known limitations:** UV islands can overlap (fine for tiling and trim textures, not yet for unique hand-painted atlases). There are no LODs or animation clips yet, only motion metadata. Only the rifle archetype exists so far. The roadmap lives in the [brief](docs/PROJECT_BRIEF.md#8-practical-milestones-suggested-not-prescribed).
+**Known limitations:** UV islands can overlap (fine for tiling and trim textures, not yet for unique hand-painted atlases). There are no LODs or animation clips yet, only motion metadata. Bows are next. The roadmap lives in the [brief](docs/PROJECT_BRIEF.md#8-practical-milestones-suggested-not-prescribed).
 
 ## Development
 

@@ -1,0 +1,18 @@
+[
+  {
+    "slug": "001-the-gun-factory-is-open",
+    "number": "001",
+    "title": "The Gun Factory Is Open",
+    "date": "2026-11-23",
+    "summary": "Day one: one rifle blueprint, three worlds, and a muzzle shaped like a trumpet.",
+    "cover": "assets/001/banner.webp"
+  },
+  {
+    "slug": "002-seven-weapons-walk-into-a-factory",
+    "number": "002",
+    "title": "Seven Weapons Walk Into a Factory",
+    "date": "2026-11-23",
+    "summary": "Pistols, shotguns, snipers, machine guns, SMGs and crossbows. Plus 30 new parts, and an official statement regarding bees.",
+    "cover": "assets/002/banner.webp"
+  }
+]

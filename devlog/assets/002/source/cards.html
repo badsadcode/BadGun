@@ -1,0 +1,170 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@500;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#121419; --ink:#f1eee8; --dim:#9aa0aa; --orange:#ff6b3d; --yellow:#ffd23d; --cyan:#42e2ff; --brass:#e0b25a; --pink:#ff5fc0; }
+* { box-sizing: border-box; margin: 0; }
+body { background: #333; font-family: 'Space Grotesk', sans-serif; color: var(--ink); padding: 20px; display: grid; gap: 20px; justify-content: start; }
+.card { width: 1200px; position: relative; overflow: hidden; border-radius: 28px; padding: 48px 56px;
+  background:
+    radial-gradient(900px 500px at 80% 30%, rgba(255,107,61,.13), transparent 60%),
+    radial-gradient(700px 400px at 10% 100%, rgba(66,226,255,.08), transparent 60%),
+    linear-gradient(160deg, #181b22, #101216);
+}
+.card::before { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+  background-size: 32px 32px; mask-image: radial-gradient(circle at 60% 40%, #000 30%, transparent 85%); }
+.kicker { font: 700 14px 'JetBrains Mono', monospace; letter-spacing: 3px; color: var(--orange); text-transform: uppercase; }
+h1 { font-size: 76px; line-height: .95; letter-spacing: -3px; font-weight: 700; margin: 18px 0 18px; }
+h1 em { font-style: normal; color: var(--orange); }
+h2 { font-size: 44px; letter-spacing: -1.5px; line-height: 1; margin: 10px 0 8px; }
+.sub { font-size: 22px; color: var(--dim); max-width: 520px; line-height: 1.35; }
+.chip { display: inline-block; font: 700 13px 'JetBrains Mono', monospace; letter-spacing: 2px; padding: 6px 12px; border-radius: 999px; border: 1.5px solid currentColor; }
+.note { font-family: 'Caveat', cursive; font-weight: 700; color: var(--yellow); }
+img { display: block; }
+.logo { position: absolute; right: 40px; bottom: 30px; font: 700 15px 'JetBrains Mono', monospace; color: #5b616c; letter-spacing: 2px; }
+.logo b { color: var(--orange); }
+
+/* banner */
+#banner { height: 560px; }
+#banner .guns { position: absolute; right: -40px; top: 40px; width: 760px; height: 500px; }
+#banner .guns img { position: absolute; filter: drop-shadow(0 30px 30px rgba(0,0,0,.45)); }
+#banner .g1 { width: 600px; right: 110px; top: 10px; opacity: .97; }
+#banner .g2 { width: 700px; right: 40px; top: 150px; }
+#banner .g3 { width: 600px; right: 130px; top: 320px; }
+#banner .stamp { position: absolute; left: 56px; bottom: 48px; display: flex; gap: 10px; }
+#banner .scribble { position: absolute; left: 58px; top: 405px; transform: rotate(-3deg); font-size: 28px; }
+
+/* worlds */
+.world { display: grid; grid-template-columns: 330px 1fr; align-items: center; gap: 20px; padding: 18px 0; border-top: 1px dashed rgba(255,255,255,.1); position: relative; }
+.world:first-of-type { border-top: 0; }
+.world p { color: var(--dim); font-size: 18px; line-height: 1.4; }
+.world img { width: 780px; justify-self: center; filter: drop-shadow(0 18px 22px rgba(0,0,0,.5)); }
+
+/* grids */
+.grid { display: grid; gap: 6px 26px; margin-top: 26px; }
+.grid img { width: 100%; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.colhead { margin-bottom: 4px; }
+.cell { position: relative; padding: 10px 6px; }
+.cell .label { position: absolute; left: 6px; top: 2px; font: 700 13px 'JetBrains Mono', monospace; color: var(--dim); letter-spacing: 1px; }
+
+/* exploded */
+#exploded .stage { position: relative; width: 1088px; margin-top: 30px; }
+#exploded .stage img { width: 100%; filter: drop-shadow(0 16px 18px rgba(0,0,0,.5)); }
+.tag { position: absolute; font-family: 'Caveat', cursive; font-weight: 700; font-size: 30px; color: var(--yellow); white-space: nowrap; transform: rotate(-3deg); }
+.tag::before { content: '↙ '; }
+.tag.r::before { content: ''; } .tag.r::after { content: ' ↘'; }
+.tag.d::before { content: '↖ '; }
+.tag.n::before { content: ''; }
+
+/* stats */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 30px; }
+.stat { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 20px; padding: 22px 24px; }
+.stat .n { font-size: 54px; font-weight: 700; letter-spacing: -2px; color: var(--ink); }
+.stat .n small { font-size: 26px; color: var(--dim); letter-spacing: 0; }
+.stat .t { color: var(--dim); font-size: 17px; line-height: 1.35; margin-top: 4px; }
+.stat.hot { border-color: rgba(255,107,61,.5); background: rgba(255,107,61,.08); }
+.stat.hot .n { color: var(--orange); }
+
+.fam { display: grid; grid-template-columns: 140px repeat(3, 1fr); gap: 4px 18px; align-items: center; margin-top: 26px; }
+.fam .rowlab { font: 700 15px 'JetBrains Mono', monospace; letter-spacing: 2px; color: var(--dim); text-transform: uppercase; }
+.fam img { width: 100%; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.fam .cell { height: 128px; display: flex; align-items: center; justify-content: center; }
+.fam .cell img { max-height: 120px; width: auto; max-width: 100%; }
+.trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 30px; align-items: end; }
+.trio .item img { width: 100%; filter: drop-shadow(0 14px 16px rgba(0,0,0,.5)); }
+.trio .item h3 { font-size: 26px; margin: 14px 0 4px; letter-spacing: -.5px; }
+.trio .item p { color: var(--dim); font-size: 16px; line-height: 1.4; }
+.xb { display: grid; gap: 4px; margin-top: 20px; }
+.xb .row { display: grid; grid-template-columns: 300px 1fr; gap: 20px; align-items: center; }
+.xb .row img { width: 100%; filter: drop-shadow(0 16px 18px rgba(0,0,0,.5)); }
+.xb .row p { color: var(--dim); font-size: 17px; line-height: 1.4; }
+.xb .row h3 { font-size: 28px; margin: 10px 0 6px; }
+.cat { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 30px; margin-top: 26px; }
+.cat .c { position: relative; padding-top: 34px; }
+.cat .c img { width: 100%; filter: drop-shadow(0 12px 14px rgba(0,0,0,.5)); }
+.cat .c .note { position: absolute; left: 4px; top: 0; font-size: 28px; transform: rotate(-2deg); }
+#banner2 { height: 560px; }
+#banner2 .g { position: absolute; filter: drop-shadow(0 26px 26px rgba(0,0,0,.5)); }
+</style></head><body>
+<section class="card" id="banner2">
+  <div class="kicker">Bad Ideas Works · Devlog #002</div>
+  <h1>Seven<br>Weapons Walk<br>Into a <em>Factory.</em></h1>
+  <p class="sub" style="max-width:470px">Pistols, shotguns, snipers, machine guns, SMGs and crossbows. Plus a lot of new parts.</p>
+  <img class="g" src="r2/c_xb_scifi.png" style="width:540px; right:10px; top:14px;">
+  <img class="g" src="r2/c_cat_lmg.png" style="width:470px; right:40px; top:270px;">
+  <img class="g" src="r2/c_pis_steampunk.png" style="width:270px; right:370px; top:400px;">
+  <div class="stamp" style="position:absolute; left:56px; bottom:48px; display:flex; gap:10px;">
+    <span class="chip" style="color:#c9ccd2">7 WEAPON TYPES</span>
+    <span class="chip" style="color:var(--yellow)">61 PARTS</span>
+  </div>
+</section>
+
+<section class="card" id="family">
+  <div class="kicker">The whole family</div>
+  <h2>Seven weapons, three worlds.</h2>
+  <p class="sub" style="max-width:900px">Twenty-one combinations, every one from lucky number #1. Nobody touched them.</p>
+  <div class="fam">
+    <div></div><div><span class="chip" style="color:#c9ccd2">MODERN</span></div><div><span class="chip" style="color:var(--brass)">STEAMPUNK</span></div><div><span class="chip" style="color:var(--pink)">SCI-FI</span></div>
+    <div class="rowlab">Rifle</div><div class="cell"><img src="r2/c_fam_rifle_modern.png"></div><div class="cell"><img src="r2/c_fam_rifle_steampunk.png"></div><div class="cell"><img src="r2/c_fam_rifle_scifi.png"></div>
+    <div class="rowlab">SMG</div><div class="cell"><img src="r2/c_fam_smg_modern.png"></div><div class="cell"><img src="r2/c_fam_smg_steampunk.png"></div><div class="cell"><img src="r2/c_fam_smg_scifi.png"></div>
+    <div class="rowlab">Shotgun</div><div class="cell"><img src="r2/c_fam_shotgun_modern.png"></div><div class="cell"><img src="r2/c_fam_shotgun_steampunk.png"></div><div class="cell"><img src="r2/c_fam_shotgun_scifi.png"></div>
+    <div class="rowlab">Sniper</div><div class="cell"><img src="r2/c_fam_sniper_modern.png"></div><div class="cell"><img src="r2/c_fam_sniper_steampunk.png"></div><div class="cell"><img src="r2/c_fam_sniper_scifi.png"></div>
+    <div class="rowlab">LMG</div><div class="cell"><img src="r2/c_fam_lmg_modern.png"></div><div class="cell"><img src="r2/c_fam_lmg_steampunk.png"></div><div class="cell"><img src="r2/c_fam_lmg_scifi.png"></div>
+    <div class="rowlab">Pistol</div><div class="cell"><img src="r2/c_fam_pistol_modern.png"></div><div class="cell"><img src="r2/c_fam_pistol_steampunk.png"></div><div class="cell"><img src="r2/c_fam_pistol_scifi.png"></div>
+    <div class="rowlab">Crossbow</div><div class="cell"><img src="r2/c_fam_crossbow_modern.png"></div><div class="cell"><img src="r2/c_fam_crossbow_steampunk.png"></div><div class="cell"><img src="r2/c_fam_crossbow_scifi.png"></div>
+
+  </div>
+  <div class="logo">BAD<b>GUN</b></div>
+</section>
+
+<section class="card" id="pistols">
+  <div class="kicker">Small but loud</div>
+  <h2>Pistols.</h2>
+  <div class="trio">
+    <div class="item"><img src="r2/c_pis_modern.png"><h3>The Slide</h3><p>The top slides back when it fires. Magazine hides inside the grip.</p></div>
+    <div class="item"><img src="r2/c_pis_steampunk.png"><h3>The Accidental Blunderbuss</h3><p>A revolver whose six-chamber cylinder really turns. It picked the trumpet muzzle all by itself.</p></div>
+    <div class="item"><img src="r2/c_pis_scifi.png"><h3>The Blaster</h3><p>The battery is a glowing tube under the barrel. Slide it out to reload.</p></div>
+  </div>
+  <div class="logo">BAD<b>GUN</b></div>
+</section>
+
+<section class="card" id="crossbows">
+  <div class="kicker">Not a gun. Still invited.</div>
+  <h2>Crossbows.</h2>
+  <div class="xb">
+    <div class="row"><div><span class="chip" style="color:#c9ccd2">MODERN</span><h3>Compound</h3><p>Split limbs, little wheels at the tips, cables everywhere. Engineers love it.</p></div><img src="r2/c_xb_modern.png"></div>
+    <div class="row"><div><span class="chip" style="color:var(--brass)">STEAMPUNK</span><h3>Wood &amp; Winch</h3><p>A steel bow on a wooden body, plus a brass crank to wind it back. Very gentlemanly.</p></div><img src="r2/c_xb_steampunk.png"></div>
+    <div class="row"><div><span class="chip" style="color:var(--pink)">SCI-FI</span><h3>Glowstring</h3><p>The string is made of light. Do not floss with it.</p></div><img src="r2/c_xb_scifi.png"></div>
+  </div>
+  <div class="logo">BAD<b>GUN</b></div>
+</section>
+
+<section class="card" id="catalogue">
+  <div class="kicker">New in the parts bin</div>
+  <h2>More parts. Many more parts.</h2>
+  <div class="cat">
+    <div class="c"><span class="note">suppressor + rail on all four sides</span><img src="r2/c_cat_suppressor.png"></div>
+    <div class="c"><span class="note">brass cage + leather-wrapped grip</span><img src="r2/c_cat_cage.png"></div>
+    <div class="c"><span class="note">ammo box + folding bipod</span><img src="r2/c_cat_lmg.png"></div>
+    <div class="c"><span class="note">two magazines taped together</span><img src="r2/c_cat_twin.png"></div>
+    <div class="c"><span class="note">faceted shell + skeleton grip</span><img src="r2/c_cat_faceted.png"></div>
+    <div class="c"><span class="note">pump action + tube magazine</span><img src="r2/c_cat_shotgun.png"></div>
+  </div>
+  <div class="logo">BAD<b>GUN</b></div>
+</section>
+
+<section class="card" id="stats2">
+  <div class="kicker">By the numbers</div>
+  <h2>Update #2, in numbers.</h2>
+  <div class="stats">
+    <div class="stat hot"><div class="n">7</div><div class="t">weapon types, up from one rifle.</div></div>
+    <div class="stat"><div class="n">61</div><div class="t">part variants (plus 5 sights and scopes) in the parts bin.</div></div>
+    <div class="stat"><div class="n">594</div><div class="t">test weapons built and checked for every update. Takes about 9 seconds.</div></div>
+    <div class="stat"><div class="n">~4<small> ms</small></div><div class="t">to build a weapon. Still faster than a blink.</div></div>
+    <div class="stat"><div class="n">1</div><div class="t">crossbow with a hand crank. Nobody asked. Everybody needed it.</div></div>
+    <div class="stat"><div class="n">0</div><div class="t">bee launchers. <i>So far.</i> 🐝</div></div>
+  </div>
+  <div class="logo">BAD<b>GUN</b></div>
+</section>
+</body></html>

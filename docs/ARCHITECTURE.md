@@ -21,16 +21,22 @@ Recipe ──► resolveParams / resolveParts ──► layout ──► part bu
 | `src/core/geometry.ts` | Geometry kernel: `extrudeSide` (side profiles, chamfered), `lathe`, `box`, `cylinder`, `tube`, `ring`, `dome`, ear-clipping, profile helpers |
 | `src/core/weapon.ts` | `WeaponBuilder` (components, sockets), `finalizeWeapon` (origin + local pivots) |
 | `src/styles/*.ts` | Style profiles: palettes, param ranges, weighted part variants, optic weights, traits |
-| `src/archetypes/rifle.ts` | Rifle layout (proportions from params) and assembly order, plus sockets |
-| `src/parts/*.ts` | Part builders, keyed by variant name: `receiver.ts`, `front.ts` (barrel/handguard/muzzle), `lower.ts` (grip/magazine), `stock.ts`, `sight.ts` |
+| `src/archetypes/archetype.ts` | `ArchetypeDef`: part tables, weight rules, layout, build, origin |
+| `src/archetypes/longgun.ts` | Rifle, SMG, shotgun, sniper, LMG: one assembly line + per-archetype proportion presets and part rules |
+| `src/archetypes/pistol.ts`, `crossbow.ts` | Handguns and crossbows |
+| `src/archetypes/index.ts` | Archetype registry and root component names (`Receiver`, `Frame`, `Tiller`) |
+| `src/parts/*.ts` | Part builders, keyed by variant name: `receiver.ts`, `front.ts` (barrel/handguard/muzzle), `lower.ts` (grip/magazine), `stock.ts`, `sight.ts`, `extra.ts` (later long-gun variants), `accessory.ts` (bipod, bolt handle…), `pistol.ts`, `crossbow.ts` |
 | `src/materials/palette.ts` | Color utils, wear, overrides |
 | `src/export/glb.ts` | Dependency-free GLB writer |
 | `src/export/manifest.ts` | Manifest (recipe, parts, sockets, bounds, stats, conventions) |
 | `src/cli.ts` | Command-line tool |
 | `tools/preview/index.html` | three.js preview that runs the generator live in the browser |
 | `tools/render.mjs` | Batch PNG renders through the preview page (Playwright) |
+| `tools/build-site.mjs`, `tools/devlog.mjs` | GitHub Pages site: playground + devlog pages rendered from `devlog/*.md` and `devlog/entries.json` |
 
 ## Key design decisions
+
+**Choosing parts.** For each part kind, the variant comes from (first match wins): the recipe's `parts` override, the style's `byArchetype[archetype][kind]`, the archetype's `weights(style, kind)` rule, the style's generic `parts[kind]`, and finally all variants equally. Pistols and crossbows decide from style *traits* (rails, plumbing, glow), so a brand-new style gets sensible handguns without editing them.
 
 **Archetype ⟂ style.** An archetype owns *proportions and assembly order* (`LongGunLayout`). A style owns *which variants, which colors, which traits*. Part builders read both through a `BuildContext`. Adding a style means writing a new `StyleProfile` and maybe a few part variants. Archetypes don't change.
 
@@ -50,4 +56,6 @@ Recipe ──► resolveParams / resolveParts ──► layout ──► part bu
 
 - **A part variant:** write a `PartBuilder` in the matching `src/parts/*.ts` file, add it to that file's export table, then reference it in a style's `parts` weights. `test/` automatically validates every variant in every style.
 - **A style:** copy `src/styles/modern.ts`, register it in `src/styles/index.ts`, and add its id to `StyleId` in `src/types.ts`.
-- **An archetype:** add `src/archetypes/<name>.ts` with a layout and an assembly function, then dispatch to it in `generate.ts`. Reuse part builders where the shapes fit (a pistol can reuse grips, magazines, muzzles and sights).
+- **A long-gun cousin:** add a preset to `PRESETS` in `longgun.ts` and a `longGun(...)` entry with its part rules.
+- **A new archetype:** implement `ArchetypeDef` in `src/archetypes/<name>.ts` (its layout fills `LongGunLayout`, using `extra` for anything special), register it in `archetypes/index.ts`, and add its id to `ArchetypeId`. Reuse part builders where the shapes fit: crossbows reuse stocks, grips and sights, and pistols reuse muzzles.
+- **A devlog entry:** write `devlog/NNN-slug.md`, add it to `devlog/entries.json`, and put images in `devlog/assets/NNN/`.
