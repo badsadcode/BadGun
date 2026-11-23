@@ -35,6 +35,7 @@
 - **Two UV sets, ready to texture.** A *tiling* unwrap (1 UV unit = 0.25 m, same density everywhere) for repeating materials and trim sheets, and a non-overlapping *atlas* with uniform texel density for hand painting, baking and unique texture sets.
 - **Texture maps on demand.** Bake a base color map, an ID map (one flat color per material slot, for masking in Substance Painter and friends) and a UV template as PNG, or embed the base color texture straight into the `.glb`.
 - **Game-ready hierarchy.** Named components on correct pivots, moving parts with motion metadata (magazine → reload, trigger → fire, stock → adjust, hammer → cock), and sockets for hands, optics, muzzle FX, ejection and the ADS camera.
+- **Animation clips included.** *Fire*, *Reload*, *Cycle* (pump, lever, bolt, rack), *Cock*, *Spin*, *Draw* and accessory clips, built from the weapon's own moving parts, as standard glTF animations. Each comes with timed events (`shot`, `magOut`, `magIn`, …) for syncing sounds and effects.
 - **Engine-agnostic.** Plain glTF 2.0 binary with zero runtime dependencies. A sidecar manifest JSON (also embedded in the `.glb` extras) carries the recipe, parts, sockets, bounds, collision box and stats.
 
 ## Quick start
@@ -124,6 +125,28 @@ const id = bakeTexture(weapon, 'id', { size: 2048 });        // { width, height,
 const png = encodePNG(id.data, id.width, id.height);         // Uint8Array, write it anywhere
 ```
 
+## Animation clips
+
+Every single-weapon `.glb` carries the clips that fit its parts (a pump shotgun gets *Cycle* as a pump, a bolt-action gets a bolt, a revolver gets *Spin*):
+
+| Clip | What moves |
+|---|---|
+| `Fire` | trigger, hammer, cylinder, slide/toggle recoil; bows and crossbows release the string and launch the projectile |
+| `Reload` | magazine out and in, then charging handle/slide/bolt/lever; break actions swing open; crossbows wind the crank |
+| `Cycle` | the manual action on its own: pump, lever, bolt, or racking the slide/handle |
+| `Cock`, `Spin` | thumb the hammer back; spin a revolver's cylinder |
+| `Draw` | bows: string and arrow come back, limbs flex (`Fire` starts from its end pose) |
+| `BipodDeploy`, `StockFold`, `StockAdjust`, `CarryHandleFold` | accessories |
+
+They animate the existing part nodes (translation/rotation, 60 fps samples, LINEAR), so they play in any engine. Durations and **events** (e.g. `Fire.events.shot = 0.06`, `Reload.events.magOut`, `magIn`, `chambered`) are in the manifest's `animations` list and in each glTF animation's `extras`, ready for sound and muzzle-flash timing. The playground plays them, with slow motion. Leave them out with `toGLB(weapon, { animations: false })` or `--no-anim`.
+
+```js
+import { generate, weaponClips } from 'badgun';
+weaponClips(generate({ archetype: 'shotgun', style: 'modern', seed: 1, parts: { config: 'standard' } }))
+  .map((c) => `${c.name} ${c.duration}s ${JSON.stringify(c.events)}`);
+// [ 'Fire 0.32s {"shot":0.06}', 'Cycle 0.46s {"back":0.2,"forward":0.36}' ]
+```
+
 ## Faction families
 
 One seed, one matching arsenal: a generated name, a signature color and livery, an insignia badge on every weapon, a *doctrine* of preferred parts (soft preferences, so each archetype keeps its own rules), shared proportions and a shared finish.
@@ -182,7 +205,7 @@ A recipe is the whole description of a weapon. Save it, share it, batch it. A re
 | Moving parts | node `extras.badgun.motion` = `{ type, axis, range, purpose }` |
 | Manifest | `<name>.json` sidecar + root node `extras.badgun` |
 
-## What's in v0.8
+## What's in v0.9
 
 | Archetype | Part kinds |
 |---|---|
@@ -193,7 +216,7 @@ A recipe is the whole description of a weapon. Save it, share it, batch it. A re
 
 147 part variants and 10 optics in total. The historical styles (WW1, WW2, Vietnam) add bolt-action and tubular receivers, full-length military stocks, internal/stick/top-fed magazines, leaf sights, bayonets and period pistols: generic period shapes, not replicas of particular models. Dieselpunk brings art-deco streamliners, riveted armor, radiator handguards, exhaust stacks, jerrycan magazines and searchlight sights; cyberpunk brings screen-equipped chassis, street-built rifles covered in cables and stickers, smart magazines with LED ammo counters, neon grips, blade stocks and smart-link sights. Archetypes enforce what they need (shotguns get a pump and tube magazine, or break open if double-barreled; snipers get a scope and bolt handle; bullpups get a butt stock). Otherwise any part works with any style, and the style's palette repaints it, so the Frankengun is a supported feature.
 
-**Known limitations:** The atlas packs islands by their bounding boxes, so only about half of the square ends up covered by actual surfaces, and every surface gets the same pixel density (hidden faces included). Islands are split at every hard edge, so there are many small ones. Embedded textures are only for single weapons, not faction arsenals. There are no LODs or animation clips yet, only motion metadata. The roadmap lives in the [brief](docs/PROJECT_BRIEF.md#8-practical-milestones-suggested-not-prescribed).
+**Known limitations:** The atlas packs islands by their bounding boxes, so only about half of the square ends up covered by actual surfaces, and every surface gets the same pixel density (hidden faces included). Islands are split at every hard edge, so there are many small ones. Embedded textures are only for single weapons, not faction arsenals. Animations move parts only (no hands, no recoil of the whole gun, no ejected casings), projectiles in *Fire* simply fly off and stay there until the clip restarts, and tube-fed guns (pump shotguns, lever actions) have no *Reload* because shells aren't modeled. There are no LODs yet. The roadmap lives in the [brief](docs/PROJECT_BRIEF.md#8-practical-milestones-suggested-not-prescribed).
 
 ## Development
 

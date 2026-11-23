@@ -8,6 +8,7 @@ import type { Vec3 } from '../core/geometry.js';
 import type { Weapon } from '../core/weapon.js';
 import { MATERIAL_SLOTS } from '../types.js';
 import { weaponAtlas } from '../texture/atlas.js';
+import { weaponClips } from '../anim/clips.js';
 import type { MaterialDef, MaterialSlot } from '../types.js';
 
 export const GENERATOR = 'BadGun';
@@ -50,6 +51,8 @@ export interface Manifest {
     /** Gap between islands, in pixels at 1024. */
     padding: number;
   };
+  /** Animation clips in the .glb (by name), with event times for sounds and effects. */
+  animations: { name: string; description: string; duration: number; events: Record<string, number>; parts: string[] }[];
   stats: { triangles: number; vertices: number; meshes: number; primitives: number; materials: number };
 }
 
@@ -121,6 +124,7 @@ export function buildManifest(w: Weapon, uvLayout: UvLayout = 'tiling'): Manifes
     bounds: { min: round3(min), max: round3(max), size: round3(size) },
     collision: { type: 'box', center: round3(center), size: round3(size) },
     uv: uvInfo(w, uvLayout),
+    animations: weaponClips(w).map((c) => ({ name: c.name, description: c.description, duration: c.duration, events: c.events, parts: c.tracks.map((t) => t.component) })),
     stats: { triangles, vertices, meshes, primitives, materials: slots.length },
   };
 }

@@ -49,6 +49,13 @@
   .param:not(.auto) .lock { opacity: 1; }
   input[type=range] { width: 100%; accent-color: var(--accent); }
   .mats { display: grid; gap: 4px; }
+  .clips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .clips button.on { background: var(--accent, #ff6b3d); color: #111; }
+  .animopts { display: flex; gap: 14px; margin-top: 8px; font-size: 13px; color: var(--dim); }
+  .animopts label { display: flex; gap: 6px; align-items: center; margin: 0; }
+  .event { position: absolute; left: 50%; top: 18%; transform: translateX(-50%); font: 700 22px 'JetBrains Mono', monospace; color: #ffd23d; letter-spacing: 2px; pointer-events: none; opacity: 0; transition: opacity .35s; text-shadow: 0 2px 12px rgba(0,0,0,.6); }
+  .event.show { opacity: 1; transition: none; }
+  body.shot .event { display: none; }
   .mat { display: grid; grid-template-columns: 28px 1fr 26px; gap: 8px; align-items: center; padding: 4px 6px; border-radius: 8px; cursor: pointer; }
   .mat:hover, .mat.iso { background: var(--panel2); }
   .mat input[type=color] { width: 28px; height: 22px; border: 0; padding: 0; background: none; cursor: pointer; }
@@ -120,6 +127,10 @@
   <label>Palette</label><select id="palette"></select>
   <label>Optic</label><select id="optic"></select>
 
+  <h2 id="animHead">Animation <small style="text-transform:none;letter-spacing:0">(click to play)</small></h2>
+  <div class="clips" id="clips"></div>
+  <div class="animopts" id="animopts"><label><input type="checkbox" id="slowmo" checked /> Slow motion</label><label><input type="checkbox" id="loop" /> Loop</label></div>
+
   <h2>Parts</h2>
   <div id="partsel"></div>
 
@@ -149,6 +160,7 @@
   </div>
   <div class="uvpanel" id="uvpanel"><canvas id="uvcanvas" width="512" height="512"></canvas><div class="cap" id="uvcap"></div></div>
   <div class="hud" id="hud"></div>
+  <div class="event" id="event"></div>
 </main>
 
 <script type="module">
@@ -252,6 +264,7 @@ async function regenerate(keepCamera = true) {
     const gltf = await loader.parseAsync(glb.buffer.slice(glb.byteOffset, glb.byteOffset + glb.byteLength), '');
     if (current) scene.remove(current);
     current = gltf.scene;
+    setupAnimations(gltf);
     current.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
     current.traverse((o) => { if (o.name.startsWith('SOCKET_')) o.add(socketGizmo()); });
     scene.add(current);
@@ -522,6 +535,67 @@ function drawUvMap() {
   $('uvcap').innerHTML = `${currentFaction ? 'first member · ' : ''}<b>${a.charts}</b> islands · ${Math.round(a.coverage * 100)}% used<br>${Math.round(a.uvPerMeter * 1024 / 100)} px/cm @1K · ${Math.round(a.uvPerMeter * 2048 / 100)} @2K`;
 }
 $('checker').onclick = () => { showChecker = !showChecker; applyChecker(); };
+
+// ---------------------------------------------------------------- animation clips
+let mixer = null, clips = [], clipInfo = new Map(), activeAction = null, activeClip = null, eventTimer = 0;
+function setupAnimations(gltf) {
+  mixer = gltf.animations.length ? new THREE.AnimationMixer(gltf.scene) : null;
+  clips = gltf.animations;
+  clipInfo = new Map(currentWeapon && !currentFaction ? BadGun.weaponClips(currentWeapon).map((c) => [c.name, c]) : []);
+  activeAction = activeClip = null;
+  const box = $('clips');
+  box.innerHTML = '';
+  for (const clip of clips) {
+    const b = document.createElement('button');
+    b.textContent = '▶ ' + clip.name;
+    b.title = clipInfo.get(clip.name)?.description ?? '';
+    b.onclick = () => playClip(clip.name);
+    box.appendChild(b);
+  }
+  for (const id of ['animHead', 'clips', 'animopts']) $(id).style.display = clips.length ? '' : 'none';
+  // Screenshot mode: freeze a pose, e.g. ?pose=Reload@0.5
+  const pose = shot && qs.get('pose');
+  if (pose && mixer) {
+    const [name, t] = pose.split('@');
+    const clip = clips.find((c) => c.name === name);
+    if (clip) {
+      const a = mixer.clipAction(clip);
+      a.setLoop(THREE.LoopOnce, 1);
+      a.clampWhenFinished = true;
+      a.play();
+      mixer.setTime(Number(t) || 0);
+    }
+  }
+}
+function playClip(name) {
+  const clip = clips.find((c) => c.name === name);
+  if (!clip || !mixer) return;
+  mixer.stopAllAction();
+  activeClip = clip;
+  activeAction = mixer.clipAction(clip);
+  activeAction.setLoop($('loop').checked ? THREE.LoopRepeat : THREE.LoopOnce, Infinity);
+  activeAction.clampWhenFinished = true;
+  activeAction.timeScale = $('slowmo').checked ? 0.25 : 1;
+  activeAction.reset().play();
+  document.querySelectorAll('#clips button').forEach((b) => b.classList.toggle('on', b.textContent === '▶ ' + name));
+}
+/** Flash event names (shot, magOut...) as the playhead passes them. */
+function flashEvents(before, after) {
+  const events = clipInfo.get(activeClip?.name)?.events;
+  if (!events) return;
+  for (const [name, t] of Object.entries(events)) {
+    const wrapped = after < before; // looped around
+    if ((!wrapped && before < t && t <= after) || (wrapped && (t > before || t <= after))) {
+      const el = $('event');
+      el.textContent = name === 'shot' ? '💥 shot' : '♪ ' + name;
+      el.classList.add('show');
+      clearTimeout(eventTimer);
+      eventTimer = setTimeout(() => el.classList.remove('show'), 350);
+    }
+  }
+}
+$('slowmo').onchange = () => { if (activeAction) activeAction.timeScale = $('slowmo').checked ? 0.25 : 1; };
+$('loop').onchange = () => { if (activeClip) playClip(activeClip.name); };
 $('uvmap').onclick = () => { showUv = !showUv; drawUvMap(); };
 $('uvFirst').onchange = () => applyChecker();
 $('explode').onclick = () => {
@@ -578,7 +652,17 @@ $('copyLink').onclick = () => navigator.clipboard?.writeText(location.href);
 buildStaticUI();
 resize();
 regenerate(false);
-renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); });
+const clock = new THREE.Clock();
+renderer.setAnimationLoop(() => {
+  const dt = clock.getDelta();
+  if (mixer && !shot) {
+    const before = activeAction?.time ?? 0;
+    mixer.update(dt);
+    flashEvents(before, activeAction?.time ?? 0);
+  }
+  controls.update();
+  renderer.render(scene, camera);
+});
 </script>
 </body>
 </html>

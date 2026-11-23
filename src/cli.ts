@@ -42,6 +42,7 @@ Options:
   --uv <set>            tiling | atlas: which UV set is TEXCOORD_0 (default: tiling;
                         the other set is TEXCOORD_1)
   --texture [size]      embed a base color texture in the .glb (default size 1024)
+  --no-anim             leave the animation clips out of the .glb
   --maps [size]         also write texture maps: _BaseColor, _ID (one color per
                         material slot) and _UVTemplate .png (default size 1024)
   --list                show styles, parts and optics
@@ -102,7 +103,7 @@ function main(): void {
   const sizeOf = (v: string[] | undefined) => (v ? (v[0] === 'true' ? 1024 : Number(v[0])) : 0);
   const textureSize = sizeOf(o.texture), mapSize = sizeOf(o.maps);
   for (const n of [textureSize, mapSize]) if (n && !(n >= 64 && n <= 8192)) throw new Error('texture sizes must be between 64 and 8192');
-  const glb = (w: Weapon) => toGLB(w, { uv, texture: textureSize || undefined });
+  const glb = (w: Weapon) => toGLB(w, { uv, texture: textureSize || undefined, animations: !o['no-anim'] });
   const maps = (w: Weapon, dir: string) => {
     if (!mapSize) return;
     for (const [mode, suffix] of [['basecolor', 'BaseColor'], ['id', 'ID'], ['layout', 'UVTemplate']] as const) {

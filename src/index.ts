@@ -15,6 +15,8 @@ export type { Atlas, AtlasOptions } from './texture/atlas.js';
 export { bakeTexture, rasterizeSlots, ID_COLORS } from './texture/bake.js';
 export type { BakeMode, BakeOptions, Image } from './texture/bake.js';
 export { encodePNG } from './texture/png.js';
+export { weaponClips, sampleKeys } from './anim/clips.js';
+export type { Clip, Track, Key } from './anim/clips.js';
 export { generateFaction, factionToGLB, factionName, summary as factionSummary } from './faction.js';
 export type { Faction, FactionRecipe, Livery } from './faction.js';
 export { buildManifest, weaponName, UV_UNITS_PER_METER, VERSION } from './export/manifest.js';

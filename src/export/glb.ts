@@ -19,6 +19,7 @@ import { GENERATOR, VERSION, UV_UNITS_PER_METER, UvLayout, buildManifest, usedSl
 import { weaponAtlas } from '../texture/atlas.js';
 import { bakeTexture } from '../texture/bake.js';
 import { encodePNG } from '../texture/png.js';
+import { weaponClips, sampleKeys } from '../anim/clips.js';
 
 export interface ExportOptions {
   /**
@@ -31,6 +32,8 @@ export interface ExportOptions {
    * model opens ready to paint. Size in pixels, or true for 1024.
    */
   texture?: boolean | number;
+  /** Include animation clips (Fire, Reload, ...). Default true for single weapons. */
+  animations?: boolean;
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -61,10 +64,10 @@ class BinWriter {
     this.length += b.byteLength;
   }
 
-  floatAccessor(data: number[], type: 'VEC2' | 'VEC3', withBounds: boolean): number {
+  floatAccessor(data: number[], type: 'SCALAR' | 'VEC2' | 'VEC3' | 'VEC4', withBounds: boolean, target: number | null = ARRAY_BUFFER): number {
     const arr = new Float32Array(data);
-    const viewIndex = this.view(new Uint8Array(arr.buffer), ARRAY_BUFFER);
-    const n = type === 'VEC2' ? 2 : 3;
+    const viewIndex = this.view(new Uint8Array(arr.buffer), target ?? undefined);
+    const n = { SCALAR: 1, VEC2: 2, VEC3: 3, VEC4: 4 }[type];
     const acc: Json = { bufferView: viewIndex, componentType: FLOAT, count: data.length / n, type };
     if (withBounds) {
       const min = new Array(n).fill(Infinity), max = new Array(n).fill(-Infinity);
@@ -191,6 +194,7 @@ function buildGltf(items: { weapon: Weapon; translation: Vec3 }[], sceneName: st
 
   const nodes: Json[] = [];
   const meshes: Json[] = [];
+  const animations: Json[] = [];
   const sceneRoots: number[] = [];
 
   for (const { weapon, translation } of items) {
@@ -250,6 +254,7 @@ function buildGltf(items: { weapon: Weapon; translation: Vec3 }[], sceneName: st
       if (c.parent && nodeIndex.has(c.parent)) (nodes[nodeIndex.get(c.parent)!].children ??= []).push(i);
       else roots.push(i);
     }
+    if (items.length === 1 && opts.animations !== false) animations.push(...buildAnimations(w, weapon, nodeIndex));
     const root: Json = { name: weaponName(weapon), children: roots, extras: { badgun: manifest } };
     if (translation.some((v) => Math.abs(v) > 1e-9)) root.translation = translation;
     nodes.push(root);
@@ -269,9 +274,65 @@ function buildGltf(items: { weapon: Weapon; translation: Vec3 }[], sceneName: st
     buffers: [{ byteLength: bin.byteLength }],
   };
   if (texture) Object.assign(gltf, texture);
+  if (animations.length) gltf.animations = animations;
   if (usesEmissiveStrength) gltf.extensionsUsed = ['KHR_materials_emissive_strength'];
   gltf.__bin = bin;
   return gltf;
+}
+
+const FPS = 60;
+
+/**
+ * Bake the weapon's clips into glTF animations: each track is sampled at
+ * 60 fps (plus its exact key times) into LINEAR translation/rotation
+ * channels, so every engine plays them the same way. Events ride along in
+ * the animation's extras.
+ */
+function buildAnimations(w: BinWriter, weapon: Weapon, nodeIndex: Map<string, number>): Json[] {
+  const pivots = new Map(weapon.components.map((c) => [c.name, c.pivot]));
+  const out: Json[] = [];
+  for (const clip of weaponClips(weapon)) {
+    const times = new Set<number>();
+    for (let f = 0; f <= Math.ceil(clip.duration * FPS); f++) times.add(Math.min(clip.duration, f / FPS));
+    for (const t of clip.tracks) for (const key of [...t.keys, ...(t.extra?.keys ?? [])]) if (key.t <= clip.duration) times.add(key.t);
+    // Dedupe in float32 (the stored precision): 27/60 and 0.45 are one time.
+    const input: number[] = [];
+    for (const t of [...times].sort((a, b) => a - b)) if (!input.length || Math.fround(t) - Math.fround(input[input.length - 1]) > 1e-5) input.push(t);
+    const inputAccessor = w.floatAccessor(input, 'SCALAR', true, null);
+    const samplers: Json[] = [];
+    const channels: Json[] = [];
+    for (const track of clip.tracks) {
+      const c = weapon.components.find((x) => x.name === track.component)!;
+      const m = c.motion!;
+      const node = nodeIndex.get(c.name)!;
+      const parentPivot: Vec3 = c.parent ? pivots.get(c.parent) ?? [0, 0, 0] : [0, 0, 0];
+      const rest = sub3(c.pivot, parentPivot);
+      const axis = normalize(m.axis);
+      const moves = m.type === 'translate' || !!track.extra;
+      if (moves) {
+        const data: number[] = [];
+        for (const t of input) {
+          const v = m.type === 'translate' ? sampleKeys(track.keys, t) : 0;
+          const e = track.extra ? sampleKeys(track.extra.keys, t) : 0;
+          const ea = track.extra ? normalize(track.extra.axis) : [0, 0, 0];
+          for (let i = 0; i < 3; i++) data.push(rest[i] + axis[i] * v + ea[i] * e);
+        }
+        samplers.push({ input: inputAccessor, output: w.floatAccessor(data, 'VEC3', false, null), interpolation: 'LINEAR' });
+        channels.push({ sampler: samplers.length - 1, target: { node, path: 'translation' } });
+      }
+      if (m.type === 'rotate') {
+        const data: number[] = [];
+        for (const t of input) {
+          const half = sampleKeys(track.keys, t) / 2, sn = Math.sin(half);
+          data.push(axis[0] * sn, axis[1] * sn, axis[2] * sn, Math.cos(half));
+        }
+        samplers.push({ input: inputAccessor, output: w.floatAccessor(data, 'VEC4', false, null), interpolation: 'LINEAR' });
+        channels.push({ sampler: samplers.length - 1, target: { node, path: 'rotation' } });
+      }
+    }
+    out.push({ name: clip.name, samplers, channels, extras: { badgun: { description: clip.description, duration: clip.duration, events: clip.events } } });
+  }
+  return out;
 }
 
 function packGlb(json: Json, bin: Uint8Array): Uint8Array {

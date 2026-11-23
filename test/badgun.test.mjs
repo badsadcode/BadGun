@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { validateBytes } from 'gltf-validator';
 import { inflateSync } from 'node:zlib';
-import { generate, toGLB, buildManifest, STYLES, ARCHETYPES, generateFaction, factionToGLB, buildAtlas, bakeTexture, encodePNG, ID_COLORS } from '../dist/index.js';
+import { generate, toGLB, buildManifest, STYLES, ARCHETYPES, generateFaction, factionToGLB, buildAtlas, bakeTexture, encodePNG, ID_COLORS, weaponClips } from '../dist/index.js';
 
 const base = { archetype: 'rifle', style: 'steampunk', seed: 42 };
 const component = (w, name) => w.components.find((c) => c.name === name);
@@ -270,4 +270,32 @@ test('texture bakes encode as valid PNGs and the textured .glb is valid glTF', a
   }
   assert.equal(buildManifest(w).uv.atlas, 'TEXCOORD_1');
   assert.equal(buildManifest(w, 'atlas').uv.atlas, 'TEXCOORD_0');
+});
+
+test('animation clips: every weapon can fire, magazines reload, and the .glb carries them', () => {
+  const glbJson = (bytes) => JSON.parse(new TextDecoder().decode(bytes.subarray(20, 20 + new DataView(bytes.buffer, bytes.byteOffset).getUint32(12, true))));
+  for (const archetype of Object.keys(ARCHETYPES)) {
+    for (const style of Object.keys(STYLES)) {
+      for (const seed of [1, 2, 3]) {
+        const w = generate({ archetype, style, seed });
+        const clips = weaponClips(w);
+        const names = clips.map((c) => c.name);
+        const tag = `${archetype}/${style}/${seed}`;
+        assert.ok(names.includes('Fire'), `${tag}: Fire clip (${names})`);
+        if (archetype === 'bow') assert.ok(names.includes('Draw'), `${tag}: bows draw`);
+        else assert.ok(clips.find((c) => c.name === 'Fire').events.shot >= 0, `${tag}: Fire has a shot event`);
+        const mag = w.components.find((c) => c.name === 'Magazine' && c.motion);
+        if (mag) assert.ok(names.includes('Reload'), `${tag}: a moving magazine means a Reload clip`);
+        for (const c of clips) {
+          assert.equal(new Set(c.tracks.map((t) => t.component)).size, c.tracks.length, `${tag}/${c.name}: one track per part`);
+          for (const t of c.tracks) for (const key of t.keys) assert.ok(key.t >= 0 && key.t <= c.duration && Number.isFinite(key.v), `${tag}/${c.name}: key in range`);
+          for (const e of Object.values(c.events)) assert.ok(e >= 0 && e <= c.duration, `${tag}/${c.name}: event in range`);
+        }
+        const json = glbJson(toGLB(w));
+        assert.deepEqual((json.animations ?? []).map((a) => a.name), names, `${tag}: glTF animations`);
+        assert.deepEqual(buildManifest(w).animations.map((a) => a.name), names);
+        assert.equal(glbJson(toGLB(w, { animations: false })).animations, undefined);
+      }
+    }
+  }
 });
