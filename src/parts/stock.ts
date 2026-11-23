@@ -21,7 +21,7 @@ function buttPad(ctx: BuildContext, comp: ReturnType<BuildContext['b']['componen
 
 const collapsible: PartBuilder = (ctx) => {
   const { L, p } = ctx;
-  const rec = ctx.b.component('Receiver', { kind: 'receiver', variant: '-' });
+  const rec = ctx.b.component(ctx.b.rootName, { kind: 'receiver', variant: '-' });
   const yb = L.rec.top - 0.018;
   const zb = L.stock.z1;
   // Buffer tube (fixed to the receiver).

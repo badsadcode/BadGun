@@ -19,8 +19,8 @@
     "parts": {
       "receiver": "cylindrical",
       "barrel": "coiled",
+      "handguard": "cage",
       "muzzle": "bell",
-      "handguard": "forend",
       "stock": "classic",
       "grip": "wood",
       "magazine": "drum",
@@ -240,7 +240,7 @@
     {
       "name": "Handguard",
       "kind": "handguard",
-      "variant": "forend",
+      "variant": "cage",
       "parent": "Receiver",
       "pivot": [
         0,
@@ -248,10 +248,10 @@
         0.2462
       ],
       "materials": [
-        "MAT_Stock",
-        "MAT_Trim"
+        "MAT_Trim",
+        "MAT_Accent"
       ],
-      "triangles": 280
+      "triangles": 714
     },
     {
       "name": "Muzzle",
@@ -514,8 +514,8 @@
     ]
   },
   "stats": {
-    "triangles": 13090,
-    "vertices": 15052,
+    "triangles": 13524,
+    "vertices": 15488,
     "meshes": 11,
     "primitives": 23,
     "materials": 10

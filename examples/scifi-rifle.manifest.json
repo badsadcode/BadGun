@@ -17,10 +17,10 @@
       "wear": 0.139
     },
     "parts": {
-      "receiver": "sleek",
-      "barrel": "rails",
-      "muzzle": "emitter",
+      "receiver": "faceted",
+      "barrel": "bull",
       "handguard": "shell",
+      "muzzle": "prongs",
       "stock": "solid",
       "grip": "sleek",
       "magazine": "cell",
@@ -110,16 +110,6 @@
       }
     },
     {
-      "name": "MAT_Accent",
-      "slot": "Accent",
-      "def": {
-        "label": "magenta",
-        "color": "#bf267a",
-        "metallic": 0.1,
-        "roughness": 0.3770440143528394
-      }
-    },
-    {
       "name": "MAT_Detail",
       "slot": "Detail",
       "def": {
@@ -157,7 +147,7 @@
     {
       "name": "Receiver",
       "kind": "receiver",
-      "variant": "sleek",
+      "variant": "faceted",
       "parent": null,
       "pivot": [
         0,
@@ -167,38 +157,9 @@
       "materials": [
         "MAT_Body",
         "MAT_Trim",
-        "MAT_Emissive",
-        "MAT_Detail"
+        "MAT_Emissive"
       ],
-      "triangles": 716
-    },
-    {
-      "name": "ChargingHandle",
-      "kind": "charging_handle",
-      "variant": "slider",
-      "parent": "Receiver",
-      "pivot": [
-        0.0288,
-        0.0823,
-        0.1863
-      ],
-      "motion": {
-        "type": "translate",
-        "axis": [
-          0,
-          0,
-          -1
-        ],
-        "range": [
-          0,
-          0.05
-        ],
-        "purpose": "charge"
-      },
-      "materials": [
-        "MAT_Accent"
-      ],
-      "triangles": 60
+      "triangles": 244
     },
     {
       "name": "Trigger",
@@ -231,7 +192,7 @@
     {
       "name": "Barrel",
       "kind": "barrel",
-      "variant": "rails",
+      "variant": "bull",
       "parent": "Receiver",
       "pivot": [
         0,
@@ -239,12 +200,9 @@
         0.2263
       ],
       "materials": [
-        "MAT_Barrel",
-        "MAT_Trim",
-        "MAT_Emissive",
-        "MAT_Detail"
+        "MAT_Barrel"
       ],
-      "triangles": 308
+      "triangles": 120
     },
     {
       "name": "Handguard",
@@ -266,7 +224,7 @@
     {
       "name": "Muzzle",
       "kind": "muzzle",
-      "variant": "emitter",
+      "variant": "prongs",
       "parent": "Barrel",
       "pivot": [
         0,
@@ -274,10 +232,11 @@
         0.6254
       ],
       "materials": [
+        "MAT_Barrel",
         "MAT_Trim",
         "MAT_Emissive"
       ],
-      "triangles": 320
+      "triangles": 458
     },
     {
       "name": "Stock",
@@ -369,7 +328,7 @@
       "position": [
         0,
         0.065,
-        0.6654
+        0.6914
       ],
       "forward": [
         0,
@@ -486,39 +445,39 @@
   ],
   "bounds": {
     "min": [
-      -0.0328,
+      -0.0303,
       -0.0751,
       -0.3217
     ],
     "max": [
-      0.0368,
+      0.0303,
       0.1657,
-      0.6654
+      0.6914
     ],
     "size": [
-      0.0697,
+      0.0607,
       0.2408,
-      0.9871
+      1.0131
     ]
   },
   "collision": {
     "type": "box",
     "center": [
-      0.002,
+      0,
       0.0453,
-      0.1718
+      0.1848
     ],
     "size": [
-      0.0697,
+      0.0607,
       0.2408,
-      0.9871
+      1.0131
     ]
   },
   "stats": {
-    "triangles": 4308,
-    "vertices": 6178,
-    "meshes": 10,
-    "primitives": 28,
-    "materials": 11
+    "triangles": 3726,
+    "vertices": 5086,
+    "meshes": 9,
+    "primitives": 24,
+    "materials": 10
   }
 }

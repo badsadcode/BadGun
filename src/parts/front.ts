@@ -268,7 +268,29 @@ const prongs: MuzzleBuilder = (ctx, c, a, rb) => {
   return 0.066;
 };
 
-const MUZZLE_BUILDERS: Record<string, MuzzleBuilder> = { brake, flash, bell, crown, emitter, prongs };
+const suppressor: MuzzleBuilder = (ctx, c, a, rb) => {
+  const R = rb * (2.1 + ctx.p.bulk * 0.5);
+  const len = 0.12 + ctx.p.length * 0.05;
+  const seg = ctx.seg(1);
+  put(ctx, c, 'Barrel', lathe([
+    [rb * 0.5, a - 0.004], [rb * 1.3, a - 0.004], [rb * 1.3, a + 0.006], [R * 0.9, a + 0.01], [R, a + 0.016],
+    [R, a + len - 0.008], [R * 0.9, a + len], [rb * 0.6, a + len], [rb * 0.6, a + len - 0.006],
+  ], seg));
+  for (const z of [a + 0.024, a + len - 0.016]) put(ctx, c, 'Trim', lathe([[R, z - 0.003], [R + 0.0008, z - 0.002], [R + 0.0008, z + 0.002], [R, z + 0.003]], seg));
+  return len;
+};
+
+const compensator: MuzzleBuilder = (ctx, c, a, rb) => {
+  const R = rb * 1.65;
+  put(ctx, c, 'Barrel', lathe([[rb * 0.5, a - 0.004], [R, a - 0.004], [R, a + 0.036], [R * 0.8, a + 0.04], [rb * 0.6, a + 0.04], [rb * 0.6, a + 0.034]], ctx.seg(0.9)));
+  for (let i = 0; i < 3; i++) put(ctx, c, 'Detail', box([0, R - 0.0005, a + 0.009 + i * 0.01], [R * 0.9, 0.002, 0.005]));
+  return 0.04;
+};
+
+/** No muzzle device: the barrel ends bare (the socket still marks the tip). */
+const none: MuzzleBuilder = () => 0;
+
+const MUZZLE_BUILDERS: Record<string, MuzzleBuilder> = { brake, flash, bell, crown, emitter, prongs, suppressor, compensator, none };
 
 export const MUZZLES: Record<string, PartBuilder> = Object.fromEntries(
   Object.entries(MUZZLE_BUILDERS).map(([name, fn]) => [

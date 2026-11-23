@@ -19,11 +19,11 @@
     "parts": {
       "receiver": "angular",
       "barrel": "plain",
-      "muzzle": "brake",
       "handguard": "railed",
+      "muzzle": "flash",
       "stock": "fixed",
-      "grip": "polymer",
-      "magazine": "curved",
+      "grip": "ergo",
+      "magazine": "straight",
       "sight": "scope"
     },
     "palette": "Desert"
@@ -107,6 +107,16 @@
         "color": "#3d4043",
         "metallic": 0.9,
         "roughness": 0.3708365211674245
+      }
+    },
+    {
+      "name": "MAT_Accent",
+      "slot": "Accent",
+      "def": {
+        "label": "black polymer",
+        "color": "#282827",
+        "metallic": 0,
+        "roughness": 0.6404780120956711
       }
     },
     {
@@ -240,7 +250,7 @@
     {
       "name": "Muzzle",
       "kind": "muzzle",
-      "variant": "brake",
+      "variant": "flash",
       "parent": "Barrel",
       "pivot": [
         0,
@@ -250,7 +260,7 @@
       "materials": [
         "MAT_Barrel"
       ],
-      "triangles": 540
+      "triangles": 450
     },
     {
       "name": "Stock",
@@ -272,7 +282,7 @@
     {
       "name": "Grip",
       "kind": "grip",
-      "variant": "polymer",
+      "variant": "ergo",
       "parent": "Receiver",
       "pivot": [
         0,
@@ -280,14 +290,15 @@
         0.0262
       ],
       "materials": [
-        "MAT_Grip"
+        "MAT_Grip",
+        "MAT_Accent"
       ],
-      "triangles": 164
+      "triangles": 200
     },
     {
       "name": "Magazine",
       "kind": "magazine",
-      "variant": "curved",
+      "variant": "straight",
       "parent": "Receiver",
       "pivot": [
         0,
@@ -339,7 +350,7 @@
       "position": [
         0,
         0.057,
-        0.7438
+        0.7398
       ],
       "forward": [
         0,
@@ -463,12 +474,12 @@
     "max": [
       0.026,
       0.1505,
-      0.7438
+      0.7398
     ],
     "size": [
       0.0679,
       0.2714,
-      1.0917
+      1.0877
     ]
   },
   "collision": {
@@ -476,19 +487,19 @@
     "center": [
       -0.0079,
       0.0148,
-      0.1979
+      0.1959
     ],
     "size": [
       0.0679,
       0.2714,
-      1.0917
+      1.0877
     ]
   },
   "stats": {
-    "triangles": 7690,
-    "vertices": 12364,
+    "triangles": 7636,
+    "vertices": 12578,
     "meshes": 10,
-    "primitives": 20,
-    "materials": 9
+    "primitives": 21,
+    "materials": 10
   }
 }

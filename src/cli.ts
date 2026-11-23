@@ -14,7 +14,7 @@ import { generate } from './generate.js';
 import { toGLB } from './export/glb.js';
 import { buildManifest, weaponName } from './export/manifest.js';
 import { STYLES } from './styles/index.js';
-import { RIFLE_PARTS } from './archetypes/rifle.js';
+import { ARCHETYPES } from './archetypes/index.js';
 import { OPTIC_NAMES } from './parts/sight.js';
 import type { Recipe, MaterialSlot, PartKind, OpticChoice, StyleId } from './types.js';
 
@@ -22,7 +22,7 @@ const HELP = `badgun - procedural weapon generator
 
 Options:
   --style <id>          ${Object.keys(STYLES).join(' | ')}   (default: modern)
-  --archetype <id>      rifle                                  (default: rifle)
+  --archetype <id>      ${Object.keys(ARCHETYPES).join(' | ')}   (default: rifle)
   --seed <n|text>       any number or word                     (default: 1)
   --count <n>           generate n variants with consecutive seeds
   --param key=value     length, bulk, ornament, detail, smoothness, wear (0..1)
@@ -53,9 +53,11 @@ function list(): void {
     console.log(`  ${s.id.padEnd(10)} ${s.description}`);
     console.log(`  ${''.padEnd(10)} palettes: ${s.palettes.map((p, i) => `${i}=${p.name}`).join(', ')}`);
   }
-  console.log('\nRifle parts:');
-  for (const [kind, table] of Object.entries(RIFLE_PARTS)) console.log(`  ${kind.padEnd(10)} ${Object.keys(table).join(', ')}`);
-  console.log(`  ${'sight'.padEnd(10)} none, ${OPTIC_NAMES.join(', ')}`);
+  for (const a of Object.values(ARCHETYPES)) {
+    console.log(`\n${a.name} (--archetype ${a.id}): ${a.description}`);
+    for (const [kind, table] of Object.entries(a.parts)) console.log(`  ${kind.padEnd(10)} ${Object.keys(table).join(', ')}`);
+    console.log(`  ${'sight'.padEnd(10)} ${a.optics.join(', ')}`);
+  }
 }
 
 function main(): void {

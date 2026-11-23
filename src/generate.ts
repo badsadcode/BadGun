@@ -6,12 +6,10 @@ import { WeaponBuilder, finalizeWeapon, type Weapon } from './core/weapon.js';
 import { applyOverrides, applyWear } from './materials/palette.js';
 import { getStyle } from './styles/index.js';
 import { makeContext } from './parts/context.js';
-import { buildRifle, rifleLayout, rifleOrigin } from './archetypes/rifle.js';
+import { ROOT_NAMES, getArchetype, partKinds } from './archetypes/index.js';
 import type { Params, PartKind, Recipe } from './types.js';
 
 export const PARAM_KEYS: (keyof Params)[] = ['length', 'bulk', 'ornament', 'detail', 'smoothness', 'wear'];
-export const PART_KINDS: PartKind[] = ['receiver', 'barrel', 'muzzle', 'handguard', 'stock', 'grip', 'magazine', 'sight'];
-
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 
 /** Fill in any params the recipe leaves out, using the style's preferred ranges. */
@@ -29,28 +27,44 @@ export function resolveParams(recipe: Recipe): Params {
   return out;
 }
 
-/** Pick part variants: recipe overrides first, then style weights by seed. */
+/**
+ * Pick part variants. Priority: recipe override > style.byArchetype >
+ * archetype rules (which may read the style) > style generic weights >
+ * every variant equally.
+ */
 export function resolveParts(recipe: Recipe): Record<PartKind, string> {
   const style = getStyle(recipe.style);
-  const out = {} as Record<PartKind, string>;
-  for (const kind of PART_KINDS) {
+  const arch = getArchetype(recipe.archetype);
+  const out: Record<PartKind, string> = {};
+  for (const kind of partKinds(arch.id)) {
     const forced = recipe.parts?.[kind];
     if (forced) {
       out[kind] = forced;
       continue;
     }
+    const rng = Rng.stream(recipe.seed, `part:${kind}`);
     if (kind === 'sight') {
-      const optic = recipe.optic && recipe.optic !== 'auto' ? recipe.optic : Rng.stream(recipe.seed, 'part:sight').weighted(style.optics);
-      out[kind] = optic;
-    } else {
-      out[kind] = Rng.stream(recipe.seed, `part:${kind}`).weighted(style.parts[kind]);
+      out[kind] = recipe.optic && recipe.optic !== 'auto' ? recipe.optic : rng.weighted(usable(style.byArchetype?.[arch.id]?.sight ?? arch.opticWeights(style), arch.optics));
+      continue;
     }
+    const table = arch.parts[kind];
+    const weights = style.byArchetype?.[arch.id]?.[kind] ?? arch.weights(style, kind) ?? style.parts[kind];
+    const ok = usable(weights, Object.keys(table));
+    out[kind] = rng.weighted(ok);
   }
   return out;
 }
 
+/** Drop unknown/zero-weight variants; fall back to uniform if nothing is left. */
+function usable(weights: Record<string, number> | undefined, available: string[]): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const [k, v] of Object.entries(weights ?? {})) if (available.includes(k) && v > 0) out[k] = v;
+  if (Object.keys(out).length) return out;
+  return Object.fromEntries(available.map((k) => [k, 1]));
+}
+
 export function generate(recipe: Recipe): Weapon {
-  if (recipe.archetype !== 'rifle') throw new Error(`Unknown archetype "${recipe.archetype}". Available: rifle`);
+  const arch = getArchetype(recipe.archetype);
   const style = getStyle(recipe.style);
   const params = resolveParams(recipe);
   const parts = resolveParts(recipe);
@@ -62,10 +76,10 @@ export function generate(recipe: Recipe): Weapon {
   const chosenPalette = style.palettes[variant];
   const palette = applyOverrides(applyWear(chosenPalette.materials, params.wear), recipe.palette);
 
-  const builder = new WeaponBuilder();
-  const layout = rifleLayout(parts.receiver, params, Rng.stream(recipe.seed, 'layout'));
-  const ctx = makeContext(builder, style, params, recipe.seed, layout);
-  buildRifle(ctx, parts);
+  const builder = new WeaponBuilder(ROOT_NAMES[arch.id] ?? 'Receiver');
+  const layout = arch.layout(parts, params, Rng.stream(recipe.seed, 'layout'), style);
+  const ctx = makeContext(arch.id, builder, style, params, recipe.seed, layout);
+  arch.build(ctx, parts);
 
   const weapon: Weapon = {
     recipe: { ...recipe },
@@ -77,5 +91,5 @@ export function generate(recipe: Recipe): Weapon {
     sockets: builder.sockets,
     finalized: false,
   };
-  return finalizeWeapon(weapon, rifleOrigin(ctx));
+  return finalizeWeapon(weapon, arch.origin(ctx));
 }

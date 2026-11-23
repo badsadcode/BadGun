@@ -6,7 +6,7 @@
  * Archetypes ask the style for part variants by kind ("which stock?"), so
  * adding a style never requires touching an archetype, and vice versa.
  */
-import type { Palette, Params, PartKind } from '../types.js';
+import type { ArchetypeId, Palette, Params } from '../types.js';
 
 export type Range = [number, number];
 
@@ -18,8 +18,13 @@ export interface StyleProfile {
   palettes: { name: string; materials: Palette }[];
   /** Preferred param ranges when the recipe leaves a param unset. */
   params: Record<keyof Params, Range>;
-  /** Weighted part variants per part kind. */
-  parts: Record<PartKind, Record<string, number>>;
+  /** Weighted part variants per long-gun part kind (receiver, barrel, stock...). */
+  parts: Record<string, Record<string, number>>;
+  /**
+   * Optional per-archetype overrides: { pistol: { frame: { revolver: 1 } } }.
+   * Without one, archetypes pick from style traits / the generic weights.
+   */
+  byArchetype?: Partial<Record<ArchetypeId, Record<string, Record<string, number>>>>;
   /** Optic weights for optic: "auto". */
   optics: Record<string, number>;
   /** Style flavor switches read by part builders. */

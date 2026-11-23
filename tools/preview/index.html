@@ -19,7 +19,7 @@
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); font: 14px/1.4 'Space Grotesk', system-ui, sans-serif; }
-  body { display: grid; grid-template-columns: 320px minmax(0, 1fr); height: 100vh; height: 100dvh; overflow: hidden; }
+  body { display: grid; grid-template-columns: 320px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); height: 100vh; height: 100dvh; overflow: hidden; }
   aside { background: var(--panel); border-right: 1px solid var(--line); overflow-y: auto; padding: 18px 16px 40px; }
   h1 { font-size: 22px; margin: 0 0 2px; letter-spacing: -0.5px; }
   h1 b { color: var(--accent); }
@@ -38,7 +38,9 @@
   button.primary { background: var(--accent); color: #1a0d08; border-color: var(--accent); }
   button.icon { flex: 0 0 auto; width: 40px; }
   .styles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-  .styles button.on { background: var(--accent); color: #1a0d08; border-color: var(--accent); }
+  .types { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .types button { padding: 7px 4px; font-size: 13px; }
+  .styles button.on, .types button.on { background: var(--accent); color: #1a0d08; border-color: var(--accent); }
   .param { display: grid; grid-template-columns: 78px 1fr 38px 22px; gap: 6px; align-items: center; margin: 4px 0; font-size: 12px; }
   .param span { color: var(--dim); }
   .param output { font-family: 'JetBrains Mono', monospace; font-size: 11px; text-align: right; }
@@ -64,7 +66,7 @@
   .parts div { display: flex; justify-content: space-between; padding: 2px 0; border-bottom: 1px dashed var(--line); }
   .parts b { color: var(--text); font-weight: 600; }
   .err { color: #ff6b6b; font-size: 12px; }
-  body.shot { grid-template-columns: minmax(0, 1fr); }
+  body.shot { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
   body.shot aside, body.shot .hud, body.shot .toolbar { display: none; }
   @media (max-width: 760px) {
     body { grid-template-columns: minmax(0, 1fr); grid-template-rows: 48dvh minmax(0, 1fr); }
@@ -88,6 +90,9 @@
   <div class="tag">Press a button, get a video game weapon.</div>
   <button class="primary surprise" id="surprise">🎲 Surprise me</button>
   <div class="links"><a href="https://github.com/badsadcode/BadGun" target="_blank" rel="noopener">GitHub</a> · <a href="https://github.com/badsadcode/BadGun/blob/main/devlog/001-the-gun-factory-is-open.md" target="_blank" rel="noopener">Devlog</a><span> · drag to spin, scroll to zoom</span></div>
+
+  <h2>Weapon</h2>
+  <div class="types" id="types"></div>
 
   <h2>Style</h2>
   <div class="styles" id="styles"></div>
@@ -207,7 +212,7 @@ function frame(obj) {
   const tanHalf = Math.tan((camera.fov * Math.PI) / 360);
   const view = qs.get('view') ?? 'three-quarter';
   const margin = view === 'side' ? 1.12 : 1.02;
-  const dist = Math.max((size.z * margin) / (2 * tanHalf * camera.aspect), (size.y * 1.8) / (2 * tanHalf)) + size.x / 2;
+  const dist = Math.max((size.z * margin) / (2 * tanHalf * camera.aspect), (size.y * 1.3) / (2 * tanHalf)) + size.x / 2;
   const dir = view === 'side' ? new THREE.Vector3(-1, 0.06, 0) : new THREE.Vector3(-1, 0.3, 0.5);
   camera.position.copy(center).add(dir.normalize().multiplyScalar(dist));
   controls.target.copy(center);
@@ -292,7 +297,18 @@ function isolate(slot) {
 // ---------------------------------------------------------------- UI
 const PARAM_LABELS = { length: 'Length', bulk: 'Bulk', ornament: 'Ornament', detail: 'Detail', smoothness: 'Smooth', wear: 'Wear' };
 
+const TYPE_ICONS = { rifle: 'Rifle', smg: 'SMG', shotgun: 'Shotgun', sniper: 'Sniper', lmg: 'LMG', pistol: 'Pistol', crossbow: 'Crossbow' };
+
 function buildStaticUI() {
+  $('types').innerHTML = '';
+  for (const a of Object.values(BadGun.ARCHETYPES)) {
+    const b = document.createElement('button');
+    b.textContent = TYPE_ICONS[a.id] ?? a.name;
+    b.title = a.description;
+    b.dataset.arch = a.id;
+    b.onclick = () => { recipe.archetype = a.id; recipe.parts = {}; recipe.optic = 'auto'; isolated = null; regenerate(false); };
+    $('types').append(b);
+  }
   $('styles').innerHTML = '';
   for (const s of Object.values(BadGun.STYLES)) {
     const b = document.createElement('button');
@@ -318,7 +334,6 @@ function buildStaticUI() {
     };
     $('params').append(row);
   }
-  $('optic').innerHTML = ['auto', 'none', ...BadGun.OPTIC_NAMES].map((o) => `<option>${o}</option>`).join('');
   $('optic').onchange = () => { recipe.optic = $('optic').value; regenerate(); };
   $('palette').onchange = () => {
     const v = $('palette').value;
@@ -326,12 +341,19 @@ function buildStaticUI() {
     recipe.palette = {};
     regenerate();
   };
+}
+
+/** Part and optic menus depend on the weapon type. */
+function buildArchetypeUI() {
+  const arch = BadGun.getArchetype(recipe.archetype);
+  $('partsel').dataset.arch = arch.id;
+  $('optic').innerHTML = ['auto', ...arch.optics].map((o) => `<option>${o}</option>`).join('');
   $('partsel').innerHTML = '';
-  for (const kind of Object.keys(BadGun.RIFLE_PARTS)) {
+  for (const kind of Object.keys(arch.parts)) {
     const wrap = document.createElement('div');
     wrap.innerHTML = `<label>${kind}</label><select data-kind="${kind}"></select>`;
     const sel = wrap.querySelector('select');
-    sel.innerHTML = ['auto', ...Object.keys(BadGun.RIFLE_PARTS[kind])].map((v) => `<option>${v}</option>`).join('');
+    sel.innerHTML = ['auto', ...Object.keys(arch.parts[kind])].map((v) => `<option>${v}</option>`).join('');
     sel.onchange = () => {
       const parts = { ...recipe.parts };
       if (sel.value === 'auto') delete parts[kind]; else parts[kind] = sel.value;
@@ -345,6 +367,8 @@ function buildStaticUI() {
 function refreshUI(weapon) {
   const style = BadGun.getStyle(recipe.style);
   document.querySelectorAll('#styles button').forEach((b) => b.classList.toggle('on', b.dataset.style === recipe.style));
+  document.querySelectorAll('#types button').forEach((b) => b.classList.toggle('on', b.dataset.arch === recipe.archetype));
+  if ($('partsel').dataset.arch !== recipe.archetype) buildArchetypeUI();
   $('seed').value = recipe.seed;
   for (const row of document.querySelectorAll('.param')) {
     const key = row.dataset.key;
@@ -387,7 +411,8 @@ $('next').onclick = () => setSeed(typeof recipe.seed === 'number' ? recipe.seed 
 $('dice').onclick = () => setSeed(Math.floor(Math.random() * 100000));
 $('surprise').onclick = () => {
   const styles = Object.keys(BadGun.STYLES);
-  recipe = { archetype: 'rifle', style: styles[Math.floor(Math.random() * styles.length)], seed: Math.floor(Math.random() * 100000), params: {}, optic: 'auto', parts: {}, palette: {} };
+  const types = Object.keys(BadGun.ARCHETYPES);
+  recipe = { archetype: types[Math.floor(Math.random() * types.length)], style: styles[Math.floor(Math.random() * styles.length)], seed: Math.floor(Math.random() * 100000), params: {}, optic: 'auto', parts: {}, palette: {} };
   isolated = null;
   regenerate(false);
 };
@@ -397,7 +422,7 @@ $('sockets').onclick = () => { showSockets = !showSockets; applySocketVisibility
 $('explode').onclick = () => {
   if (!current) return;
   exploded = !exploded;
-  const offsets = { Stock: [0, 0, -0.08], Magazine: [0, -0.1, 0.02], Grip: [0, -0.05, -0.02], Optic: [0, 0.07, 0], Handguard: [0, 0, 0.06], Barrel: [0, 0, 0.12], Muzzle: [0, 0, 0.05], Trigger: [0, -0.03, 0], ChargingHandle: [0, 0.03, -0.04], Hammer: [0, 0.04, -0.02], FrontSight: [0, 0.04, 0] };
+  const offsets = { Stock: [0, 0, -0.08], Magazine: [0, -0.1, 0.02], Grip: [0, -0.05, -0.02], Optic: [0, 0.07, 0], Handguard: [0, 0, 0.06], Barrel: [0, 0, 0.12], Muzzle: [0, 0, 0.05], Trigger: [0, -0.03, 0], ChargingHandle: [0, 0.03, -0.04], Hammer: [0, 0.04, -0.02], FrontSight: [0, 0.04, 0], Slide: [0, 0.04, -0.03], Cylinder: [0.06, 0, 0], Prod: [0, 0, 0.1], String: [0, 0.04, 0], Bolt: [0, 0.07, 0.05], Bipod: [0, -0.05, 0.04], BoltHandle: [-0.05, 0, 0], CarryHandle: [0, 0.05, 0], Stirrup: [0, 0, 0.06], Crank: [-0.06, 0, 0] };
   current.traverse((o) => {
     const off = offsets[o.name];
     if (!off) return;

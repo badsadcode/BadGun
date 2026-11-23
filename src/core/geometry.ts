@@ -523,6 +523,39 @@ export function dome(radius: number, height: number, segments: number, rings = 3
   return lathe(profile, segments);
 }
 
+/**
+ * A round rod from point a to point b (strings, struts, pipes at an angle).
+ */
+export function rod(a: Vec3, b: Vec3, radius: number, segments: number): Geometry {
+  const d = sub(b, a);
+  const len = Math.hypot(d[0], d[1], d[2]);
+  const n = normalize(d);
+  const rx = -Math.asin(Math.max(-1, Math.min(1, n[1])));
+  const ry = Math.atan2(n[0], n[2]);
+  return cylinder(radius, 0, len, segments).transform({ r: [rx, ry, 0], t: a });
+}
+
+/**
+ * Extrude a *top-down* profile (points are [z, x]) vertically by `height`,
+ * centered at y. Used for flat parts seen from above: bow limbs, stirrups.
+ */
+export function extrudeTop(profile: Vec2[], height: number, y = 0, bevel = 0): Geometry {
+  // Author as a side profile ([z, y'] with y' = x), then rotate so y' -> x.
+  const g = extrudeSide(profile, { width: height, bevel });
+  return g.transform({ r: [0, 0, -Math.PI / 2] }).transform({ t: [0, y, 0] });
+}
+
+/**
+ * Extrude a *front* profile (points are [x, y], as seen looking down the
+ * barrel) along Z from z0 to z1. Used for rounded covers and rail sections.
+ */
+export function extrudeFront(profile: Vec2[], z0: number, z1: number, bevel = 0): Geometry {
+  // Author as a side profile ([z', y] with z' = x), extrude across "width"
+  // (= length), then turn it so the extrusion axis becomes Z.
+  const g = extrudeSide(profile, { width: Math.abs(z1 - z0), bevel });
+  return g.transform({ r: [0, Math.PI / 2, 0] }).transform({ t: [0, 0, (z0 + z1) / 2] });
+}
+
 /** Rotate a Z-axis-built part so its axis points along +X (sideways) or +Y (up). */
 export const AXIS_X: Vec3 = [0, Math.PI / 2, 0];
 export const AXIS_Y: Vec3 = [-Math.PI / 2, 0, 0];

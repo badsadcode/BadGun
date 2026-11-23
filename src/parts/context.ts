@@ -5,7 +5,7 @@ import { Rng } from '../core/rng.js';
 import { Geometry, Vec2, Vec3, extrudeSide } from '../core/geometry.js';
 import type { WeaponBuilder, Component } from '../core/weapon.js';
 import type { StyleProfile } from '../styles/style.js';
-import type { MaterialSlot, Params } from '../types.js';
+import type { ArchetypeId, MaterialSlot, Params } from '../types.js';
 
 /**
  * Key dimensions of a long-gun layout, in meters, weapon space.
@@ -14,8 +14,8 @@ import type { MaterialSlot, Params } from '../types.js';
 export interface LongGunLayout {
   /** Receiver span and envelope. */
   rec: { z0: number; z1: number; top: number; bottom: number; width: number };
-  /** Magazine well (where the magazine meets the receiver). */
-  magwell: { z0: number; z1: number; y: number };
+  /** Magazine well (where the magazine meets the receiver). `flare: false` hides the flared well. */
+  magwell: { z0: number; z1: number; y: number; flare?: boolean };
   /** Magazine reach below the magwell. */
   magLength: number;
   /** Trigger pin position. */
@@ -32,10 +32,13 @@ export interface LongGunLayout {
   mountY: number;
   /** Where along Z the optic is centered. */
   opticZ: number;
+  /** Archetype-specific extra dimensions (e.g. crossbow prod span). */
+  extra: Record<string, number>;
 }
 
 export interface BuildContext {
   b: WeaponBuilder;
+  archetype: ArchetypeId;
   style: StyleProfile;
   p: Params;
   seed: number | string;
@@ -49,6 +52,7 @@ export interface BuildContext {
 }
 
 export function makeContext(
+  archetype: ArchetypeId,
   b: WeaponBuilder,
   style: StyleProfile,
   p: Params,
@@ -56,6 +60,7 @@ export function makeContext(
   L: LongGunLayout,
 ): BuildContext {
   return {
+    archetype,
     b,
     style,
     p,

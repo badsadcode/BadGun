@@ -6,15 +6,16 @@ import { AXIS_X, Vec2, Vec3, box, bezier, cylinder, dome, lathe, smoothPolygon }
 import type { Component } from '../core/weapon.js';
 import { BuildContext, put, side } from './context.js';
 
-export type PartBuilder = (ctx: BuildContext) => void;
+import type { PartBuilder } from '../archetypes/archetype.js';
+export type { PartBuilder };
 
 // ---------------------------------------------------------------------------
 // Shared mechanical bits
 // ---------------------------------------------------------------------------
 
-function triggerAndGuard(ctx: BuildContext, guardSlot: 'Detail' | 'Trim' | 'Body', guardStyle: 'square' | 'round'): void {
+export function triggerAndGuard(ctx: BuildContext, guardSlot: 'Detail' | 'Trim' | 'Body', guardStyle: 'square' | 'round'): void {
   const { L, b } = ctx;
-  const rec = b.component('Receiver', { kind: 'receiver', variant: '-' });
+  const rec = b.component(b.rootName, { kind: 'receiver', variant: '-' });
   const y = L.rec.bottom;
   const zt = L.trigger.z;
   const trig = b.component('Trigger', {
@@ -59,7 +60,7 @@ export function rail(ctx: BuildContext, comp: Component, z0: number, z1: number,
   }
 }
 
-function rivetRow(ctx: BuildContext, comp: Component, slot: 'Trim' | 'Detail', pts: Vec3[], radius: number): void {
+export function rivetRow(ctx: BuildContext, comp: Component, slot: 'Trim' | 'Detail', pts: Vec3[], radius: number): void {
   for (const p of pts) {
     const sideSign = p[0] >= 0 ? 1 : -1;
     put(ctx, comp, slot, dome(radius, radius * 0.6, Math.max(5, ctx.seg(0.4)), 2), p, [0, (sideSign * Math.PI) / 2, 0]);
@@ -85,11 +86,13 @@ const angular: PartBuilder = (ctx) => {
 
   // Lower receiver with magwell flare.
   const { z0: m0, z1: m1 } = L.magwell;
-  const flare = 0.018 + p.bulk * 0.006;
+  const flare = L.magwell.flare === false ? 0 : 0.018 + p.bulk * 0.006;
+  const well: Vec2[] = flare
+    ? [[m0 - 0.006, bottom], [m0 - 0.009, bottom - flare], [m1 + 0.004, bottom - flare], [m1 + 0.012, bottom - 0.004]]
+    : [[m1 + 0.012, bottom]];
   side(ctx, rec, 'Body', [
     [z0 + 0.004, split], [z0 + 0.004, bottom + 0.012], [z0 + 0.016, bottom],
-    [m0 - 0.006, bottom], [m0 - 0.009, bottom - flare], [m1 + 0.004, bottom - flare],
-    [m1 + 0.012, bottom - 0.004], [z1 - 0.03, split - 0.006], [z1 - 0.03, split],
+    ...well, [z1 - 0.03, split - 0.006], [z1 - 0.03, split],
   ], w * 0.9, 0.0025);
 
   // Ejection port cover on the right (-X) side.
@@ -114,7 +117,10 @@ const angular: PartBuilder = (ctx) => {
   put(ctx, ch, 'Detail', box([0, top - 0.006, z0 - 0.012], [0.04, 0.007, 0.008], ctx.bevel(0.0015)));
 
   // Top rail across receiver and handguard.
-  if (ctx.style.traits.rails) rail(ctx, rec, z0 + 0.004, L.handguard.z1 - 0.008, top);
+  if (ctx.style.traits.rails) {
+    rail(ctx, rec, z0 + 0.004, L.extra.railEnd ?? L.handguard.z1 - 0.008, top);
+    if (L.extra.railEnd === undefined) L.extra.topRail = 1;
+  }
 
   triggerAndGuard(ctx, 'Body', rng.chance(0.5) ? 'square' : 'round');
 };

@@ -174,7 +174,7 @@ export function toGltfJson(weapon: Weapon): Json {
 
   // Sockets as empty child nodes.
   for (const s of weapon.sockets) {
-    const parent = pivots.has(s.parent) ? s.parent : 'Receiver';
+    const parent = pivots.has(s.parent) ? s.parent : weapon.components.find((c) => !c.parent)?.name ?? weapon.components[0].name;
     const node: Json = {
       name: s.name,
       translation: sub3(s.position, pivots.get(parent) ?? [0, 0, 0]),

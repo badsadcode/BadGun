@@ -63,6 +63,8 @@ export interface Weapon {
 }
 
 export class WeaponBuilder {
+  /** Name of the root component; other components default to it as parent. */
+  constructor(public rootName = 'Receiver') {}
   private components = new Map<string, Component>();
   private order: string[] = [];
   sockets: Socket[] = [];
@@ -78,7 +80,7 @@ export class WeaponBuilder {
         name,
         kind: opts.kind,
         variant: opts.variant,
-        parent: opts.parent === undefined ? 'Receiver' : opts.parent,
+        parent: opts.parent === undefined ? this.rootName : opts.parent,
         pivot: opts.pivot ?? [0, 0, 0],
         motion: opts.motion,
         geometry: new Map(),

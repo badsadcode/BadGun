@@ -33,6 +33,13 @@ const irons: OpticBuilder = (ctx, c, y, z) => {
   for (const s of [1, -1]) put(ctx, c, 'Detail', box([s * 0.0065, y + 0.014, rz], [0.003, 0.014, 0.008], ctx.bevel(0.0008)));
   const ap = y + 0.016;
   put(ctx, c, 'Detail', tube(0.0045, 0.0017, rz - 0.002, rz + 0.002, 10), [0, ap, 0]);
+  if (L.extra.beadSight) {
+    // Shotguns: a bead at the end of the barrel.
+    const bead = ctx.b.component('FrontSight', { kind: 'sight', variant: 'bead', parent: 'Barrel', pivot: [0, L.barrel.radius, L.barrel.z1 - 0.012] });
+    put(ctx, bead, 'Trim', cylinder(0.0025, 0, 0.004, 8), [0, L.barrel.radius - 0.0005, L.barrel.z1 - 0.012], AXIS_Y);
+    void z;
+    return { eyeY: ap, rearZ: rz - 0.01 };
+  }
   // Front post on the front sight component (rides on the handguard).
   const fz = L.handguard.z1 - 0.014;
   const fy = Math.max(L.mountY, L.handguard.radius);

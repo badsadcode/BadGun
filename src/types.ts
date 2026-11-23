@@ -45,9 +45,9 @@ export type Palette = Record<MaterialSlot, MaterialDef>;
 /** Recolor without regenerating geometry: a hex string or partial material per slot. */
 export type PaletteOverrides = Partial<Record<MaterialSlot, string | Partial<MaterialDef>>>;
 
-export type ArchetypeId = 'rifle';
+export type ArchetypeId = 'rifle' | 'smg' | 'shotgun' | 'sniper' | 'lmg' | 'pistol' | 'crossbow';
 export type StyleId = 'modern' | 'steampunk' | 'scifi';
-export type OpticChoice = 'auto' | 'none' | 'irons' | 'reddot' | 'scope' | 'holo';
+export type OpticChoice = 'auto' | 'none' | 'irons' | 'reddot' | 'scope' | 'holo' | 'brass';
 
 /**
  * Art-direction controls. All are 0..1. Leave one undefined and the seed
@@ -83,12 +83,9 @@ export interface Recipe {
   parts?: Partial<Record<PartKind, string>>;
 }
 
-export type PartKind =
-  | 'receiver'
-  | 'barrel'
-  | 'muzzle'
-  | 'handguard'
-  | 'stock'
-  | 'grip'
-  | 'magazine'
-  | 'sight';
+/**
+ * Part kinds depend on the archetype: long guns use receiver/barrel/muzzle/
+ * handguard/stock/grip/magazine, pistols use frame/grip/muzzle, crossbows use
+ * tiller/prod/stock/grip. Every archetype also has "sight".
+ */
+export type PartKind = string;
