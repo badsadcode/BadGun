@@ -15,7 +15,8 @@
     "build": "tsc -p tsconfig.json",
     "test": "npm run build && node --test test/*.test.mjs",
     "preview": "npm run build && node tools/serve.mjs",
-    "examples": "npm run build && node tools/make-examples.mjs"
+    "examples": "npm run build && node tools/make-examples.mjs",
+    "site": "npm run build && node tools/build-site.mjs"
   },
   "keywords": ["procedural", "gltf", "glb", "weapon", "game-assets", "generator"],
   "private": true,

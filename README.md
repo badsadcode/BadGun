@@ -10,6 +10,7 @@
 </p>
 
 <p align="center">
+  <a href="https://badsadcode.github.io/BadGun/"><b>🎮 Try the playground</b></a> ·
   <a href="devlog/README.md">📓 Devlog</a> ·
   <a href="#quick-start">🚀 Quick start</a> ·
   <a href="examples/">📦 Example .glb files</a> ·
@@ -19,6 +20,8 @@
 
 ---
 
+> **Just want to play?** Open the [**playground**](https://badsadcode.github.io/BadGun/), press 🎲 *Surprise me*, and download any gun you like.
+>
 > **New here and not a programmer?** Start with the devlog: [**#001: The Gun Factory Is Open**](devlog/001-the-gun-factory-is-open.md). It explains everything with pictures and zero jargon.
 
 ## What it does
@@ -63,6 +66,8 @@ node dist/cli.js --list
 ```
 
 ### Live 3D preview
+
+The same page is online at **https://badsadcode.github.io/BadGun/**. It deploys automatically from `main` via `.github/workflows/pages.yml`. To run it locally:
 
 ```bash
 npm run preview
@@ -140,6 +145,7 @@ Any part works with any style (the style's palette repaints it), so the Frankeng
 ```bash
 npm test          # build + determinism, recolor, socket and glTF-validator tests over 100+ recipes
 npm run examples  # regenerate examples/*.glb
+npm run site      # build the static playground into site/
 ```
 
 Batch screenshots (headless Chromium via Playwright) go through `node tools/render.mjs jobs.json`.
