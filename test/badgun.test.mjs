@@ -74,7 +74,7 @@ test('every weapon type has its sockets and moving parts', () => {
       for (const s of required(archetype)) assert.ok(sockets.includes(s), `${archetype}/${style} lacks ${s}`);
       if (archetype !== 'bow') assert.equal(component(w, 'Trigger').motion.purpose, 'fire', `${archetype}/${style} trigger`);
       const movers = w.components.filter((c) => c.motion).map((c) => c.motion.purpose);
-      if (family(archetype) === 'longgun') assert.ok(movers.some((m) => /reload|pump/.test(m)), `${archetype}/${style}: ${movers}`);
+      if (family(archetype) === 'longgun') assert.ok(movers.some((m) => /reload|pump|cycle/.test(m)), `${archetype}/${style}: ${movers}`);
       if (archetype === 'bow') assert.ok(component(w, 'String').motion.purpose.startsWith('draw') && component(w, 'Arrow'), 'bow string + arrow');
       if (archetype === 'crossbow') assert.ok(component(w, 'String') && component(w, 'Bolt'), 'crossbow string + bolt');
     }
@@ -103,17 +103,23 @@ test('archetypes pick variants that fit them', () => {
       const sh = generate({ archetype: 'shotgun', style, seed });
       if (['double', 'overunder'].includes(sh.parts.barrel)) {
         assert.deepEqual([sh.parts.magazine, sh.parts.handguard], ['none', 'splinter'], 'break action');
+      } else if (sh.parts.config === 'lever') {
+        assert.equal(sh.parts.magazine, 'tube', 'lever action feeds from a tube');
+      } else if (sh.parts.config === 'boxfed') {
+        assert.ok(!['tube', 'none'].includes(sh.parts.magazine) && sh.parts.handguard !== 'pump', 'box-fed');
       } else {
         assert.deepEqual([sh.parts.magazine, sh.parts.handguard], ['tube', 'pump'], 'pump action');
       }
       const sn = generate({ archetype: 'sniper', style, seed });
-      assert.ok(['scope', 'brass'].includes(sn.parts.sight), `sniper sight ${sn.parts.sight}`);
+      assert.ok(['scope', 'brass', 'rune'].includes(sn.parts.sight), `sniper sight ${sn.parts.sight}`);
       assert.ok(component(sn, 'BoltHandle'), 'sniper bolt handle');
       assert.ok(component(generate({ archetype: 'lmg', style, seed }), 'Bipod'), 'lmg bipod');
       for (const a of ['rifle', 'smg']) {
         const w = generate({ archetype: a, style, seed });
-        assert.ok(!['tube', 'ammobox'].includes(w.parts.magazine));
+        assert.ok(!['ammobox'].includes(w.parts.magazine) && (w.parts.magazine !== 'tube' || w.parts.config === 'lever'), `${a}: ${w.parts.magazine}`);
         assert.equal(w.parts.stock === 'butt', w.parts.config === 'bullpup', 'bullpups (and only bullpups) get a butt stock');
+        assert.equal(w.parts.stock === 'sporter', w.parts.grip === 'integral', 'one-piece stocks carry their own grip');
+        if (w.parts.config === 'machinepistol') assert.equal(w.parts.magazine, 'straight', 'machine pistols feed through the grip');
       }
     }
   }

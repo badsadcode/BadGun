@@ -10,6 +10,8 @@
 import { Vec2, Vec3, bezier, box, cylinder, dome, lathe, smoothPolygon, tube } from '../core/geometry.js';
 import type { PartBuilder } from '../archetypes/archetype.js';
 import { BuildContext, put, raked, side } from './context.js';
+import { platedBlock } from './plated.js';
+import type { MaterialSlot } from '../types.js';
 
 const ROOT = 'Frame';
 
@@ -18,7 +20,7 @@ function frame(ctx: BuildContext, variant: string) {
 }
 
 /** Trigger plus a guard running from the grip forward. */
-export function pistolTrigger(ctx: BuildContext, slot: 'Grip' | 'Body' | 'Trim' | 'Detail', round: boolean): void {
+export function pistolTrigger(ctx: BuildContext, slot: MaterialSlot, round: boolean): void {
   const { L, b } = ctx;
   const f = frame(ctx, '-');
   const y = L.rec.bottom;
@@ -215,7 +217,83 @@ const blaster: PartBuilder = (ctx) => {
   L.mountY = top + hump * 0.6;
 };
 
-export const PISTOL_FRAMES: Record<string, PartBuilder> = { slide, revolver, blaster };
+/** Sci-fi loop blaster: stacked plated body, glowing core, and a guard that loops from the grip to the nose. */
+const loopFrame: PartBuilder = (ctx) => {
+  const { L, b, p } = ctx;
+  const f = frame(ctx, 'loop');
+  const { z0, z1, top, bottom, width: w } = L.rec;
+  const glow = ctx.style.traits.glow ? 'Emissive' : 'Accent';
+  platedBlock(ctx, f, z0, z1 - 0.02, top, bottom + 0.008, w * 1.15);
+  // Glowing core on both sides.
+  for (const s of [1, -1]) put(ctx, f, glow, dome(0.009, 0.004, 10, 2), [s * w * 0.58, (top + bottom) / 2 + 0.006, z0 + 0.06], [0, (s * Math.PI) / 2, 0]);
+  // Shroud.
+  const bar = b.component('Barrel', { kind: 'barrel', variant: 'shroud', pivot: [0, 0, z1 - 0.03] });
+  const R = 0.011 + p.bulk * 0.003;
+  put(ctx, bar, 'Barrel', lathe([[L.barrel.radius, z1 - 0.03], [R, z1 - 0.026], [R, L.barrel.z1 - 0.004], [R * 0.75, L.barrel.z1], [L.barrel.radius, L.barrel.z1]], ctx.seg(1)));
+  put(ctx, bar, glow, lathe([[R, L.barrel.z1 - 0.014], [R + 0.001, L.barrel.z1 - 0.013], [R + 0.001, L.barrel.z1 - 0.009], [R, L.barrel.z1 - 0.008]], ctx.seg(1)));
+  // The loop: from the bottom of the grip forward and up to the nose.
+  const a = L.grip.angle, Lg = L.grip.length;
+  const bz = L.grip.z - Math.sin(a) * Lg + 0.006, by = L.grip.y - Math.cos(a) * Lg + 0.008;
+  const nz = z1 - 0.04, t = 0.008;
+  side(ctx, f, 'Body', [[bz, by], [nz - 0.01, by + 0.02], [nz, bottom + 0.008], [nz - t, bottom + 0.008], [nz - t - 0.008, by + 0.02 + t], [bz + 0.004, by + t]], 0.016, 0.0025);
+  pistolTrigger(ctx, 'Body', true);
+  gripMagazine(ctx);
+  L.mountY = top + 0.006;
+};
+
+/** Hand cannon: a slab body, a big cylinder and a thick shroud with a top rib. */
+const cannon: PartBuilder = (ctx) => {
+  const { L, b, p } = ctx;
+  const f = frame(ctx, 'cannon');
+  const { z0, z1, top, bottom, width: w } = L.rec;
+  const cr = 0.022 + p.bulk * 0.005, yc = -cr * 0.45;
+  const zc0 = z0 + 0.045, zc1 = zc0 + 0.045;
+  side(ctx, f, 'Body', [[z0 - 0.006, top - 0.004], [zc0, top], [zc0, yc - cr - 0.004], [L.grip.z + 0.004, bottom], [L.grip.z - L.extra.gripDepth, bottom + 0.004], [z0 - 0.014, top - 0.02]], w * 1.1, 0.003);
+  side(ctx, f, 'Body', [[zc1, top], [z1, top], [z1, -0.016], [zc1, yc - cr]], w * 1.1, 0.003);
+  side(ctx, f, 'Trim', [[zc0 - 0.01, top], [z1 - 0.006, top], [z1 - 0.012, top + 0.008], [zc0, top + 0.008]], 0.008, 0.0015);
+  put(ctx, f, 'Body', box([0, yc - cr - 0.005, (zc0 + zc1) / 2], [w * 0.9, 0.008, zc1 - zc0 + 0.01], ctx.bevel(0.002)));
+  const cyl = b.component('Cylinder', {
+    kind: 'cylinder', variant: 'heavy', pivot: [0, yc, zc0],
+    motion: { type: 'rotate', axis: [0, 0, 1], range: [0, Math.PI / 3], purpose: 'advance one chamber' },
+  });
+  const e = ctx.bevel(0.003);
+  put(ctx, cyl, 'Magazine', lathe([[0, zc0], [cr - e, zc0], [cr, zc0 + e], [cr, zc1 - e], [cr - e, zc1], [0, zc1]], ctx.seg(1.2)), [0, yc, 0]);
+  for (let i = 0; i < 6; i++) {
+    const fa = (i / 6) * Math.PI * 2;
+    put(ctx, cyl, 'Detail', box([0, 0, 0], [0.004, 0.0026, (zc1 - zc0) * 0.6]), [Math.cos(fa) * cr, yc + Math.sin(fa) * cr, (zc0 + zc1) / 2], [0, 0, fa + Math.PI / 2]);
+  }
+  const bar = b.component('Barrel', { kind: 'barrel', variant: 'shroud', pivot: [0, 0, z1] });
+  put(ctx, bar, 'Barrel', lathe([[L.barrel.radius, z1], [L.barrel.radius * 1.6, z1], [L.barrel.radius * 1.6, L.barrel.z1], [L.barrel.radius * 0.8, L.barrel.z1]], 8, Math.PI / 8));
+  if (ctx.style.traits.glow) side(ctx, f, 'Emissive', [[zc1 + 0.006, 0.004], [z1 - 0.006, 0.004], [z1 - 0.006, 0.0065], [zc1 + 0.006, 0.0065]], w * 1.1 + 0.003);
+  pistolTrigger(ctx, 'Body', false);
+  L.mountY = top + 0.008;
+  L.extra.revolver = 1;
+};
+
+/** Flare gun: a fat short barrel that breaks open, a chunky frame and a big guard. */
+const flare: PartBuilder = (ctx) => {
+  const { L, b, p } = ctx;
+  const f = frame(ctx, 'flare');
+  const { z0, bottom, width: w } = L.rec;
+  const R = 0.016 + p.bulk * 0.004;
+  side(ctx, f, 'Accent', [[z0 - 0.004, R * 0.6], [z0 + 0.05, R * 0.3], [z0 + 0.06, -R], [L.grip.z + 0.05, bottom], [L.grip.z - L.extra.gripDepth, bottom + 0.004], [z0 - 0.012, -0.004]], w * 1.05, 0.004);
+  const bar = b.component('Barrel', {
+    kind: 'barrel', variant: 'flare', pivot: [0, -R, z0 + 0.05],
+    motion: { type: 'rotate', axis: [1, 0, 0], range: [0, 0.6], purpose: 'break open to reload' },
+  });
+  put(ctx, bar, 'Accent', lathe([[R * 0.75, z0 + 0.04], [R, z0 + 0.04], [R, L.barrel.z1 - 0.006], [R * 1.08, L.barrel.z1 - 0.004], [R * 1.08, L.barrel.z1], [R * 0.75, L.barrel.z1]], ctx.seg(1)));
+  put(ctx, f, 'Detail', cylinder(0.004, -w * 0.55, w * 0.55, 8), [0, -R, z0 + 0.05], [0, Math.PI / 2, 0]);
+  const hammer = b.component('Hammer', {
+    kind: 'hammer', variant: 'spur', pivot: [0, R * 0.4, z0],
+    motion: { type: 'rotate', axis: [1, 0, 0], range: [0, -0.6], purpose: 'cock' },
+  });
+  side(ctx, hammer, 'Detail', [[z0 + 0.004, R * 0.2], [z0 - 0.004, R * 0.2], [z0 - 0.014, R + 0.01], [z0 - 0.008, R + 0.012]], 0.007, 0.0015);
+  pistolTrigger(ctx, 'Accent', false);
+  L.barrel.radius = R * 0.75;
+  L.mountY = R + 0.002;
+};
+
+export const PISTOL_FRAMES: Record<string, PartBuilder> = { slide, revolver, blaster, loop: loopFrame, cannon, flare };
 
 // ---------------------------------------------------------------------------
 // Pistol grips (the frame's handle)

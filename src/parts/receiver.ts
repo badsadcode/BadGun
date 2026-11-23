@@ -2,7 +2,7 @@
  * Receivers: the central housing. Also owns small mechanical bits that live
  * on it: trigger, trigger guard, charging handle / hammer, rails, gauges.
  */
-import { AXIS_X, Vec2, Vec3, box, bezier, cylinder, dome, lathe, smoothPolygon } from '../core/geometry.js';
+import { AXIS_X, Vec2, Vec3, box, bezier, cylinder, dome, lathe, ring, smoothPolygon } from '../core/geometry.js';
 import type { Component } from '../core/weapon.js';
 import { BuildContext, put, side } from './context.js';
 
@@ -47,6 +47,18 @@ export function triggerAndGuard(ctx: BuildContext, guardSlot: 'Detail' | 'Trim' 
       [g0, y], [g0, y - depth + 0.004], [g0 + 0.006, y - depth], [g1, y - depth], [g1, y],
       [g1 - t, y], [g1 - t, y - depth + t], [g0 + t + 0.004, y - depth + t], [g0 + t, y - depth + t + 0.004], [g0 + t, y],
     ];
+  }
+  if (ctx.chosen.grip === 'loop') return; // the loop grip closes the hand loop itself
+  if (ctx.chosen.config === 'lever') {
+    // Lever action: the guard is part of a lever that swings down to cycle, with a finger loop.
+    const lever = b.component('Lever', {
+      kind: 'lever', variant: 'loop', pivot: [0, y, g1],
+      motion: { type: 'rotate', axis: [1, 0, 0], range: [0, 0.9], purpose: 'cycle (swing down and back)' },
+    });
+    const slot = ctx.style.traits.plumbing || ctx.style.traits.magic ? 'Trim' : guardSlot;
+    side(ctx, lever, slot, guard, 0.011, 0.0015);
+    put(ctx, lever, slot, ring(0.02, 0.0035, 0, Math.max(10, ctx.seg(0.8)), 6), [0, y - 0.05, L.grip.z - 0.006], AXIS_X);
+    return;
   }
   side(ctx, rec, guardSlot, guard, 0.011, 0.0015);
 }

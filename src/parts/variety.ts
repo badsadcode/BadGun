@@ -3,7 +3,7 @@
  * break-action forends, finned barrels, cooling jackets, thumbhole and
  * bullpup stocks, stockless rears and top-mounted pan magazines.
  */
-import { AXIS_Y, box, cylinder, dome, lathe, ring, smoothPolygon, tube } from '../core/geometry.js';
+import { AXIS_Y, Vec2, box, cylinder, dome, lathe, ring, smoothPolygon, tube } from '../core/geometry.js';
 import type { PartBuilder } from '../archetypes/archetype.js';
 import { BuildContext, put, raked, side } from './context.js';
 
@@ -114,7 +114,10 @@ const jacket: PartBuilder = (ctx) => {
   if (p.ornament > 0.3) put(ctx, h, 'Trim', ring(R, 0.0022, z0 + 0.008, seg, 6));
 };
 
-export const VARIETY_HANDGUARDS: Record<string, PartBuilder> = { splinter, jacket };
+/** No handguard: used when a one-piece (sporter) stock already runs under the barrel. */
+const bare: PartBuilder = () => {};
+
+export const VARIETY_HANDGUARDS: Record<string, PartBuilder> = { splinter, jacket, bare };
 
 // ---------------------------------------------------------------------------
 // Stocks
@@ -162,7 +165,63 @@ const none: PartBuilder = (ctx) => {
   shoulder(ctx, z0 - 0.008, (L.rec.top + L.rec.bottom) / 2, 'No stock: rear of the receiver (fired from the hip or one-handed).');
 };
 
-export const VARIETY_STOCKS: Record<string, PartBuilder> = { thumbhole, butt, none };
+/**
+ * One-piece "sporter" stock (hunting and bolt-action rifles): the wood runs
+ * from the butt, through a carved pistol grip, all the way under the barrel.
+ * The receiver sits *in* it, so the archetype drops the separate grip and
+ * handguard when this is chosen.
+ */
+const sporter: PartBuilder = (ctx) => {
+  const { L, p } = ctx;
+  const rng = ctx.rng('sporter');
+  const s = ctx.b.component('Stock', { kind: 'stock', variant: 'sporter', pivot: [0, 0, L.rec.z0] });
+  const zb = L.stock.z1, drop = L.stock.drop;
+  const top = L.rec.top, bottom = L.rec.bottom, rb = L.barrel.radius;
+  const tipZ = Math.max(L.handguard.z1 - rng.range(0, 0.06), L.rec.z1 + 0.08);
+  const fDepth = -(0.024 + p.bulk * 0.01) * rng.range(0.9, 1.25);
+  const heelY = top * 0.5 - drop * 0.5, toeY = -0.095 - drop - p.bulk * 0.01;
+  // Pistol-grip bulge, following the grip rake.
+  const [gz, gy] = raked([L.grip.z, L.grip.y], L.grip.angle, [[L.grip.length * rng.range(0.7, 0.95), -0.012]])[0];
+  const [bz, by] = raked([L.grip.z, L.grip.y], L.grip.angle, [[L.grip.length * 0.75, -0.045]])[0];
+  const prof: Vec2[] = [
+    [zb + 0.012, heelY], [L.rec.z0 + 0.01, top * 0.35], [L.rec.z0 + 0.02, -rb * 0.2], [tipZ - 0.012, -rb * 0.4], [tipZ, -rb - 0.006],
+    [tipZ - 0.006, fDepth], [L.magwell.z1 + 0.01, fDepth - 0.002], [L.grip.z + 0.05, bottom - 0.004],
+    [gz + 0.008, gy], [gz - 0.012, gy - 0.006], [bz - 0.008, by + 0.004], [zb + 0.12, toeY + 0.02], [zb + 0.004, toeY], [zb, heelY - 0.008],
+  ];
+  side(ctx, s, 'Stock', smoothPolygon(prof, ctx.p.smoothness > 0.3 ? 1 : 0), 0.04, 0.007);
+  side(ctx, s, 'Grip', [[zb + 0.002, heelY - 0.004], [zb - 0.011, heelY - 0.006], [zb - 0.009, toeY + 0.002], [zb + 0.004, toeY]], 0.042, 0.003);
+  // Barrel bands and a sling swivel.
+  for (const z of [tipZ - 0.02]) put(ctx, s, 'Detail', lathe([[rb * 1.05, z - 0.005], [rb * 1.35, z - 0.004], [rb * 1.35, z + 0.004], [rb * 1.05, z + 0.005]], ctx.seg(0.8)));
+  put(ctx, s, 'Detail', box([0, fDepth - 0.004, tipZ - 0.05], [0.006, 0.008, 0.012], ctx.bevel(0.001)));
+  shoulder(ctx, zb - 0.011, (heelY + toeY) / 2);
+};
+
+/** Side-folding skeleton stock: an open frame with a butt pad. */
+const frame: PartBuilder = (ctx) => {
+  const { L } = ctx;
+  const { z0 } = L.stock, zb = L.stock.z1, drop = L.stock.drop;
+  const top = L.rec.top, bottom = L.rec.bottom;
+  const s = ctx.b.component('Stock', {
+    kind: 'stock', variant: 'frame', pivot: [L.rec.width / 2, 0, z0],
+    motion: { type: 'rotate', axis: [0, 1, 0], range: [0, Math.PI], purpose: 'fold' },
+  });
+  const t = 0.013;
+  const bt = top - 0.006 - drop * 0.3, bb = -0.09 - drop;
+  // An open "C" frame plus a front bar that closes it against the receiver.
+  side(ctx, s, 'Stock', [
+    [z0 + 0.006, top - 0.004], [zb, bt], [zb, bb], [z0 - 0.03, bottom - 0.004], [z0 + 0.006, bottom + 0.008],
+    [z0 - 0.03, bottom + 0.008 + t * 0.3], [zb + t, bb + t], [zb + t, bt - t], [z0 - 0.02, top - 0.004 - t],
+  ], 0.022, 0.003);
+  side(ctx, s, 'Stock', [[z0 - 0.034, top - 0.004 - t], [z0 + 0.004, top - 0.004 - t], [z0 + 0.004, bottom + 0.008], [z0 - 0.034, bottom + 0.008]], 0.024, 0.002);
+  side(ctx, s, 'Grip', [[zb + 0.002, bt + 0.002], [zb - 0.01, bt], [zb - 0.01, bb], [zb + 0.002, bb - 0.002]], 0.03, 0.003);
+  shoulder(ctx, zb - 0.01, (bt + bb) / 2);
+};
+
+/** No separate grip: the stock has one carved in. */
+const integral: PartBuilder = () => {};
+
+export const VARIETY_STOCKS: Record<string, PartBuilder> = { thumbhole, butt, none, sporter, frame };
+export const VARIETY_GRIPS: Record<string, PartBuilder> = { integral };
 
 // ---------------------------------------------------------------------------
 // Magazines

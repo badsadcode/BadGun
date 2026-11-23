@@ -67,7 +67,7 @@ export const scrap: StyleProfile = {
     barrel: { pipe: 1, plain: 0.5, heavy: 0.2, double: 0.35 },
     muzzle: { none: 1, can: 0.8, bottle: 0.8, brake: 0.15 },
     handguard: { plank: 1, taped: 1, slim: 0.2 },
-    stock: { plank: 1, pipe: 0.8, none: 0.35, wire: 0.3 },
+    stock: { plank: 1, pipe: 0.8, none: 0.35, wire: 0.3, sporter: 0.2 },
     grip: { taped: 1, plank: 0.8, polymer: 0.15 },
     magazine: { straight: 0.6, twin: 0.5, can: 0.8, curved: 0.3, pan: 0.15 },
     sight: { auto: 1 },

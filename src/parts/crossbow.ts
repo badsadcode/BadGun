@@ -9,6 +9,7 @@ import { AXIS_Y, Vec2, Vec3, bezier, box, cylinder, dome, extrudeSide, extrudeTo
 import type { PartBuilder } from '../archetypes/archetype.js';
 import { BuildContext, put, side } from './context.js';
 import { rail, rivetRow, triggerAndGuard } from './receiver.js';
+import { crystal } from './fantasy.js';
 import type { MaterialSlot } from '../types.js';
 
 const ROOT = 'Tiller';
@@ -220,7 +221,27 @@ const leafspring: PartBuilder = (ctx) => {
   stirrup(ctx, 'Barrel');
 };
 
-export const PRODS: Record<string, PartBuilder> = { recurve, compound, energy, leafspring };
+/** Arcane prod: carved wooden recurve limbs with rune strips and crystal tips. */
+const arcane: PartBuilder = (ctx) => {
+  const { L, p } = ctx;
+  const c = prodComponent(ctx, 'arcane');
+  const W = L.extra.span * 0.95, pz = L.extra.prodZ, y = L.extra.prodY;
+  const shape: LimbShape = { ctrl: [[0, 0.03], [0.03, W * 0.35], [-0.08, W * 0.75], [-0.035, W]], width0: 0.034 + p.bulk * 0.006, width1: 0.012 };
+  const h = 0.014;
+  const glow: MaterialSlot = ctx.style.traits.magic ? 'Emissive' : 'Trim';
+  for (const m of [1, -1]) {
+    put(ctx, c, 'Stock', extrudeTop(limbPolygon(shape, pz, m, 16), h, y, ctx.bevel(0.002)));
+    put(ctx, c, glow, extrudeTop(limbPolygon({ ...shape, width0: 0.005, width1: 0.0025 }, pz, m, 16), 0.0016, y + h / 2 + 0.0006));
+    crystal(ctx, c, [m * W, y, pz - 0.035], 0.032, 0.006, [0, (m * Math.PI) / 2, 0]);
+  }
+  put(ctx, c, 'Trim', box([0, y, pz], [0.075, h + 0.012, 0.05], ctx.bevel(0.005)));
+  L.extra.tipX = W;
+  L.extra.tipZ = pz - 0.035;
+  L.extra.glowString = ctx.style.traits.magic ? 1 : 0;
+  stirrup(ctx, 'Trim');
+};
+
+export const PRODS: Record<string, PartBuilder> = { recurve, compound, energy, leafspring, arcane };
 
 /** String (drawn to the latch) and the loaded bolt. Call after the prod. */
 export function stringAndBolt(ctx: BuildContext): void {

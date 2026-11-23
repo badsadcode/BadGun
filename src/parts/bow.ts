@@ -11,6 +11,7 @@ import type { PartBuilder } from '../archetypes/archetype.js';
 import type { Component } from '../core/weapon.js';
 import { BuildContext, put, side } from './context.js';
 import { LimbShape, limbPolygon } from './crossbow.js';
+import { crystal, sideGem } from './fantasy.js';
 import type { MaterialSlot } from '../types.js';
 
 const ROOT = 'Riser';
@@ -170,7 +171,29 @@ const pvc: PartBuilder = (ctx) => {
   setTips(ctx, T);
 };
 
-export const BOWS: Record<string, PartBuilder> = { longbow, recurve, compound, energy, pvc };
+/** Elven bow: long elegant recurve, leaf-shaped tips, a gem in the riser, glowing runes. */
+const elven: PartBuilder = (ctx) => {
+  const { L, p } = ctx;
+  const r = riser(ctx, 'elven', 'Stock', { frontBulge: 0.01 });
+  const R = L.extra.riser, H = L.extra.H, T = -0.12;
+  const shape: LimbShape = { ctrl: [[0.012, R], [0.03, R + (H - R) * 0.45], [T - 0.09, H - 0.08], [T, H]], width0: 0.02, width1: 0.008 };
+  limbs(ctx, shape, 'Stock', 20);
+  const glow: MaterialSlot = ctx.style.traits.magic ? 'Emissive' : 'Trim';
+  for (const which of ['Top', 'Bottom'] as const) {
+    const s = which === 'Top' ? 1 : -1;
+    const c = limbComponent(ctx, which);
+    const strip = limbPolygon({ ...shape, width0: 0.004, width1: 0.002 }, 0.0015, s, 20);
+    put(ctx, c, glow, extrudeSide(strip, { width: L.extra.limbW + 0.002 }));
+    // Leaf-shaped tip ornament.
+    const leaf: Vec2[] = [[T, s * (H - 0.002)], [T + 0.02, s * (H + 0.03)], [T + 0.004, s * (H + 0.07)], [T - 0.012, s * (H + 0.03)]];
+    put(ctx, c, 'Trim', extrudeSide(leaf, { width: 0.004, bevel: ctx.bevel(0.001) }));
+  }
+  sideGem(ctx, r, 0.0155, 0.06, 0.012, 0.007 + p.ornament * 0.003);
+  setTips(ctx, T);
+  L.extra.glowString = 0;
+};
+
+export const BOWS: Record<string, PartBuilder> = { longbow, recurve, compound, energy, pvc, elven };
 
 // ---------------------------------------------------------------------------
 // String and arrows
@@ -253,4 +276,12 @@ const scrapArrow: PartBuilder = (ctx) => {
   vanes(ctx, c, z0, 'Accent', 0.06, 0.012);
 };
 
-export const ARROWS: Record<string, PartBuilder> = { field, broadhead, wooden, energy: energyArrow, scrap: scrapArrow };
+const crystalArrow: PartBuilder = (ctx) => {
+  const { c, z0, z1, seg } = arrowBase(ctx, 'crystal');
+  put(ctx, c, 'Stock', cylinder(0.0036, z0, z1 - 0.03, seg));
+  put(ctx, c, 'Trim', cylinder(0.0045, z1 - 0.034, z1 - 0.028, seg));
+  crystal(ctx, c, [0, 0, z1 - 0.014], 0.03, 0.0055);
+  vanes(ctx, c, z0, 'Grip', 0.09, 0.014);
+};
+
+export const ARROWS: Record<string, PartBuilder> = { field, broadhead, wooden, energy: energyArrow, scrap: scrapArrow, crystal: crystalArrow };

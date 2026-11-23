@@ -28,9 +28,9 @@ export const crossbow: ArchetypeDef = {
 
   weights(style, kind): Weights | undefined {
     const { rails, plumbing, glow } = style.traits;
-    const scrap = !!style.traits.scrap;
-    if (kind === 'tiller') return { rail: t(rails, 3, 0.3), wood: t(plumbing, 3, 0.5), sleek: t(glow, 3, 0.3), plank: t(scrap, 4, 0.05) };
-    if (kind === 'prod') return { compound: t(rails, 3, 0.3), recurve: t(plumbing, 3, 1), energy: t(glow, 3, 0.2), leafspring: t(scrap, 4, 0.05) };
+    const scrap = !!style.traits.scrap, magic = !!style.traits.magic;
+    if (kind === 'tiller') return { rail: t(rails, 3, 0.3), wood: t(plumbing, 3, 0.5) + t(magic, 3, 0), sleek: t(glow, 3, 0.3), plank: t(scrap, 4, 0.05) };
+    if (kind === 'prod') return { compound: t(rails, 3, 0.3), recurve: t(plumbing, 3, 1), energy: t(glow, 3, 0.2), leafspring: t(scrap, 4, 0.05), arcane: t(magic, 4, 0.05) };
     if (kind === 'stock') {
       const w = { ...style.parts.stock };
       delete w.wire;

@@ -16,6 +16,7 @@ const SIZES: Record<string, { H: [number, number]; riser: number; limbW: number 
   compound: { H: [0.38, 0.46], riser: 0.31, limbW: 0.01 },
   energy: { H: [0.55, 0.66], riser: 0.22, limbW: 0.03 },
   pvc: { H: [0.64, 0.78], riser: 0.17, limbW: 0.02 },
+  elven: { H: [0.74, 0.88], riser: 0.22, limbW: 0.026 },
 };
 
 export const bow: ArchetypeDef = {
@@ -27,12 +28,12 @@ export const bow: ArchetypeDef = {
 
   weights(style, kind): Weights | undefined {
     const { rails, plumbing, glow } = style.traits;
-    const scrap = !!style.traits.scrap;
+    const scrap = !!style.traits.scrap, magic = !!style.traits.magic;
     if (kind === 'bow') {
-      return { longbow: t(plumbing, 1.5, 0.3) + t(scrap, 0.4, 0), recurve: t(plumbing, 2, 0.5) + t(rails, 1, 0), compound: t(rails, 3, 0.2), energy: t(glow, 3, 0.1), pvc: t(scrap, 3, 0.02) };
+      return { elven: t(magic, 3, 0.05), longbow: t(plumbing, 1.5, 0.3) + t(scrap, 0.4, 0) + t(magic, 1, 0), recurve: t(plumbing, 2, 0.5) + t(rails, 1, 0), compound: t(rails, 3, 0.2), energy: t(glow, 3, 0.1), pvc: t(scrap, 3, 0.02) };
     }
     if (kind === 'arrow') {
-      return { field: t(rails, 1, 0.2), broadhead: t(rails, 1.5, 0.2), wooden: t(plumbing, 3, 0.3), energy: t(glow, 3, 0.05), scrap: t(scrap, 3, 0.02) };
+      return { field: t(rails, 1, 0.2), broadhead: t(rails, 1.5, 0.2), wooden: t(plumbing, 3, 0.3), energy: t(glow, 3, 0.05), scrap: t(scrap, 3, 0.02), crystal: t(magic, 3, 0.03) };
     }
     return undefined;
   },

@@ -59,6 +59,18 @@ export function carryHandle(ctx: BuildContext): void {
   put(ctx, c, 'Grip', box([0, y0 + h - 0.002, (z0 + z1) / 2], [0.02, 0.012, z1 - z0 - 0.03], ctx.bevel(0.004)));
 }
 
+/** Vertical foregrip under the handguard. Returns where the support hand goes. */
+export function foregrip(ctx: BuildContext): [number, number, number] {
+  const { L, p } = ctx;
+  const zc = L.handguard.z0 + (L.handguard.z1 - L.handguard.z0) * ctx.rng('foregrip').range(0.35, 0.6);
+  const yT = -L.handguard.radius * 0.92;
+  const c = ctx.b.component('Foregrip', { kind: 'foregrip', variant: 'vertical', parent: 'Handguard', pivot: [0, yT, zc] });
+  const len = 0.06 + p.bulk * 0.02;
+  side(ctx, c, 'Detail', [[zc - 0.016, yT + 0.002], [zc + 0.016, yT + 0.002], [zc + 0.014, yT - 0.008], [zc - 0.014, yT - 0.008]], 0.024, 0.002);
+  side(ctx, c, 'Grip', [[zc - 0.012, yT - 0.006], [zc + 0.012, yT - 0.006], [zc + 0.016, yT - len], [zc + 0.012, yT - len - 0.006], [zc - 0.01, yT - len - 0.004], [zc - 0.014, yT - len + 0.004]], 0.026, 0.004);
+  return [0, yT - len * 0.5, zc + 0.002];
+}
+
 /** Shotgun shell holder on the left side of the receiver. */
 export function sideSaddle(ctx: BuildContext): void {
   const { L, p } = ctx;

@@ -2,9 +2,9 @@
  * Sights and optics. Every rifle gets SOCKET_Optic (the mount point) and
  * SOCKET_ADS (where a camera sits to aim down sights), even with no optic.
  */
-import { AXIS_X, AXIS_Y, Vec2, box, cylinder, lathe, tube } from '../core/geometry.js';
+import { AXIS_X, AXIS_Y, Vec2, box, cylinder, lathe, tube, ring, dome } from '../core/geometry.js';
 import type { Component } from '../core/weapon.js';
-import { BuildContext, put } from './context.js';
+import { BuildContext, put, side } from './context.js';
 
 /** Builds the optic; returns the sight-line height and the optic's rear z. */
 type OpticBuilder = (ctx: BuildContext, c: Component, y: number, z: number) => { eyeY: number; rearZ: number };
@@ -28,6 +28,7 @@ function lenses(ctx: BuildContext, c: Component, y: number, z: number, back: [nu
 
 const irons: OpticBuilder = (ctx, c, y, z) => {
   const { L } = ctx;
+  if (ctx.style.traits.rails && !L.extra.beadSight && ctx.rng('irons').chance(0.5)) return carryHandleIrons(ctx, c, y);
   const rz = L.rec.z0 + 0.03;
   put(ctx, c, 'Detail', box([0, y + 0.004, rz], [0.018, 0.008, 0.022], ctx.bevel(0.0015)));
   for (const s of [1, -1]) put(ctx, c, 'Detail', box([s * 0.0065, y + 0.014, rz], [0.003, 0.014, 0.008], ctx.bevel(0.0008)));
@@ -51,6 +52,26 @@ const irons: OpticBuilder = (ctx, c, y, z) => {
   return { eyeY: ap, rearZ: rz - 0.01 };
 };
 
+/** Classic carry-handle rear sight with a triangular "A-frame" front sight. */
+function carryHandleIrons(ctx: BuildContext, c: Component, y: number): { eyeY: number; rearZ: number } {
+  const { L } = ctx;
+  const z0 = L.rec.z0 + 0.012, z1 = Math.min(L.rec.z1 - 0.02, z0 + 0.15), h = 0.03;
+  side(ctx, c, 'Body', [
+    [z0, y], [z0 + 0.014, y], [z0 + 0.02, y + h - 0.012], [z1 - 0.02, y + h - 0.012], [z1 - 0.012, y], [z1, y], [z1 - 0.004, y + h], [z0 + 0.004, y + h + 0.004],
+  ], 0.016, 0.0025);
+  const ap = y + h + 0.007;
+  for (const s of [1, -1]) put(ctx, c, 'Detail', box([s * 0.006, ap - 0.002, z0 + 0.008], [0.003, 0.012, 0.01], ctx.bevel(0.0008)));
+  put(ctx, c, 'Detail', tube(0.004, 0.0015, z0 + 0.006, z0 + 0.01, 10), [0, ap, 0]);
+  const fz = L.handguard.z1 - 0.01;
+  const fy = Math.max(L.mountY, L.handguard.radius) - 0.004;
+  const front = ctx.b.component('FrontSight', { kind: 'sight', variant: 'a-frame', parent: 'Handguard', pivot: [0, fy, fz] });
+  const top = ap + 0.002;
+  side(ctx, front, 'Body', [[fz - 0.026, fy], [fz + 0.01, fy], [fz + 0.002, top - 0.004], [fz - 0.008, top - 0.004]], 0.012, 0.002);
+  put(ctx, front, 'Detail', box([0, top - 0.001, fz - 0.003], [0.0025, 0.008, 0.003]));
+  put(ctx, front, 'Body', box([0, fy - 0.004, fz - 0.006], [L.barrel.radius * 2 + 0.008, 0.012, 0.03], ctx.bevel(0.002)));
+  return { eyeY: ap, rearZ: z0 - 0.01 };
+}
+
 const reddot: OpticBuilder = (ctx, c, y, z) => {
   const seg = ctx.seg(1);
   put(ctx, c, 'Detail', box([0, y + 0.004, z], [0.022, 0.008, 0.034], ctx.bevel(0.0015)));
@@ -65,23 +86,26 @@ const reddot: OpticBuilder = (ctx, c, y, z) => {
 
 const scope: OpticBuilder = (ctx, c, y, z) => {
   const seg = ctx.seg(1.2);
-  const yc = y + 0.03;
-  const stations: Vec2[] = [
+  // Proportion genes: tube length, objective bell size, eyepiece size.
+  const g = ctx.rng('scope');
+  const zK = g.range(0.8, 1.25), objK = g.range(0.85, 1.4), eyeK = g.range(0.9, 1.15);
+  const yc = y + 0.03 * Math.max(1, objK * 0.95);
+  const stations: Vec2[] = ([
     [0.0195, -0.155], [0.0195, -0.095], [0.0127, -0.078], [0.0127, -0.03], [0.017, -0.026], [0.017, 0.026],
     [0.0127, 0.03], [0.0127, 0.055], [0.0225, 0.09], [0.0225, 0.145],
-  ];
+  ] as Vec2[]).map(([r, sz]) => [r * (sz > 0.06 ? objK : sz < -0.08 ? eyeK : 1), sz * zK] as Vec2);
   put(ctx, c, 'Sight', lathe(scopeBody(stations), seg), [0, yc, z]);
-  lenses(ctx, c, yc, z, [0.0195, -0.155], [0.0225, 0.145]);
+  lenses(ctx, c, yc, z, stations[0], stations[stations.length - 1]);
   // Turrets.
   put(ctx, c, 'Sight', cylinder(0.0085, 0, 0.012, 14, ctx.bevel(0.001)), [0, yc + 0.014, z], AXIS_Y);
   put(ctx, c, 'Sight', cylinder(0.0085, 0, 0.012, 14, ctx.bevel(0.001)), [0.014, yc, z], AXIS_X);
   put(ctx, c, 'Trim', cylinder(0.009, 0.012, 0.016, 14, ctx.bevel(0.0008)), [0, yc + 0.014, z], AXIS_Y);
   // Rings and mounts.
-  for (const dz of [-0.05, 0.042]) {
+  for (const dz of [-0.05 * zK, 0.042 * zK]) {
     put(ctx, c, 'Detail', box([0, (y + yc - 0.012) / 2, z + dz], [0.02, yc - 0.012 - y, 0.014], ctx.bevel(0.0015)));
     put(ctx, c, 'Detail', tube(0.0157, 0.0125, z + dz - 0.007, z + dz + 0.007, seg), [0, yc, 0]);
   }
-  return { eyeY: yc, rearZ: z - 0.155 };
+  return { eyeY: yc, rearZ: z - 0.155 * zK };
 };
 
 const holo: OpticBuilder = (ctx, c, y, z) => {
@@ -138,7 +162,21 @@ const tube_: OpticBuilder = (ctx, c, y, z) => {
   return { eyeY: yc, rearZ: z - len / 2 };
 };
 
-const OPTICS: Record<string, OpticBuilder> = { irons, reddot, scope, holo, brass, tube: tube_ };
+/** Rune sight: two glowing rune circles floating on gold posts. */
+const runeSight: OpticBuilder = (ctx, c, y, z) => {
+  const glow = ctx.style.traits.magic ? 'Emissive' : 'Trim';
+  const seg = ctx.seg(1.4);
+  const yc = y + 0.03;
+  for (const [dz, R] of [[-0.05, 0.012], [0.05, 0.018]] as [number, number][]) {
+    put(ctx, c, 'Trim', box([0, (y + yc - R) / 2, z + dz], [0.004, yc - R - y, 0.004], ctx.bevel(0.0008)));
+    put(ctx, c, glow, ring(R, 0.0013, 0, seg, 4), [0, yc, z + dz]);
+    put(ctx, c, glow, ring(R * 0.55, 0.0008, 0, seg, 4), [0, yc, z + dz]);
+  }
+  put(ctx, c, glow, dome(0.0018, 0.0018, 6, 2), [0, yc, z + 0.05]);
+  return { eyeY: yc, rearZ: z - 0.05 };
+};
+
+const OPTICS: Record<string, OpticBuilder> = { irons, reddot, scope, holo, brass, tube: tube_, rune: runeSight };
 export const OPTIC_NAMES = Object.keys(OPTICS);
 
 export function buildOptic(ctx: BuildContext, choice: string): void {

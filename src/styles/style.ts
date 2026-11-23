@@ -41,5 +41,7 @@ export interface StyleProfile {
     roundness: number;
     /** Salvaged, makeshift construction (tape, pipes, planks). */
     scrap?: boolean;
+    /** Enchanted: glowing runes and crystals. */
+    magic?: boolean;
   };
 }

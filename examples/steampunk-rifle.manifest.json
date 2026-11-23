@@ -20,10 +20,10 @@
       "config": "standard",
       "receiver": "cylindrical",
       "barrel": "finned",
-      "handguard": "cage",
+      "handguard": "bare",
       "muzzle": "bell",
-      "stock": "wire",
-      "grip": "wood",
+      "stock": "sporter",
+      "grip": "integral",
       "magazine": "drum",
       "sight": "irons"
     },
@@ -237,22 +237,6 @@
       "triangles": 1162
     },
     {
-      "name": "Handguard",
-      "kind": "handguard",
-      "variant": "cage",
-      "parent": "Receiver",
-      "pivot": [
-        0,
-        0.0741,
-        0.2521
-      ],
-      "materials": [
-        "MAT_Trim",
-        "MAT_Accent"
-      ],
-      "triangles": 714
-    },
-    {
       "name": "Muzzle",
       "kind": "muzzle",
       "variant": "bell",
@@ -270,48 +254,19 @@
     {
       "name": "Stock",
       "kind": "stock",
-      "variant": "wire",
-      "parent": "Receiver",
-      "pivot": [
-        0.0367,
-        0.0741,
-        -0.064
-      ],
-      "motion": {
-        "type": "rotate",
-        "axis": [
-          0,
-          1,
-          0
-        ],
-        "range": [
-          0,
-          3.141592653589793
-        ],
-        "purpose": "fold"
-      },
-      "materials": [
-        "MAT_Detail",
-        "MAT_Stock",
-        "MAT_Grip"
-      ],
-      "triangles": 266
-    },
-    {
-      "name": "Grip",
-      "kind": "grip",
-      "variant": "wood",
+      "variant": "sporter",
       "parent": "Receiver",
       "pivot": [
         0,
-        0.0274,
-        0.0283
+        0.0741,
+        -0.064
       ],
       "materials": [
+        "MAT_Stock",
         "MAT_Grip",
-        "MAT_Trim"
+        "MAT_Detail"
       ],
-      "triangles": 280
+      "triangles": 410
     },
     {
       "name": "Magazine",
@@ -395,8 +350,8 @@
       "parent": "Stock",
       "position": [
         0,
-        0.0348,
-        -0.2853
+        0.0183,
+        -0.3143
       ],
       "forward": [
         0,
@@ -500,7 +455,7 @@
     "min": [
       -0.0399,
       -0.1164,
-      -0.2853
+      -0.3143
     ],
     "max": [
       0.0506,
@@ -510,7 +465,7 @@
     "size": [
       0.0904,
       0.2501,
-      0.9794
+      1.0084
     ]
   },
   "collision": {
@@ -518,19 +473,19 @@
     "center": [
       0.0053,
       0.0087,
-      0.2044
+      0.1899
     ],
     "size": [
       0.0904,
       0.2501,
-      0.9794
+      1.0084
     ]
   },
   "stats": {
-    "triangles": 9120,
-    "vertices": 10572,
-    "meshes": 11,
-    "primitives": 22,
+    "triangles": 8270,
+    "vertices": 9670,
+    "meshes": 9,
+    "primitives": 18,
     "materials": 10
   }
 }

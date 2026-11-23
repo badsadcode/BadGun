@@ -4,6 +4,7 @@
 import { Vec2, box, cylinder, extrudeSide, lathe, ring, tube, dome } from '../core/geometry.js';
 import { BuildContext, put, side } from './context.js';
 import { bottleMuzzle, canMuzzle } from './scrap.js';
+import { crystalMuzzle, mawMuzzle } from './fantasy.js';
 import type { PartBuilder } from './receiver.js';
 
 function barrelComponent(ctx: BuildContext, variant: string) {
@@ -288,10 +289,22 @@ const compensator: MuzzleBuilder = (ctx, c, a, rb) => {
   return 0.04;
 };
 
+/** Heavy two-chamber brake (anti-materiel rifles): a big slab with side ports. */
+const heavybrake: MuzzleBuilder = (ctx, c, a, rb) => {
+  const W = rb * 4, H = rb * 2.4, len = 0.06 + ctx.p.bulk * 0.025;
+  put(ctx, c, 'Barrel', lathe([[rb * 0.5, a - 0.004], [rb * 1.3, a - 0.004], [rb * 1.3, a + 0.012], [rb * 0.6, a + 0.012]], ctx.seg(0.8)));
+  put(ctx, c, 'Barrel', box([0, 0, a + 0.012 + len / 2], [W, H, len], ctx.bevel(0.004)));
+  for (let i = 0; i < 2; i++) {
+    const z = a + 0.012 + len * (0.3 + i * 0.4);
+    for (const s of [1, -1]) put(ctx, c, 'Detail', box([s * (W / 2 + 0.0005), 0, z], [0.002, H * 0.72, len * 0.24]));
+  }
+  return len + 0.012;
+};
+
 /** No muzzle device: the barrel ends bare (the socket still marks the tip). */
 const none: MuzzleBuilder = () => 0;
 
-const MUZZLE_BUILDERS: Record<string, MuzzleBuilder> = { brake, flash, bell, crown, emitter, prongs, suppressor, compensator, none, can: canMuzzle, bottle: bottleMuzzle };
+const MUZZLE_BUILDERS: Record<string, MuzzleBuilder> = { brake, flash, bell, crown, emitter, prongs, suppressor, compensator, heavybrake, none, can: canMuzzle, bottle: bottleMuzzle, crystal: crystalMuzzle, maw: mawMuzzle };
 
 export const MUZZLES: Record<string, PartBuilder> = Object.fromEntries(
   Object.entries(MUZZLE_BUILDERS).map(([name, fn]) => [

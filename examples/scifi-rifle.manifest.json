@@ -18,11 +18,11 @@
     },
     "parts": {
       "config": "standard",
-      "receiver": "faceted",
+      "receiver": "plated",
       "barrel": "bull",
       "handguard": "slim",
       "muzzle": "prongs",
-      "stock": "solid",
+      "stock": "thumbhole",
       "grip": "sleek",
       "magazine": "cell",
       "sight": "scope"
@@ -148,19 +148,20 @@
     {
       "name": "Receiver",
       "kind": "receiver",
-      "variant": "faceted",
+      "variant": "plated",
       "parent": null,
       "pivot": [
         0,
-        0.0705,
+        0.0625,
         0.056
       ],
       "materials": [
+        "MAT_Detail",
         "MAT_Body",
         "MAT_Trim",
         "MAT_Emissive"
       ],
-      "triangles": 244
+      "triangles": 272
     },
     {
       "name": "Trigger",
@@ -197,7 +198,7 @@
       "parent": "Receiver",
       "pivot": [
         0,
-        0.0705,
+        0.0625,
         0.2321
       ],
       "materials": [
@@ -212,7 +213,7 @@
       "parent": "Receiver",
       "pivot": [
         0,
-        0.0705,
+        0.0625,
         0.2521
       ],
       "materials": [
@@ -229,7 +230,7 @@
       "parent": "Barrel",
       "pivot": [
         0,
-        0.0705,
+        0.0625,
         0.5845
       ],
       "materials": [
@@ -242,20 +243,18 @@
     {
       "name": "Stock",
       "kind": "stock",
-      "variant": "solid",
+      "variant": "thumbhole",
       "parent": "Receiver",
       "pivot": [
         0,
-        0.0705,
+        0.0625,
         -0.064
       ],
       "materials": [
         "MAT_Stock",
-        "MAT_Trim",
-        "MAT_Emissive",
         "MAT_Grip"
       ],
-      "triangles": 256
+      "triangles": 112
     },
     {
       "name": "Grip",
@@ -310,7 +309,7 @@
       "parent": "Receiver",
       "pivot": [
         0,
-        0.1167,
+        0.1025,
         0.1099
       ],
       "materials": [
@@ -328,7 +327,7 @@
       "parent": "Muzzle",
       "position": [
         0,
-        0.0705,
+        0.0625,
         0.6505
       ],
       "forward": [
@@ -343,7 +342,7 @@
       "parent": "Stock",
       "position": [
         0,
-        0.0255,
+        0.0084,
         -0.3084
       ],
       "forward": [
@@ -358,7 +357,7 @@
       "parent": "Receiver",
       "position": [
         0,
-        0.1167,
+        0.1025,
         0.1099
       ],
       "forward": [
@@ -373,8 +372,8 @@
       "parent": "Receiver",
       "position": [
         0,
-        0.1467,
-        -0.1151
+        0.1369,
+        -0.1141
       ],
       "forward": [
         0,
@@ -403,7 +402,7 @@
       "parent": "Handguard",
       "position": [
         0,
-        0.0334,
+        0.0254,
         0.3449
       ],
       "forward": [
@@ -432,8 +431,8 @@
       "name": "SOCKET_Eject",
       "parent": "Receiver",
       "position": [
-        -0.0328,
-        0.0745,
+        -0.0289,
+        0.0665,
         0.1099
       ],
       "forward": [
@@ -446,18 +445,18 @@
   ],
   "bounds": {
     "min": [
-      -0.0303,
+      -0.0285,
       -0.0911,
       -0.3084
     ],
     "max": [
-      0.0303,
-      0.1767,
+      0.0285,
+      0.1669,
       0.6505
     ],
     "size": [
-      0.0607,
-      0.2678,
+      0.057,
+      0.258,
       0.9589
     ]
   },
@@ -465,20 +464,20 @@
     "type": "box",
     "center": [
       0,
-      0.0428,
+      0.0379,
       0.1711
     ],
     "size": [
-      0.0607,
-      0.2678,
+      0.057,
+      0.258,
       0.9589
     ]
   },
   "stats": {
-    "triangles": 4178,
-    "vertices": 5926,
+    "triangles": 4062,
+    "vertices": 5720,
     "meshes": 9,
-    "primitives": 24,
+    "primitives": 23,
     "materials": 10
   }
 }

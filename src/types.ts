@@ -46,8 +46,8 @@ export type Palette = Record<MaterialSlot, MaterialDef>;
 export type PaletteOverrides = Partial<Record<MaterialSlot, string | Partial<MaterialDef>>>;
 
 export type ArchetypeId = 'rifle' | 'smg' | 'shotgun' | 'sniper' | 'lmg' | 'pistol' | 'crossbow' | 'bow';
-export type StyleId = 'modern' | 'steampunk' | 'scifi' | 'scrap';
-export type OpticChoice = 'auto' | 'none' | 'irons' | 'reddot' | 'scope' | 'holo' | 'brass' | 'tube';
+export type StyleId = 'modern' | 'steampunk' | 'scifi' | 'scrap' | 'fantasy';
+export type OpticChoice = 'auto' | 'none' | 'irons' | 'reddot' | 'scope' | 'holo' | 'brass' | 'tube' | 'rune';
 
 /**
  * Art-direction controls. All are 0..1. Leave one undefined and the seed
