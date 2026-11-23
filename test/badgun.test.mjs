@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { validateBytes } from 'gltf-validator';
-import { generate, toGLB, buildManifest, STYLES, ARCHETYPES } from '../dist/index.js';
+import { generate, toGLB, buildManifest, STYLES, ARCHETYPES, generateFaction, factionToGLB } from '../dist/index.js';
 
 const base = { archetype: 'rifle', style: 'steampunk', seed: 42 };
 const component = (w, name) => w.components.find((c) => c.name === name);
@@ -152,4 +152,33 @@ test('every archetype x style x part variant exports a valid glTF', async () => 
     assert.equal(errors.length, 0, `${JSON.stringify(r)}: ${errors.map((e) => `${e.code} ${e.message}`).join('; ')}`);
   }
   console.log(`# validated ${recipes.length} weapons`);
+});
+
+test('factions: deterministic, one palette, shared doctrine, valid arsenal file', async () => {
+  for (const style of Object.keys(STYLES)) {
+    const a = generateFaction({ style, seed: 11 });
+    const b = generateFaction({ style, seed: 11 });
+    assert.equal(a.name, b.name);
+    assert.deepEqual(factionToGLB(a), factionToGLB(b), `${style}: same faction seed -> same arsenal`);
+    // Every member wears the same paint.
+    const accent = a.members.map((m) => m.weapon.palette.Accent.color);
+    assert.equal(new Set(accent).size, 1, `${style}: one accent color`);
+    assert.equal(accent[0], a.color);
+    // Doctrine: long guns mostly share the faction's preferred receiver.
+    const want = a.doctrine.longgun.receiver;
+    // (Bolt-action receivers are only preferred by rifles and snipers.)
+    const longs = a.members.filter((m) => !['pistol', 'crossbow', 'bow'].includes(m.archetype) && (want !== 'boltaction' || ['rifle', 'sniper'].includes(m.archetype)));
+    const hits = longs.filter((m) => m.weapon.parts.receiver === want).length;
+    assert.ok(hits >= longs.length - 1, `${style}: ${hits}/${longs.length} use the doctrine receiver ${want}`);
+    // Everyone carries the insignia, and the arsenal is valid glTF.
+    const report = await validateBytes(factionToGLB(a));
+    assert.equal(report.issues.messages.filter((m) => m.severity <= 1).length, 0, `${style}: arsenal glTF errors`);
+  }
+});
+
+test('preferences are soft: archetype rules still win', () => {
+  const sh = generate({ archetype: 'shotgun', style: 'modern', seed: 3, prefer: { magazine: 'curved', handguard: 'quad' } });
+  assert.notEqual(sh.parts.magazine, 'curved');
+  const r = generate({ archetype: 'rifle', style: 'modern', seed: 3, parts: { config: 'standard' }, prefer: { stock: 'thumbhole' } });
+  assert.equal(r.parts.stock, 'thumbhole');
 });

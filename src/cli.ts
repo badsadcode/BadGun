@@ -12,6 +12,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { generate } from './generate.js';
 import { toGLB } from './export/glb.js';
+import { factionToGLB, generateFaction, summary as factionSummary } from './faction.js';
 import { buildManifest, weaponName } from './export/manifest.js';
 import { STYLES } from './styles/index.js';
 import { ARCHETYPES } from './archetypes/index.js';
@@ -32,6 +33,7 @@ Options:
   --color Slot=#hex     recolor a material slot, e.g. --color Body=#336699
   --recipe <file>       load a recipe JSON (other flags override it)
   --out <dir>           output folder                          (default: out)
+  --faction             generate a whole matching arsenal (uses --style and --seed)
   --list                show styles, parts and optics
   --help`;
 
@@ -87,6 +89,22 @@ function main(): void {
 
   const outDir = o.out?.[0] ?? 'out';
   mkdirSync(outDir, { recursive: true });
+
+  if (o.faction) {
+    const { length: _l, ...shared } = recipe.params ?? {};
+    void _l;
+    const f = generateFaction({ style: recipe.style, seed: recipe.seed, params: shared, paletteVariant: recipe.paletteVariant });
+    const slug = f.name.replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '');
+    const dir = join(outDir, slug);
+    mkdirSync(dir, { recursive: true });
+    for (const m of f.members) writeFileSync(join(dir, `${weaponName(m.weapon)}.glb`), toGLB(m.weapon));
+    writeFileSync(join(dir, `${slug}_arsenal.glb`), factionToGLB(f));
+    writeFileSync(join(dir, `${slug}.faction.json`), JSON.stringify(factionSummary(f), null, 2));
+    console.log(`${f.name}  (${f.style}, ${f.livery} livery in ${f.color}, ${f.insignia.shape} insignia)`);
+    for (const m of f.members) console.log(`  ${m.archetype.padEnd(9)} ${Object.entries(m.weapon.parts).map(([k, v]) => `${k}:${v}`).join(' ')}`);
+    console.log(`-> ${dir}/`);
+    return;
+  }
   const count = Math.max(1, Number(o.count?.[0] ?? 1));
   for (let i = 0; i < count; i++) {
     const r: Recipe = { ...recipe, seed: typeof recipe.seed === 'number' ? recipe.seed + i : count > 1 ? `${recipe.seed}-${i}` : recipe.seed };

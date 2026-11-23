@@ -81,6 +81,24 @@ export interface Recipe {
   palette?: PaletteOverrides;
   /** Force specific part variants, e.g. { stock: "classic", magazine: "drum" }. */
   parts?: Partial<Record<PartKind, string>>;
+  /**
+   * Soft preferences: like `parts`, but only a strong nudge. Ignored when the
+   * variant doesn't fit this archetype. Factions use this for their doctrine.
+   */
+  prefer?: Partial<Record<PartKind, string>>;
+  /** Share proportions ("shape genes") with every recipe using the same family key. */
+  family?: number | string;
+  /** A badge on the weapon (faction insignia). */
+  insignia?: Insignia;
+}
+
+export type InsigniaShape = 'circle' | 'shield' | 'diamond' | 'star' | 'chevron' | 'hex' | 'triangle';
+
+/** A flat badge on the side of the weapon, in the Accent color with a Trim emblem. */
+export interface Insignia {
+  shape: InsigniaShape;
+  /** Inner emblem: number of points / strokes. */
+  emblem: number;
 }
 
 /**

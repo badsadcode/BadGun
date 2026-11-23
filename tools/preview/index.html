@@ -223,9 +223,18 @@ function frame(obj) {
 async function regenerate(keepCamera = true) {
   $('err').textContent = '';
   try {
-    const weapon = BadGun.generate(clean(recipe));
+    // Faction mode shows a whole matching arsenal; otherwise one weapon.
+    let weapon, glb;
+    if (recipe.archetype === 'faction') {
+      currentFaction = BadGun.generateFaction(factionRecipe());
+      weapon = currentFaction.members[0].weapon;
+      glb = BadGun.factionToGLB(currentFaction);
+    } else {
+      currentFaction = null;
+      weapon = BadGun.generate(clean(recipe));
+      glb = BadGun.toGLB(weapon);
+    }
     currentWeapon = weapon;
-    const glb = BadGun.toGLB(weapon);
     const gltf = await loader.parseAsync(glb.buffer.slice(glb.byteOffset, glb.byteOffset + glb.byteLength), '');
     if (current) scene.remove(current);
     current = gltf.scene;
@@ -237,13 +246,25 @@ async function regenerate(keepCamera = true) {
     applySocketVisibility();
     refreshUI(weapon);
     if (!shot) history.replaceState(null, '', '#' + encodeURIComponent(JSON.stringify(clean(recipe))));
-    document.title = `BadGun · ${weapon.recipe.style} #${weapon.recipe.seed}`;
+    document.title = currentFaction ? `BadGun · ${currentFaction.name}` : `BadGun · ${weapon.recipe.style} #${weapon.recipe.seed}`;
     if (shot && qs.has('explode') && !exploded) { $('explode').click(); frame(current); }
     window.__ready = true;
   } catch (e) {
     console.error(e);
     $('err').textContent = e.message;
   }
+}
+
+let currentFaction = null;
+
+/** The faction recipe for faction mode (shared params minus length). */
+function factionRecipe() {
+  const f = { style: recipe.style, seed: recipe.seed };
+  const params = { ...(recipe.params ?? {}) };
+  delete params.length;
+  if (Object.keys(params).length) f.params = params;
+  if (recipe.paletteVariant !== undefined) f.paletteVariant = recipe.paletteVariant;
+  return f;
 }
 
 function clean(r) {
@@ -309,6 +330,12 @@ function buildStaticUI() {
     b.onclick = () => { recipe.archetype = a.id; recipe.parts = {}; recipe.optic = 'auto'; isolated = null; regenerate(false); };
     $('types').append(b);
   }
+  const fb = document.createElement('button');
+  fb.textContent = '⚑ Faction';
+  fb.title = 'A whole matching arsenal: shared colors, doctrine, proportions and insignia';
+  fb.dataset.arch = 'faction';
+  fb.onclick = () => { recipe.archetype = 'faction'; recipe.parts = {}; recipe.optic = 'auto'; isolated = null; regenerate(false); };
+  $('types').append(fb);
   $('styles').innerHTML = '';
   for (const s of Object.values(BadGun.STYLES)) {
     const b = document.createElement('button');
@@ -368,7 +395,9 @@ function refreshUI(weapon) {
   const style = BadGun.getStyle(recipe.style);
   document.querySelectorAll('#styles button').forEach((b) => b.classList.toggle('on', b.dataset.style === recipe.style));
   document.querySelectorAll('#types button').forEach((b) => b.classList.toggle('on', b.dataset.arch === recipe.archetype));
-  if ($('partsel').dataset.arch !== recipe.archetype) buildArchetypeUI();
+  const factionMode = recipe.archetype === 'faction';
+  for (const id of ['partsel', 'optic']) $(id).style.display = factionMode ? 'none' : '';
+  if (!factionMode && $('partsel').dataset.arch !== recipe.archetype) buildArchetypeUI();
   $('seed').value = recipe.seed;
   for (const row of document.querySelectorAll('.param')) {
     const key = row.dataset.key;
@@ -401,7 +430,13 @@ function refreshUI(weapon) {
     .map((c) => `<div><b>${c.name}</b><span>${c.variant}${c.motion ? ' ⟲' : ''} · ${c.triangles}</span></div>`).join('') +
     manifest.sockets.map((s) => `<div><span>◆ ${s.name}</span><span>${s.parent}</span></div>`).join('');
   const st = manifest.stats;
-  $('hud').innerHTML = `<b>${manifest.name}</b> · palette <b>${weapon.paletteName}</b><br>${st.triangles.toLocaleString()} tris · ${st.vertices.toLocaleString()} verts · ${st.materials} materials · ${st.primitives} draw calls · ${manifest.bounds.size[2].toFixed(2)} m long`;
+  if (currentFaction) {
+    const f = currentFaction;
+    const tris = f.members.reduce((n, m) => n + BadGun.buildManifest(m.weapon).stats.triangles, 0);
+    $('hud').innerHTML = `<b style="color:${f.color}">⚑</b> <b>${f.name}</b> · ${f.members.length} weapons · ${f.livery} livery · ${f.insignia.shape} insignia<br>palette <b>${weapon.paletteName}</b> · ${tris.toLocaleString()} tris in total · doctrine: ${Object.entries(f.doctrine.longgun ?? {}).filter(([k]) => ['config', 'receiver', 'stock'].includes(k)).map(([k, v]) => `${k} ${v}`).join(', ')}`;
+  } else {
+    $('hud').innerHTML = `<b>${manifest.name}</b> · palette <b>${weapon.paletteName}</b><br>${st.triangles.toLocaleString()} tris · ${st.vertices.toLocaleString()} verts · ${st.materials} materials · ${st.primitives} draw calls · ${manifest.bounds.size[2].toFixed(2)} m long`;
+  }
 }
 
 function setSeed(s) { recipe.seed = /^-?\d+$/.test(String(s)) ? Number(s) : s; regenerate(false); }
@@ -439,10 +474,13 @@ function download(name, data, type) {
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 $('exportGlb').onclick = () => {
+  if (currentFaction) return download(currentFaction.name.replace(/[^A-Za-z0-9]+/g, '_') + '.glb', BadGun.factionToGLB(currentFaction), 'model/gltf-binary');
   const w = BadGun.generate(clean(recipe));
   download(BadGun.weaponName(w) + '.glb', BadGun.toGLB(w), 'model/gltf-binary');
 };
-$('saveRecipe').onclick = () => download(BadGun.weaponName(currentWeapon) + '.recipe.json', JSON.stringify(clean(recipe), null, 2), 'application/json');
+$('saveRecipe').onclick = () => currentFaction
+  ? download(currentFaction.name.replace(/[^A-Za-z0-9]+/g, '_') + '.faction.json', JSON.stringify(BadGun.factionSummary(currentFaction), null, 2), 'application/json')
+  : download(BadGun.weaponName(currentWeapon) + '.recipe.json', JSON.stringify(clean(recipe), null, 2), 'application/json');
 $('loadRecipe').onclick = () => $('file').click();
 $('file').onchange = async () => {
   const f = $('file').files[0];

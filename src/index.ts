@@ -8,7 +8,9 @@
 export { generate, resolveParams, resolveParts, PARAM_KEYS } from './generate.js';
 export { ARCHETYPES, getArchetype, partKinds } from './archetypes/index.js';
 export type { ArchetypeDef } from './archetypes/index.js';
-export { toGLB, toGltfJson } from './export/glb.js';
+export { toGLB, toGltfJson, toGLBArsenal } from './export/glb.js';
+export { generateFaction, factionToGLB, factionName, summary as factionSummary } from './faction.js';
+export type { Faction, FactionRecipe, Livery } from './faction.js';
 export { buildManifest, weaponName, UV_UNITS_PER_METER, VERSION } from './export/manifest.js';
 export type { Manifest } from './export/manifest.js';
 export { STYLES, getStyle } from './styles/index.js';

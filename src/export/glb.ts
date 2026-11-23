@@ -108,16 +108,33 @@ export function toGLB(weapon: Weapon): Uint8Array {
 
 /** Build the glTF JSON (with the binary payload stashed on `__bin`). */
 export function toGltfJson(weapon: Weapon): Json {
-  if (!weapon.finalized) throw new Error('Weapon must be finalized before export');
-  const w = new BinWriter();
-  const manifest = buildManifest(weapon);
+  return buildGltf([{ weapon, translation: [0, 0, 0] }], weaponName(weapon), { badgun: { recipe: weapon.recipe } });
+}
 
-  // Materials: one per used slot, in canonical order.
-  const slots = usedSlots(weapon);
+/**
+ * Several weapons in one .glb (e.g. a faction's whole arsenal), each under
+ * its own root node at `translation`. Materials are shared by slot; the first
+ * weapon that uses a slot defines it (faction members share one palette).
+ */
+export function toGLBArsenal(items: { weapon: Weapon; translation: Vec3 }[], name: string, extras: Json = {}): Uint8Array {
+  const json = buildGltf(items, name, extras);
+  const bin: Uint8Array = json.__bin;
+  delete json.__bin;
+  return packGlb(json, bin);
+}
+
+function buildGltf(items: { weapon: Weapon; translation: Vec3 }[], sceneName: string, sceneExtras: Json): Json {
+  for (const it of items) if (!it.weapon.finalized) throw new Error('Weapon must be finalized before export');
+  const w = new BinWriter();
+
+  // Materials: one per used slot (across all weapons), in canonical order.
+  const used = new Set(items.flatMap((it) => usedSlots(it.weapon)));
+  const slots = MATERIAL_SLOTS.filter((s) => used.has(s));
   const materialIndex = new Map(slots.map((s, i) => [s, i]));
   let usesEmissiveStrength = false;
   const materials = slots.map((slot) => {
-    const m = weapon.palette[slot];
+    const owner = items.find((it) => usedSlots(it.weapon).includes(slot))!.weapon;
+    const m = owner.palette[slot];
     const [r, g, b] = hexToLinear(m.color);
     const opacity = m.opacity ?? 1;
     const mat: Json = {
@@ -138,70 +155,75 @@ export function toGltfJson(weapon: Weapon): Json {
     return mat;
   });
 
-  // Meshes and component nodes.
   const nodes: Json[] = [];
   const meshes: Json[] = [];
-  const nodeIndex = new Map<string, number>();
-  const pivots = new Map(weapon.components.map((c) => [c.name, c.pivot]));
+  const sceneRoots: number[] = [];
 
-  for (const c of weapon.components) {
-    const node: Json = { name: c.name, extras: { badgun: { kind: c.kind, variant: c.variant, ...(c.motion ? { motion: c.motion } : {}) } } };
-    const parentPivot: Vec3 = c.parent ? pivots.get(c.parent) ?? [0, 0, 0] : [0, 0, 0];
-    const t = sub3(c.pivot, parentPivot);
-    if (t.some((v) => Math.abs(v) > 1e-9)) node.translation = t;
-    if (c.geometry.size) {
-      const primitives: Json[] = [];
-      for (const slot of MATERIAL_SLOTS) {
-        const g = c.geometry.get(slot);
-        if (!g || g.indices.length === 0) continue;
-        const uv = g.uvs.map((v) => v * UV_UNITS_PER_METER);
-        primitives.push({
-          attributes: {
-            POSITION: w.floatAccessor(g.positions, 'VEC3', true),
-            NORMAL: w.floatAccessor(g.normals, 'VEC3', false),
-            TEXCOORD_0: w.floatAccessor(uv, 'VEC2', false),
-          },
-          indices: w.indexAccessor(g.indices, g.vertexCount),
-          material: materialIndex.get(slot),
-        });
+  for (const { weapon, translation } of items) {
+    const manifest = buildManifest(weapon);
+    const nodeIndex = new Map<string, number>();
+    const pivots = new Map(weapon.components.map((c) => [c.name, c.pivot]));
+
+    for (const c of weapon.components) {
+      const node: Json = { name: c.name, extras: { badgun: { kind: c.kind, variant: c.variant, ...(c.motion ? { motion: c.motion } : {}) } } };
+      const parentPivot: Vec3 = c.parent ? pivots.get(c.parent) ?? [0, 0, 0] : [0, 0, 0];
+      const t = sub3(c.pivot, parentPivot);
+      if (t.some((v) => Math.abs(v) > 1e-9)) node.translation = t;
+      if (c.geometry.size) {
+        const primitives: Json[] = [];
+        for (const slot of MATERIAL_SLOTS) {
+          const g = c.geometry.get(slot);
+          if (!g || g.indices.length === 0) continue;
+          const uv = g.uvs.map((v) => v * UV_UNITS_PER_METER);
+          primitives.push({
+            attributes: {
+              POSITION: w.floatAccessor(g.positions, 'VEC3', true),
+              NORMAL: w.floatAccessor(g.normals, 'VEC3', false),
+              TEXCOORD_0: w.floatAccessor(uv, 'VEC2', false),
+            },
+            indices: w.indexAccessor(g.indices, g.vertexCount),
+            material: materialIndex.get(slot),
+          });
+        }
+        meshes.push({ name: `${c.name}_Mesh`, primitives });
+        node.mesh = meshes.length - 1;
       }
-      meshes.push({ name: `${c.name}_Mesh`, primitives });
-      node.mesh = meshes.length - 1;
+      nodes.push(node);
+      nodeIndex.set(c.name, nodes.length - 1);
     }
-    nodes.push(node);
-    nodeIndex.set(c.name, nodes.length - 1);
-  }
 
-  // Sockets as empty child nodes.
-  for (const s of weapon.sockets) {
-    const parent = pivots.has(s.parent) ? s.parent : weapon.components.find((c) => !c.parent)?.name ?? weapon.components[0].name;
-    const node: Json = {
-      name: s.name,
-      translation: sub3(s.position, pivots.get(parent) ?? [0, 0, 0]),
-      extras: { badgun: { socket: true, description: s.description } },
-    };
-    const q = quatFromZ(s.forward);
-    if (q[3] !== 1) node.rotation = q;
-    nodes.push(node);
-    nodeIndex.set(`#socket:${s.name}`, nodes.length - 1);
-    (nodes[nodeIndex.get(parent)!].children ??= []).push(nodes.length - 1);
-  }
+    // Sockets as empty child nodes.
+    for (const s of weapon.sockets) {
+      const parent = pivots.has(s.parent) ? s.parent : weapon.components.find((c) => !c.parent)?.name ?? weapon.components[0].name;
+      const node: Json = {
+        name: s.name,
+        translation: sub3(s.position, pivots.get(parent) ?? [0, 0, 0]),
+        extras: { badgun: { socket: true, description: s.description } },
+      };
+      const q = quatFromZ(s.forward);
+      if (q[3] !== 1) node.rotation = q;
+      nodes.push(node);
+      (nodes[nodeIndex.get(parent)!].children ??= []).push(nodes.length - 1);
+    }
 
-  // Hierarchy.
-  const roots: number[] = [];
-  for (const c of weapon.components) {
-    const i = nodeIndex.get(c.name)!;
-    if (c.parent && nodeIndex.has(c.parent)) (nodes[nodeIndex.get(c.parent)!].children ??= []).push(i);
-    else roots.push(i);
+    // Hierarchy.
+    const roots: number[] = [];
+    for (const c of weapon.components) {
+      const i = nodeIndex.get(c.name)!;
+      if (c.parent && nodeIndex.has(c.parent)) (nodes[nodeIndex.get(c.parent)!].children ??= []).push(i);
+      else roots.push(i);
+    }
+    const root: Json = { name: weaponName(weapon), children: roots, extras: { badgun: manifest } };
+    if (translation.some((v) => Math.abs(v) > 1e-9)) root.translation = translation;
+    nodes.push(root);
+    sceneRoots.push(nodes.length - 1);
   }
-  nodes.push({ name: weaponName(weapon), children: roots, extras: { badgun: manifest } });
-  const rootIndex = nodes.length - 1;
 
   const bin = w.concat();
   const gltf: Json = {
     asset: { version: '2.0', generator: `${GENERATOR} ${VERSION}` },
     scene: 0,
-    scenes: [{ name: weaponName(weapon), nodes: [rootIndex], extras: { badgun: { recipe: weapon.recipe } } }],
+    scenes: [{ name: sceneName, nodes: sceneRoots, extras: sceneExtras }],
     nodes,
     meshes,
     materials,

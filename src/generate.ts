@@ -7,6 +7,7 @@ import { applyOverrides, applyWear } from './materials/palette.js';
 import { getStyle } from './styles/index.js';
 import { makeContext } from './parts/context.js';
 import { ROOT_NAMES, getArchetype, partKinds } from './archetypes/index.js';
+import { insignia } from './parts/insignia.js';
 import type { Params, PartKind, Recipe } from './types.js';
 
 export const PARAM_KEYS: (keyof Params)[] = ['length', 'bulk', 'ornament', 'detail', 'smoothness', 'wear'];
@@ -44,16 +45,22 @@ export function resolveParts(recipe: Recipe): Record<PartKind, string> {
     }
     const rng = Rng.stream(recipe.seed, `part:${kind}`);
     if (kind === 'sight') {
-      out[kind] = recipe.optic && recipe.optic !== 'auto' ? recipe.optic : rng.weighted(usable(style.byArchetype?.[arch.id]?.sight ?? arch.opticWeights(style), arch.optics));
+      out[kind] = recipe.optic && recipe.optic !== 'auto' ? recipe.optic : rng.weighted(prefer(usable(style.byArchetype?.[arch.id]?.sight ?? arch.opticWeights(style), arch.optics), recipe.prefer?.sight));
       continue;
     }
     const table = arch.parts[kind];
     const weights = style.byArchetype?.[arch.id]?.[kind] ?? arch.weights(style, kind) ?? style.parts[kind];
-    const ok = usable(weights, Object.keys(table));
-    out[kind] = rng.weighted(ok);
+    out[kind] = rng.weighted(prefer(usable(weights, Object.keys(table)), recipe.prefer?.[kind]));
   }
   arch.fixup?.(out, new Set(Object.keys(recipe.parts ?? {}).concat(recipe.optic && recipe.optic !== 'auto' ? ['sight'] : [])));
   return out;
+}
+
+/** Boost a preferred variant (if it's a valid option here) so it wins most of the time. */
+function prefer(weights: Record<string, number>, preferred: string | undefined): Record<string, number> {
+  if (!preferred || !(preferred in weights)) return weights;
+  const total = Object.values(weights).reduce((a, b) => a + b, 0);
+  return { ...weights, [preferred]: weights[preferred] + total * 8 };
 }
 
 /** Drop unknown/zero-weight variants; fall back to uniform if nothing is left. */
@@ -78,9 +85,11 @@ export function generate(recipe: Recipe): Weapon {
   const palette = applyOverrides(applyWear(chosenPalette.materials, params.wear), recipe.palette);
 
   const builder = new WeaponBuilder(ROOT_NAMES[arch.id] ?? 'Receiver');
-  const layout = arch.layout(parts, params, Rng.stream(recipe.seed, 'layout'), style);
+  // Family members share shape genes: their layout stream comes from the family key.
+  const layout = arch.layout(parts, params, Rng.stream(recipe.family ?? recipe.seed, 'layout'), style);
   const ctx = makeContext(arch.id, builder, style, params, recipe.seed, layout, parts);
   arch.build(ctx, parts);
+  if (recipe.insignia) insignia(ctx, recipe.insignia);
 
   const weapon: Weapon = {
     recipe: { ...recipe },

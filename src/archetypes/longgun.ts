@@ -333,7 +333,7 @@ function longGun(
     weights: (style, kind) => {
       if (kind === 'config') {
         const t = style.traits;
-        const base = t.glow ? 0.5 : t.rails ? 0.3 : t.scrap ? 0.05 : 0.08;
+        const base = (t.era ?? 2000) < 1970 ? 0 : t.glow ? 0.5 : t.rails ? 0.3 : t.scrap ? 0.05 : 0.08;
         const lever = t.plumbing || t.magic ? 0.35 : t.scrap ? 0.2 : t.rails ? 0.08 : 0.04;
         const mp = t.rails || t.scrap ? 0.4 : t.glow ? 0.2 : 0.12;
         const box = t.rails || t.glow ? 0.5 : t.scrap ? 0.25 : 0.1;
@@ -345,7 +345,8 @@ function longGun(
           boxfed: id === 'shotgun' ? box : 0,
         };
       }
-      return tweak(style, kind, without(style.parts[kind], SPECIALISTS[kind] ?? []));
+      const banned = [...(SPECIALISTS[kind] ?? []), ...(kind === 'receiver' && !['rifle', 'sniper'].includes(id) ? ['boltaction'] : [])];
+      return tweak(style, kind, without(style.parts[kind], banned));
     },
     opticWeights: optics,
     layout: (chosen, p, rng) => longGunLayout(id, chosen, p, rng),
