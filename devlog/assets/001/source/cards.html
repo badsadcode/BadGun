@@ -1,0 +1,204 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@500;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#121419; --ink:#f1eee8; --dim:#9aa0aa; --orange:#ff6b3d; --yellow:#ffd23d; --cyan:#42e2ff; --brass:#e0b25a; --pink:#ff5fc0; }
+* { box-sizing: border-box; margin: 0; }
+body { background: #333; font-family: 'Space Grotesk', sans-serif; color: var(--ink); padding: 20px; display: grid; gap: 20px; justify-content: start; }
+.card { width: 1200px; position: relative; overflow: hidden; border-radius: 28px; padding: 48px 56px;
+  background:
+    radial-gradient(900px 500px at 80% 30%, rgba(255,107,61,.13), transparent 60%),
+    radial-gradient(700px 400px at 10% 100%, rgba(66,226,255,.08), transparent 60%),
+    linear-gradient(160deg, #181b22, #101216);
+}
+.card::before { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+  background-size: 32px 32px; mask-image: radial-gradient(circle at 60% 40%, #000 30%, transparent 85%); }
+.kicker { font: 700 14px 'JetBrains Mono', monospace; letter-spacing: 3px; color: var(--orange); text-transform: uppercase; }
+h1 { font-size: 76px; line-height: .95; letter-spacing: -3px; font-weight: 700; margin: 18px 0 18px; }
+h1 em { font-style: normal; color: var(--orange); }
+h2 { font-size: 44px; letter-spacing: -1.5px; line-height: 1; margin: 10px 0 8px; }
+.sub { font-size: 22px; color: var(--dim); max-width: 520px; line-height: 1.35; }
+.chip { display: inline-block; font: 700 13px 'JetBrains Mono', monospace; letter-spacing: 2px; padding: 6px 12px; border-radius: 999px; border: 1.5px solid currentColor; }
+.note { font-family: 'Caveat', cursive; font-weight: 700; color: var(--yellow); }
+img { display: block; }
+.logo { position: absolute; right: 40px; bottom: 30px; font: 700 15px 'JetBrains Mono', monospace; color: #5b616c; letter-spacing: 2px; }
+.logo b { color: var(--orange); }
+
+/* banner */
+#banner { height: 560px; }
+#banner .guns { position: absolute; right: -40px; top: 40px; width: 760px; height: 500px; }
+#banner .guns img { position: absolute; filter: drop-shadow(0 30px 30px rgba(0,0,0,.45)); }
+#banner .g1 { width: 600px; right: 110px; top: 10px; opacity: .97; }
+#banner .g2 { width: 700px; right: 40px; top: 150px; }
+#banner .g3 { width: 600px; right: 130px; top: 320px; }
+#banner .stamp { position: absolute; left: 56px; bottom: 48px; display: flex; gap: 10px; }
+#banner .scribble { position: absolute; left: 58px; top: 405px; transform: rotate(-3deg); font-size: 28px; }
+
+/* worlds */
+.world { display: grid; grid-template-columns: 330px 1fr; align-items: center; gap: 20px; padding: 18px 0; border-top: 1px dashed rgba(255,255,255,.1); position: relative; }
+.world:first-of-type { border-top: 0; }
+.world p { color: var(--dim); font-size: 18px; line-height: 1.4; }
+.world img { width: 780px; justify-self: center; filter: drop-shadow(0 18px 22px rgba(0,0,0,.5)); }
+
+/* grids */
+.grid { display: grid; gap: 6px 26px; margin-top: 26px; }
+.grid img { width: 100%; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.colhead { margin-bottom: 4px; }
+.cell { position: relative; padding: 10px 6px; }
+.cell .label { position: absolute; left: 6px; top: 2px; font: 700 13px 'JetBrains Mono', monospace; color: var(--dim); letter-spacing: 1px; }
+
+/* exploded */
+#exploded .stage { position: relative; width: 1088px; margin-top: 30px; }
+#exploded .stage img { width: 100%; filter: drop-shadow(0 16px 18px rgba(0,0,0,.5)); }
+.tag { position: absolute; font-family: 'Caveat', cursive; font-weight: 700; font-size: 30px; color: var(--yellow); white-space: nowrap; transform: rotate(-3deg); }
+.tag::before { content: '↙ '; }
+.tag.r::before { content: ''; } .tag.r::after { content: ' ↘'; }
+.tag.d::before { content: '↖ '; }
+.tag.n::before { content: ''; }
+
+/* stats */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 30px; }
+.stat { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 20px; padding: 22px 24px; }
+.stat .n { font-size: 54px; font-weight: 700; letter-spacing: -2px; color: var(--ink); }
+.stat .n small { font-size: 26px; color: var(--dim); letter-spacing: 0; }
+.stat .t { color: var(--dim); font-size: 17px; line-height: 1.35; margin-top: 4px; }
+.stat.hot { border-color: rgba(255,107,61,.5); background: rgba(255,107,61,.08); }
+.stat.hot .n { color: var(--orange); }
+</style></head><body>
+
+<!-- 1. BANNER -->
+<section class="card" id="banner">
+  <div class="kicker">Bad Ideas Works · Devlog #001</div>
+  <h1>The Gun<br>Factory<br>Is <em>Open.</em></h1>
+  <p class="sub">We taught a computer to design video game weapons. It took the job very seriously.</p>
+  <div class="note scribble">pinky promise: no real guns, only pixels ✌</div>
+  <div class="guns">
+    <img class="g1" src="r/c_hero_modern.png">
+    <img class="g2" src="r/c_hero_steampunk.png">
+    <img class="g3" src="r/c_hero_scifi.png">
+  </div>
+  <div class="stamp">
+    <span class="chip" style="color:#c9ccd2">MODERN</span>
+    <span class="chip" style="color:var(--brass)">STEAMPUNK</span>
+    <span class="chip" style="color:var(--pink)">SCI-FI</span>
+  </div>
+</section>
+
+<!-- 2. WORLDS -->
+<section class="card" id="worlds">
+  <div class="kicker">One rifle · three worlds</div>
+  <div class="world">
+    <div><span class="chip" style="color:#c9ccd2">MODERN</span><h2>The Sensible One</h2><p>Aluminium, polymer and a rail for everything. Looks like it has opinions about your posture.</p></div>
+    <img src="r/c_hero_modern.png">
+  </div>
+  <div class="world">
+    <div><span class="chip" style="color:var(--brass)">STEAMPUNK</span><h2>The Victorian Overachiever</h2><p>Brass, wood, a drum magazine and a muzzle shaped like a trumpet. Runs on steam and confidence.</p></div>
+    <img src="r/c_hero_steampunk.png">
+  </div>
+  <div class="world">
+    <div><span class="chip" style="color:var(--pink)">SCI-FI</span><h2>The One From Next Tuesday</h2><p>Smooth shell, glowing strips, energy cell. Batteries not included. The battery <i>is</i> the gun.</p></div>
+    <img src="r/c_hero_scifi.png">
+  </div>
+  <div class="logo">BAD<b>GUN</b></div>
+</section>
+
+<!-- 3. EXPLODED -->
+<section class="card" id="exploded">
+  <div class="kicker">What's in the box</div>
+  <h2>It's basically LEGO.</h2>
+  <p class="sub" style="max-width:900px">Every gun is built from named parts. Each one can be swapped, repainted or animated on its own.</p>
+  <div class="stage">
+    <img src="r/c_exploded.png">
+    <span class="tag d" style="left:70px; top:225px">stock</span>
+    <span class="tag d" style="left:320px; top:300px">grip</span>
+    <span class="tag" style="left:440px; top:330px">magazine (slides out!)</span>
+    <span class="tag" style="left:620px; top:-4px">telescope</span>
+    <span class="tag d" style="left:410px; top:178px">receiver</span>
+    <span class="tag d" style="left:640px; top:182px">forend</span>
+    <span class="tag" style="left:820px; top:66px">barrel</span>
+    <span class="tag d" style="left:960px; top:170px">muzzle</span>
+  </div>
+  <div class="logo">BAD<b>GUN</b></div>
+</section>
+
+<!-- 4. PALETTES -->
+<section class="card" id="palettes">
+  <div class="kicker">The paint job comes free</div>
+  <h2>Same gun. Four paint jobs.</h2>
+  <p class="sub" style="max-width:900px">Every gun ships with colors that already fit its world. Want pink? Repaint one bucket. The shape doesn't change.</p>
+  <div class="grid" style="grid-template-columns: 1fr 1fr;">
+    <div class="cell"><span class="label">POLAR CYAN</span><img src="r/c_pal_0.png"></div>
+    <div class="cell"><span class="label">NIGHT ORCHID</span><img src="r/c_pal_1.png"></div>
+    <div class="cell"><span class="label">ADMIRAL</span><img src="r/c_pal_2.png"></div>
+    <div class="cell"><span class="label">BIOHAZARD</span><img src="r/c_pal_3.png"></div>
+  </div>
+  <div class="logo">BAD<b>GUN</b></div>
+</section>
+
+<!-- 5. LINEUP -->
+<section class="card" id="lineup">
+  <div class="kicker">Press the button, get a gun</div>
+  <h2>Twelve lucky numbers, twelve guns.</h2>
+  <p class="sub" style="max-width:900px">Each one comes from a single number we call the <b style="color:var(--ink)">seed</b>. Same seed, same gun, forever.</p>
+  <div class="grid" style="grid-template-columns: repeat(3, 1fr);">
+    <div class="colhead"><span class="chip" style="color:#c9ccd2">MODERN</span></div>
+    <div class="colhead"><span class="chip" style="color:var(--brass)">STEAMPUNK</span></div>
+    <div class="colhead"><span class="chip" style="color:var(--pink)">SCI-FI</span></div>
+    <div class="cell"><span class="label">#1</span><img src="r/c_line_modern_1.png"></div>
+    <div class="cell"><span class="label">#1</span><img src="r/c_line_steampunk_1.png"></div>
+    <div class="cell"><span class="label">#2</span><img src="r/c_line_scifi_2.png"></div>
+    <div class="cell"><span class="label">#3</span><img src="r/c_line_modern_3.png"></div>
+    <div class="cell"><span class="label">#5</span><img src="r/c_line_steampunk_5.png"></div>
+    <div class="cell"><span class="label">#3</span><img src="r/c_line_scifi_3.png"></div>
+    <div class="cell"><span class="label">#5</span><img src="r/c_line_modern_5.png"></div>
+    <div class="cell"><span class="label">#6</span><img src="r/c_line_steampunk_6.png"></div>
+    <div class="cell"><span class="label">#5</span><img src="r/c_line_scifi_5.png"></div>
+    <div class="cell"><span class="label">#7</span><img src="r/c_line_modern_7.png"></div>
+    <div class="cell"><span class="label">#8</span><img src="r/c_line_steampunk_8.png"></div>
+    <div class="cell"><span class="label">#9</span><img src="r/c_line_scifi_9.png"></div>
+  </div>
+  <div class="logo">BAD<b>GUN</b></div>
+</section>
+
+<!-- 6. FRANKENGUN -->
+<section class="card" id="franken">
+  <div class="kicker">Lab accident</div>
+  <h2>Meet the Frankengun.</h2>
+  <p class="sub" style="max-width:860px">A modern rifle wearing steampunk parts. It shouldn't work, but it sort of does: everything gets repainted in the modern colors, so it still looks like one gun.</p>
+  <div style="position:relative; margin-top: 16px;">
+    <img src="r/c_franken.png" style="width: 1000px; margin-left: 40px; filter: drop-shadow(0 18px 22px rgba(0,0,0,.5));">
+    <span class="tag" style="left:150px; top:20px">wooden-style stock, but make it polymer</span>
+    <span class="tag d" style="left:420px; top:250px">steampunk drum magazine</span>
+    <span class="tag n" style="left:740px; top:215px">the trumpet stays ↗</span>
+  </div>
+  <div class="logo">BAD<b>GUN</b></div>
+</section>
+
+<!-- 7. RETRO -->
+<section class="card" id="retro">
+  <div class="kicker">One slider</div>
+  <h2>Smooth ↔ Retro</h2>
+  <p class="sub" style="max-width:900px">Slide "smoothness" all the way down and every round thing goes chunky and polygonal (look at that drum!). Very 1998. We love it.</p>
+  <div class="grid" style="grid-template-columns: 1fr 1fr;">
+    <div class="cell"><span class="label">SMOOTHNESS 0 · RETRO</span><img src="r/c_lowpoly.png"></div>
+    <div class="cell"><span class="label">SMOOTHNESS 1 · SMOOTH</span><img src="r/c_smooth.png"></div>
+  </div>
+  <div class="logo">BAD<b>GUN</b></div>
+</section>
+
+<!-- 8. STATS -->
+<section class="card" id="stats">
+  <div class="kicker">By the numbers</div>
+  <h2>Day one, in numbers.</h2>
+  <div class="stats">
+    <div class="stat hot"><div class="n">0</div><div class="t">real guns harmed. These only exist inside video games.</div></div>
+    <div class="stat"><div class="n">~6<small> ms</small></div><div class="t">to build one gun. You blink in about 100.</div></div>
+    <div class="stat"><div class="n">4.3<small> billion</small></div><div class="t">lucky numbers to try. Words work too ("tom-was-here" is a valid gun).</div></div>
+    <div class="stat"><div class="n">11</div><div class="t">named paint buckets: body, grip, stock, glass, glow…</div></div>
+    <div class="stat"><div class="n">8</div><div class="t">invisible hooks per gun: hands, scope, muzzle flash, shoulder, aim camera…</div></div>
+    <div class="stat"><div class="n">1</div><div class="t">trumpet-shaped muzzle. We regret nothing.</div></div>
+  </div>
+  <div class="logo">BAD<b>GUN</b></div>
+</section>
+</body></html>

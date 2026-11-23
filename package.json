@@ -1,0 +1,31 @@
+{
+  "name": "badgun",
+  "version": "0.1.0",
+  "description": "Procedural, game-ready weapon asset generator. Archetype + style + seed = a reproducible, coherent weapon (.glb).",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "badgun": "dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "preview": "npm run build && node tools/serve.mjs",
+    "examples": "npm run build && node tools/make-examples.mjs"
+  },
+  "keywords": ["procedural", "gltf", "glb", "weapon", "game-assets", "generator"],
+  "private": true,
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "gltf-validator": "^2.0.0-dev.3.10",
+    "typescript": "^5.9.3"
+  }
+}

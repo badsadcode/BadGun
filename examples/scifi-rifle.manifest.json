@@ -1,0 +1,524 @@
+{
+  "generator": "BadGun",
+  "version": "0.1.0",
+  "name": "BadGun_rifle_scifi_4",
+  "recipe": {
+    "archetype": "rifle",
+    "style": "scifi",
+    "seed": 4
+  },
+  "resolved": {
+    "params": {
+      "length": 0.478,
+      "bulk": 0.471,
+      "ornament": 0.379,
+      "detail": 0.391,
+      "smoothness": 0.882,
+      "wear": 0.139
+    },
+    "parts": {
+      "receiver": "sleek",
+      "barrel": "rails",
+      "muzzle": "emitter",
+      "handguard": "shell",
+      "stock": "solid",
+      "grip": "sleek",
+      "magazine": "cell",
+      "sight": "scope"
+    },
+    "palette": "Night Orchid"
+  },
+  "conventions": {
+    "units": "meters",
+    "up": "+Y",
+    "forward": "+Z (muzzle direction)",
+    "left": "+X (the ejection port is on the right, -X)",
+    "origin": "Trigger hand on the pistol grip (SOCKET_Hand_Grip)",
+    "uv": "TEXCOORD_0 is a physical unwrap: 1 UV unit = 0.25 m, consistent texel density, tiling-friendly (islands may overlap)",
+    "materials": "One shared material per semantic slot (MAT_<Slot>); names are stable across regenerations",
+    "sockets": "Empty nodes named SOCKET_*; their +Z axis is the socket forward direction"
+  },
+  "materials": [
+    {
+      "name": "MAT_Body",
+      "slot": "Body",
+      "def": {
+        "label": "black ceramic shell",
+        "color": "#22242a",
+        "metallic": 0.2,
+        "roughness": 0.3291243231492117
+      }
+    },
+    {
+      "name": "MAT_Barrel",
+      "slot": "Barrel",
+      "def": {
+        "label": "dark alloy",
+        "color": "#2c2f36",
+        "metallic": 0.85,
+        "roughness": 0.3291243231492117
+      }
+    },
+    {
+      "name": "MAT_Grip",
+      "slot": "Grip",
+      "def": {
+        "label": "charcoal elastomer",
+        "color": "#2d3137",
+        "metallic": 0,
+        "roughness": 0.7124818527782335
+      }
+    },
+    {
+      "name": "MAT_Stock",
+      "slot": "Stock",
+      "def": {
+        "label": "black ceramic",
+        "color": "#26282e",
+        "metallic": 0.2,
+        "roughness": 0.3482921996306628
+      }
+    },
+    {
+      "name": "MAT_Magazine",
+      "slot": "Magazine",
+      "def": {
+        "label": "cell casing",
+        "color": "#3b4049",
+        "metallic": 0.7,
+        "roughness": 0.3770440143528394
+      }
+    },
+    {
+      "name": "MAT_Sight",
+      "slot": "Sight",
+      "def": {
+        "label": "sensor housing",
+        "color": "#31353c",
+        "metallic": 0.7,
+        "roughness": 0.3291243231492117
+      }
+    },
+    {
+      "name": "MAT_Trim",
+      "slot": "Trim",
+      "def": {
+        "label": "chrome panel",
+        "color": "#8c939d",
+        "metallic": 1,
+        "roughness": 0.21411706426050514
+      }
+    },
+    {
+      "name": "MAT_Accent",
+      "slot": "Accent",
+      "def": {
+        "label": "magenta",
+        "color": "#bf267a",
+        "metallic": 0.1,
+        "roughness": 0.3770440143528394
+      }
+    },
+    {
+      "name": "MAT_Detail",
+      "slot": "Detail",
+      "def": {
+        "label": "dark alloy",
+        "color": "#1f2227",
+        "metallic": 0.85,
+        "roughness": 0.3770440143528394
+      }
+    },
+    {
+      "name": "MAT_Glass",
+      "slot": "Glass",
+      "def": {
+        "label": "smoked glass",
+        "color": "#fe9ad7",
+        "metallic": 0,
+        "roughness": 0.030193513102224095,
+        "opacity": 0.35
+      }
+    },
+    {
+      "name": "MAT_Emissive",
+      "slot": "Emissive",
+      "def": {
+        "label": "plasma magenta",
+        "color": "#310119",
+        "metallic": 0,
+        "roughness": 0.4062409263891168,
+        "emissive": "#ff3ab0",
+        "emissiveStrength": 2.1771166032399054
+      }
+    }
+  ],
+  "components": [
+    {
+      "name": "Receiver",
+      "kind": "receiver",
+      "variant": "sleek",
+      "parent": null,
+      "pivot": [
+        0,
+        0.065,
+        0.073
+      ],
+      "materials": [
+        "MAT_Body",
+        "MAT_Trim",
+        "MAT_Emissive",
+        "MAT_Detail"
+      ],
+      "triangles": 716
+    },
+    {
+      "name": "ChargingHandle",
+      "kind": "charging_handle",
+      "variant": "slider",
+      "parent": "Receiver",
+      "pivot": [
+        0.0288,
+        0.0823,
+        0.1863
+      ],
+      "motion": {
+        "type": "translate",
+        "axis": [
+          0,
+          0,
+          -1
+        ],
+        "range": [
+          0,
+          0.05
+        ],
+        "purpose": "charge"
+      },
+      "materials": [
+        "MAT_Accent"
+      ],
+      "triangles": 60
+    },
+    {
+      "name": "Trigger",
+      "kind": "trigger",
+      "variant": "blade",
+      "parent": "Receiver",
+      "pivot": [
+        0,
+        0.0283,
+        0.052
+      ],
+      "motion": {
+        "type": "rotate",
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "range": [
+          0,
+          0.3
+        ],
+        "purpose": "fire"
+      },
+      "materials": [
+        "MAT_Detail"
+      ],
+      "triangles": 44
+    },
+    {
+      "name": "Barrel",
+      "kind": "barrel",
+      "variant": "rails",
+      "parent": "Receiver",
+      "pivot": [
+        0,
+        0.065,
+        0.2263
+      ],
+      "materials": [
+        "MAT_Barrel",
+        "MAT_Trim",
+        "MAT_Emissive",
+        "MAT_Detail"
+      ],
+      "triangles": 308
+    },
+    {
+      "name": "Handguard",
+      "kind": "handguard",
+      "variant": "shell",
+      "parent": "Receiver",
+      "pivot": [
+        0,
+        0.065,
+        0.2463
+      ],
+      "materials": [
+        "MAT_Body",
+        "MAT_Emissive",
+        "MAT_Trim"
+      ],
+      "triangles": 284
+    },
+    {
+      "name": "Muzzle",
+      "kind": "muzzle",
+      "variant": "emitter",
+      "parent": "Barrel",
+      "pivot": [
+        0,
+        0.065,
+        0.6254
+      ],
+      "materials": [
+        "MAT_Trim",
+        "MAT_Emissive"
+      ],
+      "triangles": 320
+    },
+    {
+      "name": "Stock",
+      "kind": "stock",
+      "variant": "solid",
+      "parent": "Receiver",
+      "pivot": [
+        0,
+        0.065,
+        -0.047
+      ],
+      "materials": [
+        "MAT_Stock",
+        "MAT_Trim",
+        "MAT_Emissive",
+        "MAT_Grip"
+      ],
+      "triangles": 256
+    },
+    {
+      "name": "Grip",
+      "kind": "grip",
+      "variant": "sleek",
+      "parent": "Receiver",
+      "pivot": [
+        0,
+        0.0283,
+        0.026
+      ],
+      "materials": [
+        "MAT_Grip",
+        "MAT_Trim"
+      ],
+      "triangles": 280
+    },
+    {
+      "name": "Magazine",
+      "kind": "magazine",
+      "variant": "cell",
+      "parent": "Receiver",
+      "pivot": [
+        0,
+        0.0243,
+        0.1159
+      ],
+      "motion": {
+        "type": "translate",
+        "axis": [
+          0,
+          -1,
+          0
+        ],
+        "range": [
+          0,
+          0.25
+        ],
+        "purpose": "reload"
+      },
+      "materials": [
+        "MAT_Magazine",
+        "MAT_Emissive",
+        "MAT_Trim"
+      ],
+      "triangles": 388
+    },
+    {
+      "name": "Optic",
+      "kind": "optic",
+      "variant": "scope",
+      "parent": "Receiver",
+      "pivot": [
+        0,
+        0.1057,
+        0.1143
+      ],
+      "materials": [
+        "MAT_Sight",
+        "MAT_Glass",
+        "MAT_Trim",
+        "MAT_Detail"
+      ],
+      "triangles": 1652
+    }
+  ],
+  "sockets": [
+    {
+      "name": "SOCKET_Muzzle",
+      "parent": "Muzzle",
+      "position": [
+        0,
+        0.065,
+        0.6654
+      ],
+      "forward": [
+        0,
+        0,
+        1
+      ],
+      "description": "Muzzle tip: projectiles, flashes, tracers."
+    },
+    {
+      "name": "SOCKET_Shoulder",
+      "parent": "Stock",
+      "position": [
+        0,
+        0.022,
+        -0.3217
+      ],
+      "forward": [
+        0,
+        0,
+        -1
+      ],
+      "description": "Butt of the stock, where it meets the shoulder."
+    },
+    {
+      "name": "SOCKET_Optic",
+      "parent": "Receiver",
+      "position": [
+        0,
+        0.1057,
+        0.1143
+      ],
+      "forward": [
+        0,
+        0,
+        1
+      ],
+      "description": "Optic mount point on top of the weapon."
+    },
+    {
+      "name": "SOCKET_ADS",
+      "parent": "Receiver",
+      "position": [
+        0,
+        0.1357,
+        -0.1107
+      ],
+      "forward": [
+        0,
+        0,
+        1
+      ],
+      "description": "Eye position when aiming down sights (place the camera here)."
+    },
+    {
+      "name": "SOCKET_Hand_Grip",
+      "parent": "Grip",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "forward": [
+        0,
+        0,
+        1
+      ],
+      "description": "Trigger hand on the pistol grip."
+    },
+    {
+      "name": "SOCKET_Hand_Support",
+      "parent": "Handguard",
+      "position": [
+        0,
+        0.0302,
+        0.3943
+      ],
+      "forward": [
+        0,
+        0,
+        1
+      ],
+      "description": "Support hand under the handguard."
+    },
+    {
+      "name": "SOCKET_Magazine",
+      "parent": "Receiver",
+      "position": [
+        0,
+        0.0243,
+        0.1159
+      ],
+      "forward": [
+        0,
+        -1,
+        0
+      ],
+      "description": "Magazine well: magazine attaches here, pointing down."
+    },
+    {
+      "name": "SOCKET_Eject",
+      "parent": "Receiver",
+      "position": [
+        -0.0328,
+        0.069,
+        0.1143
+      ],
+      "forward": [
+        -1,
+        0.3,
+        -0.2
+      ],
+      "description": "Ejection port on the right side: shell casings / heat vents."
+    }
+  ],
+  "bounds": {
+    "min": [
+      -0.0328,
+      -0.0751,
+      -0.3217
+    ],
+    "max": [
+      0.0368,
+      0.1657,
+      0.6654
+    ],
+    "size": [
+      0.0697,
+      0.2408,
+      0.9871
+    ]
+  },
+  "collision": {
+    "type": "box",
+    "center": [
+      0.002,
+      0.0453,
+      0.1718
+    ],
+    "size": [
+      0.0697,
+      0.2408,
+      0.9871
+    ]
+  },
+  "stats": {
+    "triangles": 4308,
+    "vertices": 6178,
+    "meshes": 10,
+    "primitives": 28,
+    "materials": 11
+  }
+}

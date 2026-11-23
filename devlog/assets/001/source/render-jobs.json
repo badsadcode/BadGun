@@ -1,0 +1,293 @@
+[
+ {
+  "out": "r/hero_modern.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "modern",
+   "seed": 2
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 1400,
+  "height": 640
+ },
+ {
+  "out": "r/hero_steampunk.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "steampunk",
+   "seed": 4
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 1400,
+  "height": 640
+ },
+ {
+  "out": "r/hero_scifi.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "scifi",
+   "seed": 4
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 1400,
+  "height": 640
+ },
+ {
+  "out": "r/exploded.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "steampunk",
+   "seed": 2
+  },
+  "view": "side&explode=1",
+  "bg": "none",
+  "width": 1400,
+  "height": 700
+ },
+ {
+  "out": "r/pal_0.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "scifi",
+   "seed": 1,
+   "paletteVariant": 0
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 1000,
+  "height": 420
+ },
+ {
+  "out": "r/pal_1.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "scifi",
+   "seed": 1,
+   "paletteVariant": 1
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 1000,
+  "height": 420
+ },
+ {
+  "out": "r/pal_2.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "scifi",
+   "seed": 1,
+   "paletteVariant": 2
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 1000,
+  "height": 420
+ },
+ {
+  "out": "r/pal_3.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "scifi",
+   "seed": 1,
+   "paletteVariant": 3
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 1000,
+  "height": 420
+ },
+ {
+  "out": "r/line_modern_1.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "modern",
+   "seed": 1
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 900,
+  "height": 380
+ },
+ {
+  "out": "r/line_modern_3.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "modern",
+   "seed": 3
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 900,
+  "height": 380
+ },
+ {
+  "out": "r/line_modern_5.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "modern",
+   "seed": 5
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 900,
+  "height": 380
+ },
+ {
+  "out": "r/line_modern_7.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "modern",
+   "seed": 7
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 900,
+  "height": 380
+ },
+ {
+  "out": "r/line_steampunk_1.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "steampunk",
+   "seed": 1
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 900,
+  "height": 380
+ },
+ {
+  "out": "r/line_steampunk_5.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "steampunk",
+   "seed": 5
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 900,
+  "height": 380
+ },
+ {
+  "out": "r/line_steampunk_6.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "steampunk",
+   "seed": 6
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 900,
+  "height": 380
+ },
+ {
+  "out": "r/line_steampunk_8.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "steampunk",
+   "seed": 8
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 900,
+  "height": 380
+ },
+ {
+  "out": "r/line_scifi_2.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "scifi",
+   "seed": 2
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 900,
+  "height": 380
+ },
+ {
+  "out": "r/line_scifi_3.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "scifi",
+   "seed": 3
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 900,
+  "height": 380
+ },
+ {
+  "out": "r/line_scifi_5.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "scifi",
+   "seed": 5
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 900,
+  "height": 380
+ },
+ {
+  "out": "r/line_scifi_9.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "scifi",
+   "seed": 9
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 900,
+  "height": 380
+ },
+ {
+  "out": "r/franken.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "modern",
+   "seed": 5,
+   "parts": {
+    "magazine": "drum",
+    "muzzle": "bell",
+    "stock": "classic"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 1200,
+  "height": 600
+ },
+ {
+  "out": "r/lowpoly.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "steampunk",
+   "seed": 4,
+   "params": {
+    "smoothness": 0
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 1200,
+  "height": 600
+ },
+ {
+  "out": "r/smooth.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "steampunk",
+   "seed": 4,
+   "params": {
+    "smoothness": 1
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 1200,
+  "height": 600
+ }
+]
