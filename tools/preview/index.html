@@ -61,7 +61,13 @@
   canvas { display: block; touch-action: none; }
   .hud { position: absolute; left: 16px; bottom: 14px; font: 12px 'JetBrains Mono', monospace; color: var(--dim); pointer-events: none; }
   .hud b { color: var(--text); font-weight: 600; }
-  .toolbar { position: absolute; right: 14px; top: 14px; display: flex; gap: 6px; }
+  .toolbar { position: absolute; right: 14px; top: 14px; display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; max-width: calc(100% - 28px); }
+  .toolbar button.on { background: var(--accent, #ff6b3d); color: #111; }
+  .uvpanel { position: absolute; right: 14px; top: 58px; width: min(300px, 42vw); background: rgba(16,18,22,.92); border: 1px solid rgba(255,255,255,.1); border-radius: 12px; padding: 10px; display: none; }
+  .uvpanel.open { display: block; }
+  .uvpanel canvas { width: 100%; aspect-ratio: 1; display: block; border-radius: 6px; image-rendering: auto; }
+  .uvpanel .cap { font: 11px 'JetBrains Mono', monospace; color: var(--dim); margin-top: 6px; line-height: 1.45; }
+  body.shot .uvpanel.open { display: block; top: 14px; }
   .parts { font: 11px 'JetBrains Mono', monospace; color: var(--dim); }
   .parts div { display: flex; justify-content: space-between; padding: 2px 0; border-bottom: 1px dashed var(--line); }
   .parts b { color: var(--text); font-weight: 600; }
@@ -121,6 +127,9 @@
 
   <h2>Export</h2>
   <div class="row"><button class="primary" id="exportGlb">⬇ .glb</button><button id="saveRecipe">Save recipe</button></div>
+  <div class="row" style="margin-top:6px"><button id="exportTextured" title="The .glb with the colors baked into a texture, ready to paint">⬇ .glb + texture</button><button id="exportMaps" title="Base color, ID map and UV template as PNG files">⬇ Texture maps</button></div>
+  <label style="margin-top:8px">UV set 0 <small>(the one most tools paint on)</small></label>
+  <select id="uvFirst"><option value="tiling">Tiling (repeating textures)</option><option value="atlas">Atlas (unique, paintable)</option></select>
   <div class="row" style="margin-top:6px"><button id="loadRecipe">Load recipe</button><button id="copyLink">Copy link</button></div>
   <input type="file" id="file" accept=".json" hidden />
   <div class="err" id="err"></div>
@@ -132,8 +141,11 @@
   <div class="toolbar">
     <button id="explode" title="Pull parts apart">Explode</button>
     <button id="sockets" title="Show sockets">Sockets</button>
+    <button id="checker" title="Show the paintable texture layout as a checkerboard">Checker</button>
+    <button id="uvmap" title="Show the UV map (texture layout)">UV map</button>
     <button id="frame" title="Reset camera">Frame</button>
   </div>
+  <div class="uvpanel" id="uvpanel"><canvas id="uvcanvas" width="512" height="512"></canvas><div class="cap" id="uvcap"></div></div>
   <div class="hud" id="hud"></div>
 </main>
 
@@ -244,6 +256,8 @@ async function regenerate(keepCamera = true) {
     if (!keepCamera || !frame.done) { frame(current); frame.done = true; }
     exploded = false;
     applySocketVisibility();
+    applyChecker();
+    drawUvMap();
     refreshUI(weapon);
     if (!shot) history.replaceState(null, '', '#' + encodeURIComponent(JSON.stringify(clean(recipe))));
     document.title = currentFaction ? `BadGun · ${currentFaction.name}` : `BadGun · ${weapon.recipe.style} #${weapon.recipe.seed}`;
@@ -297,7 +311,10 @@ function materialsByName() {
 function recolor(slot, hex) {
   recipe.palette = { ...recipe.palette, [slot]: hex };
   const m = materialsByName().get('MAT_' + slot);
-  if (m) m.color.set(hex); // three handles sRGB -> linear
+  if (m) {
+    m.userData.baseColor = new THREE.Color(hex).getHex();
+    if (!showChecker) m.color.set(hex); // three handles sRGB -> linear
+  }
   history.replaceState(null, '', '#' + encodeURIComponent(JSON.stringify(clean(recipe))));
 }
 let isolated = null;
@@ -454,6 +471,57 @@ $('surprise').onclick = () => {
 $('resetColors').onclick = () => { recipe.palette = {}; regenerate(); };
 $('frame').onclick = () => current && frame(current);
 $('sockets').onclick = () => { showSockets = !showSockets; applySocketVisibility(); };
+
+// ---------------------------------------------------------------- texturing views
+// Checker: a grid texture on the atlas UV set (TEXCOORD_1, or 0 when atlas comes first).
+let showChecker = shot && qs.has('checker'), showUv = shot && qs.has('uvmap');
+let checkerTex = null;
+function makeChecker() {
+  const c = document.createElement('canvas');
+  c.width = c.height = 1024;
+  const g = c.getContext('2d');
+  const n = 32, cell = 1024 / n;
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
+    g.fillStyle = (x + y) % 2 ? '#f2f2f2' : '#3a3d44';
+    g.fillRect(x * cell, y * cell, cell, cell);
+  }
+  // Colored corner marks show orientation inside each 4x4 block.
+  g.fillStyle = '#ff6b3d';
+  for (let y = 0; y < n; y += 4) for (let x = 0; x < n; x += 4) g.fillRect(x * cell + 3, y * cell + 3, cell * 0.35, cell * 0.35);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 8;
+  return t;
+}
+function applyChecker() {
+  $('checker').classList.toggle('on', showChecker);
+  checkerTex ??= makeChecker();
+  checkerTex.channel = $('uvFirst').value === 'atlas' ? 0 : 1;
+  current?.traverse((o) => {
+    if (!o.isMesh || o.name === '__gizmo') return;
+    for (const m of [o.material].flat()) {
+      if (!m.isMeshStandardMaterial) continue;
+      if (m.userData.baseColor === undefined) m.userData.baseColor = m.color.getHex();
+      m.map = showChecker ? checkerTex : null;
+      if (showChecker) m.color.setHex(0xffffff); else m.color.setHex(m.userData.baseColor);
+      m.needsUpdate = true;
+    }
+  });
+}
+function drawUvMap() {
+  $('uvmap').classList.toggle('on', showUv);
+  $('uvpanel').classList.toggle('open', showUv);
+  if (!showUv || !currentWeapon) return;
+  const size = 512;
+  const img = BadGun.bakeTexture(currentWeapon, 'layout', { size });
+  const ctx = $('uvcanvas').getContext('2d');
+  ctx.putImageData(new ImageData(new Uint8ClampedArray(img.data.buffer, img.data.byteOffset, img.data.byteLength), size, size), 0, 0);
+  const a = BadGun.weaponAtlas(currentWeapon);
+  $('uvcap').innerHTML = `${currentFaction ? 'first member · ' : ''}<b>${a.charts}</b> islands · ${Math.round(a.coverage * 100)}% used<br>${Math.round(a.uvPerMeter * 1024 / 100)} px/cm at 1024 · ${Math.round(a.uvPerMeter * 2048 / 100)} px/cm at 2048`;
+}
+$('checker').onclick = () => { showChecker = !showChecker; applyChecker(); };
+$('uvmap').onclick = () => { showUv = !showUv; drawUvMap(); };
+$('uvFirst').onchange = () => applyChecker();
 $('explode').onclick = () => {
   if (!current) return;
   exploded = !exploded;
@@ -474,9 +542,24 @@ function download(name, data, type) {
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 $('exportGlb').onclick = () => {
-  if (currentFaction) return download(currentFaction.name.replace(/[^A-Za-z0-9]+/g, '_') + '.glb', BadGun.factionToGLB(currentFaction), 'model/gltf-binary');
+  if (currentFaction) return download(currentFaction.name.replace(/[^A-Za-z0-9]+/g, '_') + '.glb', BadGun.factionToGLB(currentFaction, { uv: $('uvFirst').value }), 'model/gltf-binary');
   const w = BadGun.generate(clean(recipe));
-  download(BadGun.weaponName(w) + '.glb', BadGun.toGLB(w), 'model/gltf-binary');
+  download(BadGun.weaponName(w) + '.glb', BadGun.toGLB(w, { uv: $('uvFirst').value }), 'model/gltf-binary');
+};
+$('exportTextured').onclick = () => {
+  if (currentFaction) return ($('err').textContent = 'Textured export works for single weapons (each has its own texture layout).');
+  const w = BadGun.generate(clean(recipe));
+  download(BadGun.weaponName(w) + '_textured.glb', BadGun.toGLB(w, { uv: $('uvFirst').value, texture: 1024 }), 'model/gltf-binary');
+};
+$('exportMaps').onclick = async () => {
+  if (currentFaction) return ($('err').textContent = 'Texture maps work for single weapons (each has its own texture layout).');
+  const w = BadGun.generate(clean(recipe));
+  const name = BadGun.weaponName(w);
+  for (const [mode, suffix] of [['basecolor', 'BaseColor'], ['id', 'ID'], ['layout', 'UVTemplate']]) {
+    const img = BadGun.bakeTexture(w, mode, { size: 1024 });
+    download(`${name}_${suffix}.png`, BadGun.encodePNG(img.data, img.width, img.height), 'image/png');
+    await new Promise((r) => setTimeout(r, 300)); // browsers dislike a burst of downloads
+  }
 };
 $('saveRecipe').onclick = () => currentFaction
   ? download(currentFaction.name.replace(/[^A-Za-z0-9]+/g, '_') + '.faction.json', JSON.stringify(BadGun.factionSummary(currentFaction), null, 2), 'application/json')

@@ -2,7 +2,7 @@
 // Regenerates examples/: the three "success criteria" rifles from the project brief, plus newer worlds.
 //   npm run examples
 import { mkdirSync, writeFileSync } from 'node:fs';
-import { generate, toGLB, buildManifest } from '../dist/index.js';
+import { generate, toGLB, buildManifest, bakeTexture, encodePNG } from '../dist/index.js';
 
 const examples = {
   'modern-rifle': { archetype: 'rifle', style: 'modern', seed: 2 },
@@ -21,3 +21,12 @@ for (const [name, recipe] of Object.entries(examples)) {
   writeFileSync(new URL(`${name}.manifest.json`, dir), JSON.stringify(buildManifest(weapon), null, 2) + '\n');
   console.log(`examples/${name}.glb`);
 }
+
+// One fully textured example: atlas UVs first, embedded base color, plus the texture maps.
+const textured = generate(examples['steampunk-rifle']);
+writeFileSync(new URL('steampunk-rifle_textured.glb', dir), toGLB(textured, { uv: 'atlas', texture: 1024 }));
+for (const [mode, suffix] of [['basecolor', 'BaseColor'], ['id', 'ID'], ['layout', 'UVTemplate']]) {
+  const img = bakeTexture(textured, mode, { size: 1024 });
+  writeFileSync(new URL(`steampunk-rifle_${suffix}.png`, dir), encodePNG(img.data, img.width, img.height));
+}
+console.log('examples/steampunk-rifle_textured.glb (+ texture maps)');

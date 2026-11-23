@@ -42,7 +42,7 @@
     "forward": "+Z (muzzle direction)",
     "left": "+X (the ejection port is on the right, -X)",
     "origin": "Trigger hand on the pistol grip (SOCKET_Hand_Grip)",
-    "uv": "TEXCOORD_0 is a physical unwrap: 1 UV unit = 0.25 m, consistent texel density, tiling-friendly (islands may overlap)",
+    "uv": "Two UV sets. Tiling: a physical unwrap, 1 UV unit = 0.25 m, for tiling textures and trim sheets (islands may overlap). Atlas: every surface packed once into the 0..1 square with uniform texel density and no overlaps, for hand painting, baking and unique texture sets. See \"uv\" for which set is which.",
     "materials": "One shared material per semantic slot (MAT_<Slot>); names are stable across regenerations",
     "sockets": "Empty nodes named SOCKET_*; their +Z axis is the socket forward direction"
   },
@@ -504,6 +504,17 @@
       0.2882,
       0.9334
     ]
+  },
+  "uv": {
+    "tiling": "TEXCOORD_0",
+    "atlas": "TEXCOORD_1",
+    "charts": 1973,
+    "coverage": 0.61,
+    "texelsPerMeter": {
+      "1024": 1052,
+      "2048": 2103
+    },
+    "padding": 4
   },
   "stats": {
     "triangles": 4788,

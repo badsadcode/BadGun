@@ -9,6 +9,11 @@
 Recipe ──► resolveParams / resolveParts ──► layout ──► part builders ──► Weapon ──► finalize ──► toGLB / buildManifest
  (JSON)     (seeded, per-style ranges)      (sizes)    (geometry per       (components,  (move origin,   (glTF 2.0 binary,
                                                         material slot)      sockets)      local pivots)   sidecar JSON)
+                                                                                              │
+                                                                                              └──► buildAtlas ──► bakeTexture ──► encodePNG
+                                                                                                   (2nd UV set)   (base color,    (PNG files or
+                                                                                                                   ID map, UV      embedded in
+                                                                                                                   template)       the .glb)
 ```
 
 ## Source map
@@ -28,7 +33,11 @@ Recipe ──► resolveParams / resolveParts ──► layout ──► part bu
 | `src/parts/*.ts` | Part builders, keyed by variant name: `receiver.ts`, `front.ts` (barrel/handguard/muzzle), `lower.ts` (grip/magazine), `stock.ts`, `sight.ts`, `extra.ts` and `variety.ts` (later long-gun variants: doubles, bullpup butt, pan magazine…), `scrap.ts` (survivor/makeshift parts), `accessory.ts` (bipod, bolt handle…), `pistol.ts`, `crossbow.ts`, `bow.ts` |
 | `src/materials/palette.ts` | Color utils, wear, overrides |
 | `src/export/glb.ts` | Dependency-free GLB writer |
-| `src/export/manifest.ts` | Manifest (recipe, parts, sockets, bounds, stats, conventions) |
+| `src/export/manifest.ts` | Manifest (recipe, parts, sockets, bounds, stats, conventions, UV info) |
+| `src/texture/atlas.ts` | Atlas UVs: charts from shared vertices, skyline packing into one square, uniform texel density |
+| `src/texture/bake.ts` | Rasterizer: base color, ID map and UV template images in atlas space |
+| `src/texture/png.ts` | Dependency-free PNG encoder (own DEFLATE), works in Node and browsers |
+| `src/parts/punk.ts` | Dieselpunk and cyberpunk parts |
 | `src/cli.ts` | Command-line tool |
 | `tools/preview/index.html` | three.js preview that runs the generator live in the browser |
 | `tools/render.mjs` | Batch PNG renders through the preview page (Playwright) |
@@ -54,7 +63,9 @@ Recipe ──► resolveParams / resolveParts ──► layout ──► part bu
 
 **Materials = semantic slots.** Eleven slots, shared materials, so draw calls per weapon stay ≈ (components × slots actually used), typically about 20-30. Slot names never change between styles; only their `MaterialDef` does.
 
-**UVs are physical.** Builders emit UVs in meters (perimeter × depth for extrusions, arc × length for lathes); the exporter scales by `UV_UNITS_PER_METER = 4`. Islands can overlap. A future atlas/packing pass can be added without touching builders.
+**UVs are physical.** Builders emit UVs in meters (perimeter × depth for extrusions, arc × length for lathes; flat lathe caps project as a disc); the exporter scales by `UV_UNITS_PER_METER = 4`. These "tiling" UVs can overlap.
+
+**The atlas is derived, not authored.** `buildAtlas` runs after finalize and never touches builders. It treats every group of triangles connected through shared vertices as one chart (builders already cut seams by duplicating vertices, and every chart's physical UVs are flat and fold-free), measures charts in meters, and skyline-packs them into one square with padding in pixels. Because the source UVs are physical, texel density is uniform everywhere. The export writes both sets: tiling in `TEXCOORD_0` and atlas in `TEXCOORD_1` by default, or swapped with `{ uv: 'atlas' }`. The atlas is cached per weapon (`weaponAtlas`) so the GLB, manifest and bakes all agree. If a new builder ever makes a chart that overlaps itself in UV, the atlas test will catch it.
 
 ## Adding things
 

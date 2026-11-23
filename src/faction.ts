@@ -16,6 +16,7 @@ import { generate, resolveParams, resolveParts } from './generate.js';
 import { getStyle } from './styles/index.js';
 import { mixHex } from './materials/palette.js';
 import { buildManifest } from './export/manifest.js';
+import type { UvLayout } from './export/manifest.js';
 import { toGLBArsenal } from './export/glb.js';
 import type { ArchetypeId, Insignia, InsigniaShape, PaletteOverrides, Params, Recipe, StyleId } from './types.js';
 
@@ -164,7 +165,8 @@ export function generateFaction(f: FactionRecipe): Faction {
  * one column (pistol on top), crossbows and bows in a second column to the
  * right. Each weapon keeps its own root node; materials are shared.
  */
-export function factionToGLB(faction: Faction, gap = 0.08): Uint8Array {
+export function factionToGLB(faction: Faction, opts: { uv?: UvLayout; gap?: number } = {}): Uint8Array {
+  const gap = opts.gap ?? 0.08;
   const items: { weapon: Weapon; translation: Vec3 }[] = [];
   const columns: Faction['members'][] = [
     faction.members.filter((m) => m.archetype !== 'bow' && m.archetype !== 'crossbow'),
@@ -185,7 +187,7 @@ export function factionToGLB(faction: Faction, gap = 0.08): Uint8Array {
     });
     zShift += maxZ - minZ + 0.25;
   }
-  return toGLBArsenal(items, faction.name, { badgun: { faction: summary(faction) } });
+  return toGLBArsenal(items, faction.name, { badgun: { faction: summary(faction) } }, { uv: opts.uv });
 }
 
 /** JSON-friendly description of a faction (recipes included, weapons not). */

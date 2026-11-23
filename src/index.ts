@@ -9,9 +9,16 @@ export { generate, resolveParams, resolveParts, PARAM_KEYS } from './generate.js
 export { ARCHETYPES, getArchetype, partKinds } from './archetypes/index.js';
 export type { ArchetypeDef } from './archetypes/index.js';
 export { toGLB, toGltfJson, toGLBArsenal } from './export/glb.js';
+export type { ExportOptions } from './export/glb.js';
+export { buildAtlas, weaponAtlas } from './texture/atlas.js';
+export type { Atlas, AtlasOptions } from './texture/atlas.js';
+export { bakeTexture, rasterizeSlots, ID_COLORS } from './texture/bake.js';
+export type { BakeMode, BakeOptions, Image } from './texture/bake.js';
+export { encodePNG } from './texture/png.js';
 export { generateFaction, factionToGLB, factionName, summary as factionSummary } from './faction.js';
 export type { Faction, FactionRecipe, Livery } from './faction.js';
 export { buildManifest, weaponName, UV_UNITS_PER_METER, VERSION } from './export/manifest.js';
+export type { UvLayout } from './export/manifest.js';
 export type { Manifest } from './export/manifest.js';
 export { STYLES, getStyle } from './styles/index.js';
 export type { StyleProfile } from './styles/index.js';

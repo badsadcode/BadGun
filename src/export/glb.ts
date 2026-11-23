@@ -15,7 +15,23 @@ import { normalize, cross, dot } from '../core/geometry.js';
 import type { Weapon } from '../core/weapon.js';
 import { hexToLinear } from '../materials/palette.js';
 import { MATERIAL_SLOTS } from '../types.js';
-import { GENERATOR, VERSION, UV_UNITS_PER_METER, buildManifest, usedSlots, weaponName } from './manifest.js';
+import { GENERATOR, VERSION, UV_UNITS_PER_METER, UvLayout, buildManifest, usedSlots, weaponName } from './manifest.js';
+import { weaponAtlas } from '../texture/atlas.js';
+import { bakeTexture } from '../texture/bake.js';
+import { encodePNG } from '../texture/png.js';
+
+export interface ExportOptions {
+  /**
+   * Which UV set is TEXCOORD_0 (the one most tools paint on and most engines
+   * sample by default). The other goes to TEXCOORD_1. Default "tiling".
+   */
+  uv?: UvLayout;
+  /**
+   * Embed a base color texture (the palette baked into the atlas) so the
+   * model opens ready to paint. Size in pixels, or true for 1024.
+   */
+  texture?: boolean | number;
+}
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Json = any;
@@ -99,16 +115,16 @@ function quatFromZ(dir: Vec3): [number, number, number, number] {
 
 const sub3 = (a: Vec3, b: Vec3): Vec3 => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 
-export function toGLB(weapon: Weapon): Uint8Array {
-  const json = toGltfJson(weapon);
+export function toGLB(weapon: Weapon, opts: ExportOptions = {}): Uint8Array {
+  const json = toGltfJson(weapon, opts);
   const bin: Uint8Array = json.__bin;
   delete json.__bin;
   return packGlb(json, bin);
 }
 
 /** Build the glTF JSON (with the binary payload stashed on `__bin`). */
-export function toGltfJson(weapon: Weapon): Json {
-  return buildGltf([{ weapon, translation: [0, 0, 0] }], weaponName(weapon), { badgun: { recipe: weapon.recipe } });
+export function toGltfJson(weapon: Weapon, opts: ExportOptions = {}): Json {
+  return buildGltf([{ weapon, translation: [0, 0, 0] }], weaponName(weapon), { badgun: { recipe: weapon.recipe } }, opts);
 }
 
 /**
@@ -116,16 +132,32 @@ export function toGltfJson(weapon: Weapon): Json {
  * its own root node at `translation`. Materials are shared by slot; the first
  * weapon that uses a slot defines it (faction members share one palette).
  */
-export function toGLBArsenal(items: { weapon: Weapon; translation: Vec3 }[], name: string, extras: Json = {}): Uint8Array {
-  const json = buildGltf(items, name, extras);
+export function toGLBArsenal(items: { weapon: Weapon; translation: Vec3 }[], name: string, extras: Json = {}, opts: Pick<ExportOptions, 'uv'> = {}): Uint8Array {
+  const json = buildGltf(items, name, extras, opts);
   const bin: Uint8Array = json.__bin;
   delete json.__bin;
   return packGlb(json, bin);
 }
 
-function buildGltf(items: { weapon: Weapon; translation: Vec3 }[], sceneName: string, sceneExtras: Json): Json {
+function buildGltf(items: { weapon: Weapon; translation: Vec3 }[], sceneName: string, sceneExtras: Json, opts: ExportOptions = {}): Json {
   for (const it of items) if (!it.weapon.finalized) throw new Error('Weapon must be finalized before export');
   const w = new BinWriter();
+  const uvFirst: UvLayout = opts.uv ?? 'tiling';
+  const atlasSet = uvFirst === 'atlas' ? 0 : 1;
+  // A baked texture belongs to one weapon's atlas, so only single weapons embed one.
+  const textureSize = opts.texture ? (opts.texture === true ? 1024 : opts.texture) : 0;
+  if (textureSize && items.length !== 1) throw new Error('Embedded textures are only supported for single-weapon exports');
+  let texture: Json = null;
+  if (textureSize) {
+    const img = bakeTexture(items[0].weapon, 'basecolor', { size: textureSize });
+    const view = w.view(encodePNG(img.data, img.width, img.height));
+    texture = {
+      images: [{ name: 'T_BaseColor', mimeType: 'image/png', bufferView: view }],
+      // Linear filtering with mipmaps; clamp so atlas edges don't wrap around.
+      samplers: [{ magFilter: 9729, minFilter: 9987, wrapS: 33071, wrapT: 33071 }],
+      textures: [{ name: 'T_BaseColor', sampler: 0, source: 0 }],
+    };
+  }
 
   // Materials: one per used slot (across all weapons), in canonical order.
   const used = new Set(items.flatMap((it) => usedSlots(it.weapon)));
@@ -139,7 +171,9 @@ function buildGltf(items: { weapon: Weapon; translation: Vec3 }[], sceneName: st
     const opacity = m.opacity ?? 1;
     const mat: Json = {
       name: `MAT_${slot}`,
-      pbrMetallicRoughness: { baseColorFactor: [r, g, b, opacity], metallicFactor: m.metallic, roughnessFactor: m.roughness },
+      pbrMetallicRoughness: texture
+        ? { baseColorFactor: [1, 1, 1, opacity], baseColorTexture: { index: 0, texCoord: atlasSet }, metallicFactor: m.metallic, roughnessFactor: m.roughness }
+        : { baseColorFactor: [r, g, b, opacity], metallicFactor: m.metallic, roughnessFactor: m.roughness },
       extras: { badgunSlot: slot, label: m.label ?? slot, color: m.color },
     };
     if (opacity < 1) mat.alphaMode = 'BLEND';
@@ -160,7 +194,8 @@ function buildGltf(items: { weapon: Weapon; translation: Vec3 }[], sceneName: st
   const sceneRoots: number[] = [];
 
   for (const { weapon, translation } of items) {
-    const manifest = buildManifest(weapon);
+    const manifest = buildManifest(weapon, uvFirst);
+    const atlas = weaponAtlas(weapon);
     const nodeIndex = new Map<string, number>();
     const pivots = new Map(weapon.components.map((c) => [c.name, c.pivot]));
 
@@ -174,12 +209,14 @@ function buildGltf(items: { weapon: Weapon; translation: Vec3 }[], sceneName: st
         for (const slot of MATERIAL_SLOTS) {
           const g = c.geometry.get(slot);
           if (!g || g.indices.length === 0) continue;
-          const uv = g.uvs.map((v) => v * UV_UNITS_PER_METER);
+          const tiling = w.floatAccessor(g.uvs.map((v) => v * UV_UNITS_PER_METER), 'VEC2', false);
+          const packed = w.floatAccessor(Array.from(atlas.uvs.get(g)!), 'VEC2', false);
           primitives.push({
             attributes: {
               POSITION: w.floatAccessor(g.positions, 'VEC3', true),
               NORMAL: w.floatAccessor(g.normals, 'VEC3', false),
-              TEXCOORD_0: w.floatAccessor(uv, 'VEC2', false),
+              TEXCOORD_0: uvFirst === 'atlas' ? packed : tiling,
+              TEXCOORD_1: uvFirst === 'atlas' ? tiling : packed,
             },
             indices: w.indexAccessor(g.indices, g.vertexCount),
             material: materialIndex.get(slot),
@@ -231,6 +268,7 @@ function buildGltf(items: { weapon: Weapon; translation: Vec3 }[], sceneName: st
     bufferViews: w.views,
     buffers: [{ byteLength: bin.byteLength }],
   };
+  if (texture) Object.assign(gltf, texture);
   if (usesEmissiveStrength) gltf.extensionsUsed = ['KHR_materials_emissive_strength'];
   gltf.__bin = bin;
   return gltf;

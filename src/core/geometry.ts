@@ -441,14 +441,20 @@ export function lathe(profile: Vec2[], segments: number, phase = 0): Geometry {
     if (len < 1e-7) continue;
     const nr = dz / len, nz = -dr / len;
     const v0 = profileLength(profile, k), v1 = v0 + len;
+    // Mostly-radial bands that reach near the axis (caps, steep cones) unwrap
+    // as a flat disc seen down the axis: wrapping them would squash the inner
+    // edge. Everything else (sides, thin flanges) wraps around at mean radius.
+    const rMin = Math.min(r0, r1), rMax = Math.max(r0, r1);
+    const planar = Math.abs(dr) > Math.abs(dz) && rMin < rMax * 0.5;
+    const rArc = Math.max((r0 + r1) / 2, 0.001);
     const ring0: number[] = [], ring1: number[] = [];
     for (let s = 0; s <= segments; s++) {
       const a = phase + (s / segments) * Math.PI * 2;
       const c = Math.cos(a), sn = Math.sin(a);
       const n: Vec3 = [c * nr, sn * nr, nz];
-      const arc = a * Math.max(r0, r1, 0.001);
-      ring0.push(g.addVertex([c * r0, sn * r0, z0], n, [arc, v0]));
-      ring1.push(g.addVertex([c * r1, sn * r1, z1], n, [arc, v1]));
+      const arc = a * rArc;
+      ring0.push(g.addVertex([c * r0, sn * r0, z0], n, planar ? [c * r0, sn * r0] : [arc, v0]));
+      ring1.push(g.addVertex([c * r1, sn * r1, z1], n, planar ? [c * r1, sn * r1] : [arc, v1]));
     }
     for (let s = 0; s < segments; s++) {
       const a = phase + ((s + 0.5) / segments) * Math.PI * 2;

@@ -1,7 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { validateBytes } from 'gltf-validator';
-import { generate, toGLB, buildManifest, STYLES, ARCHETYPES, generateFaction, factionToGLB } from '../dist/index.js';
+import { inflateSync } from 'node:zlib';
+import { generate, toGLB, buildManifest, STYLES, ARCHETYPES, generateFaction, factionToGLB, buildAtlas, bakeTexture, encodePNG, ID_COLORS } from '../dist/index.js';
 
 const base = { archetype: 'rifle', style: 'steampunk', seed: 42 };
 const component = (w, name) => w.components.find((c) => c.name === name);
@@ -181,4 +182,92 @@ test('preferences are soft: archetype rules still win', () => {
   assert.notEqual(sh.parts.magazine, 'curved');
   const r = generate({ archetype: 'rifle', style: 'modern', seed: 3, parts: { config: 'standard' }, prefer: { stock: 'thumbhole' } });
   assert.equal(r.parts.stock, 'thumbhole');
+});
+
+/** Paint each atlas chart with its own id; count pixels claimed by two charts. */
+function atlasOverlap(weapon, atlas, size) {
+  const owner = new Int32Array(size * size).fill(-1);
+  let over = 0, filled = 0, next = 0;
+  for (const c of weapon.components) for (const geo of c.geometry.values()) {
+    const uv = atlas.uvs.get(geo);
+    const parent = Int32Array.from({ length: geo.vertexCount }, (_, i) => i);
+    const find = (a) => { while (parent[a] !== a) a = parent[a] = parent[parent[a]]; return a; };
+    const I = geo.indices;
+    for (let t = 0; t < I.length; t += 3) { const r = find(I[t]); parent[find(I[t + 1])] = r; parent[find(I[t + 2])] = r; }
+    const ids = new Map();
+    for (let t = 0; t < I.length; t += 3) {
+      const root = find(I[t]);
+      if (!ids.has(root)) ids.set(root, next++);
+      const id = ids.get(root);
+      const [ax, ay, bx, by, cx, cy] = [0, 1, 2].flatMap((k) => [uv[I[t + k] * 2] * size, uv[I[t + k] * 2 + 1] * size]);
+      const area = (bx - ax) * (cy - ay) - (by - ay) * (cx - ax);
+      if (Math.abs(area) < 1e-12) continue;
+      const sg = Math.sign(area);
+      for (let y = Math.max(0, Math.floor(Math.min(ay, by, cy))); y <= Math.min(size - 1, Math.ceil(Math.max(ay, by, cy))); y++) {
+        for (let x = Math.max(0, Math.floor(Math.min(ax, bx, cx))); x <= Math.min(size - 1, Math.ceil(Math.max(ax, bx, cx))); x++) {
+          const px = x + 0.5, py = y + 0.5;
+          const w0 = ((bx - px) * (cy - py) - (by - py) * (cx - px)) * sg;
+          const w1 = ((cx - px) * (ay - py) - (cy - py) * (ax - px)) * sg;
+          const w2 = ((ax - px) * (by - py) - (ay - py) * (bx - px)) * sg;
+          if (w0 < 0 || w1 < 0 || w2 < 0) continue;
+          const i = y * size + x;
+          if (owner[i] === -1) { owner[i] = id; filled++; } else if (owner[i] !== id) over++;
+        }
+      }
+    }
+  }
+  return { over, filled };
+}
+
+test('texture atlas: every surface gets its own spot in the 0..1 square', () => {
+  for (const archetype of Object.keys(ARCHETYPES)) {
+    for (const style of Object.keys(STYLES)) {
+      const w = generate({ archetype, style, seed: 7 });
+      const atlas = buildAtlas(w);
+      for (const uv of atlas.uvs.values()) for (const v of uv) assert.ok(v >= 0 && v <= 1, `${archetype}/${style}: atlas UV ${v} outside 0..1`);
+      const { over, filled } = atlasOverlap(w, atlas, 512);
+      assert.equal(over, 0, `${archetype}/${style}: ${over} overlapping atlas pixels`);
+      assert.ok(atlas.coverage > 0.4, `${archetype}/${style}: atlas only ${Math.round(atlas.coverage * 100)}% used`);
+      assert.ok(filled > 0);
+    }
+  }
+  // Deterministic: same weapon, same layout.
+  const a = buildAtlas(generate(base)), b = buildAtlas(generate(base));
+  assert.deepEqual([...a.uvs.values()].map((u) => Array.from(u)), [...b.uvs.values()].map((u) => Array.from(u)));
+});
+
+test('texture bakes encode as valid PNGs and the textured .glb is valid glTF', async () => {
+  const w = generate(base);
+  for (const mode of ['basecolor', 'id', 'layout']) {
+    const img = bakeTexture(w, mode, { size: 256 });
+    const png = encodePNG(img.data, img.width, img.height);
+    assert.deepEqual([...png.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
+    // Decode IDAT with zlib and undo the Sub filter: must give back the exact pixels.
+    const len = new DataView(png.buffer, png.byteOffset + 33).getUint32(0);
+    const raw = inflateSync(png.subarray(41, 41 + len));
+    const stride = 256 * 4, out = new Uint8Array(256 * stride);
+    for (let y = 0; y < 256; y++) {
+      assert.equal(raw[y * (stride + 1)], 1, 'Sub filter');
+      for (let x = 0; x < stride; x++) out[y * stride + x] = (raw[y * (stride + 1) + 1 + x] + (x >= 4 ? out[y * stride + x - 4] : 0)) & 255;
+    }
+    assert.deepEqual(out, img.data, `${mode}: PNG round trip`);
+  }
+  // The ID map only uses the documented slot colors (plus black background).
+  const id = bakeTexture(w, 'id', { size: 128 }).data;
+  const allowed = new Set(['000000', ...Object.values(ID_COLORS).map((c) => c.slice(1))]);
+  for (let i = 0; i < id.length; i += 4) assert.ok(allowed.has([id[i], id[i + 1], id[i + 2]].map((v) => v.toString(16).padStart(2, '0')).join('')));
+
+  for (const opts of [{}, { uv: 'atlas' }, { texture: 256 }, { texture: 256, uv: 'atlas' }]) {
+    const bytes = toGLB(w, opts);
+    const report = await validateBytes(bytes);
+    const errors = report.issues.messages.filter((m) => m.severity <= 1);
+    assert.equal(errors.length, 0, `${JSON.stringify(opts)}: ${errors.map((e) => e.code).join(', ')}`);
+    const json = JSON.parse(new TextDecoder().decode(bytes.subarray(20, 20 + new DataView(bytes.buffer, bytes.byteOffset).getUint32(12, true))));
+    const prim = json.meshes[0].primitives[0];
+    assert.ok(prim.attributes.TEXCOORD_0 !== undefined && prim.attributes.TEXCOORD_1 !== undefined, 'both UV sets');
+    assert.equal(json.scenes[0].nodes.length, 1);
+    if (opts.texture) assert.equal(json.materials[0].pbrMetallicRoughness.baseColorTexture.texCoord, opts.uv === 'atlas' ? 0 : 1);
+  }
+  assert.equal(buildManifest(w).uv.atlas, 'TEXCOORD_1');
+  assert.equal(buildManifest(w, 'atlas').uv.atlas, 'TEXCOORD_0');
 });

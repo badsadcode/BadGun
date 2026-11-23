@@ -32,7 +32,8 @@
 - **Deterministic.** Same recipe + seed gives a byte-identical `.glb`. Every decision draws from a *named* random stream, so tweaking the stock never reshuffles the barrel.
 - **Painted on arrival.** Style-appropriate PBR materials (base color, metallic, roughness, emissive, glass), with multiple palette variants per style.
 - **Easy to texture.** 11 semantic material slots (`MAT_Body`, `MAT_Grip`, `MAT_Stock`, `MAT_Barrel`, `MAT_Trim`, `MAT_Glass`, `MAT_Emissive`, …), shared across parts and stable across regenerations. Recolor any slot without touching geometry.
-- **UVs included.** Every part gets a physical unwrap with constant texel density (1 UV unit = 0.25 m), which suits tiling materials and trim sheets.
+- **Two UV sets, ready to texture.** A *tiling* unwrap (1 UV unit = 0.25 m, same density everywhere) for repeating materials and trim sheets, and a non-overlapping *atlas* with uniform texel density for hand painting, baking and unique texture sets.
+- **Texture maps on demand.** Bake a base color map, an ID map (one flat color per material slot, for masking in Substance Painter and friends) and a UV template as PNG, or embed the base color texture straight into the `.glb`.
 - **Game-ready hierarchy.** Named components on correct pivots, moving parts with motion metadata (magazine → reload, trigger → fire, stock → adjust, hammer → cock), and sockets for hands, optics, muzzle FX, ejection and the ADS camera.
 - **Engine-agnostic.** Plain glTF 2.0 binary with zero runtime dependencies. A sidecar manifest JSON (also embedded in the `.glb` extras) carries the recipe, parts, sockets, bounds, collision box and stats.
 
@@ -100,6 +101,29 @@ const bytes = toGLB(weapon);                  // Uint8Array, ready for fs.writeF
 const manifest = buildManifest(weapon);       // sockets, parts, materials, bounds, stats
 ```
 
+## Texturing
+
+Every exported `.glb` carries two UV sets:
+
+| UV set | What it is | Use it for |
+|---|---|---|
+| **Tiling** (`TEXCOORD_0` by default) | Physical unwrap: 1 UV unit = 0.25 m on every surface. Islands may overlap. | Repeating materials, trim sheets, triplanar-style looks |
+| **Atlas** (`TEXCOORD_1` by default) | Every surface packed once into the 0..1 square, no overlaps, uniform texel density (about 11 px/cm at 1024, 22 px/cm at 2048 on a rifle) | Hand painting, AO/lightmap baking, unique texture sets |
+
+```bash
+node dist/cli.js --style diesel --seed 3 --maps 2048 --uv atlas
+```
+
+`--maps` writes `_BaseColor.png` (the palette baked into the atlas), `_ID.png` (one flat color per material slot, see `ID_COLORS`) and `_UVTemplate.png` (island outlines to paint over). `--uv atlas` puts the atlas first, which is what most painting tools read. `--texture` embeds the base color map in the `.glb`, so the model opens already textured and ready to paint over. The playground has the same options, plus a **Checker** view and a **UV map** panel.
+
+```js
+import { generate, toGLB, bakeTexture, encodePNG } from 'badgun';
+const weapon = generate({ archetype: 'rifle', style: 'cyber', seed: 4 });
+const glb = toGLB(weapon, { uv: 'atlas', texture: 1024 });   // textured, atlas in TEXCOORD_0
+const id = bakeTexture(weapon, 'id', { size: 2048 });        // { width, height, data: RGBA }
+const png = encodePNG(id.data, id.width, id.height);         // Uint8Array, write it anywhere
+```
+
 ## Faction families
 
 One seed, one matching arsenal: a generated name, a signature color and livery, an insignia badge on every weapon, a *doctrine* of preferred parts (soft preferences, so each archetype keeps its own rules), shared proportions and a shared finish.
@@ -158,7 +182,7 @@ A recipe is the whole description of a weapon. Save it, share it, batch it. A re
 | Moving parts | node `extras.badgun.motion` = `{ type, axis, range, purpose }` |
 | Manifest | `<name>.json` sidecar + root node `extras.badgun` |
 
-## What's in v0.7
+## What's in v0.8
 
 | Archetype | Part kinds |
 |---|---|
@@ -169,7 +193,7 @@ A recipe is the whole description of a weapon. Save it, share it, batch it. A re
 
 147 part variants and 10 optics in total. The historical styles (WW1, WW2, Vietnam) add bolt-action and tubular receivers, full-length military stocks, internal/stick/top-fed magazines, leaf sights, bayonets and period pistols: generic period shapes, not replicas of particular models. Dieselpunk brings art-deco streamliners, riveted armor, radiator handguards, exhaust stacks, jerrycan magazines and searchlight sights; cyberpunk brings screen-equipped chassis, street-built rifles covered in cables and stickers, smart magazines with LED ammo counters, neon grips, blade stocks and smart-link sights. Archetypes enforce what they need (shotguns get a pump and tube magazine, or break open if double-barreled; snipers get a scope and bolt handle; bullpups get a butt stock). Otherwise any part works with any style, and the style's palette repaints it, so the Frankengun is a supported feature.
 
-**Known limitations:** UV islands can overlap (fine for tiling and trim textures, not yet for unique hand-painted atlases). There are no LODs or animation clips yet, only motion metadata. Better texturing support (non-overlapping UV atlases) is next. The roadmap lives in the [brief](docs/PROJECT_BRIEF.md#8-practical-milestones-suggested-not-prescribed).
+**Known limitations:** The atlas packs islands by their bounding boxes, so only about half of the square ends up covered by actual surfaces, and every surface gets the same pixel density (hidden faces included). Islands are split at every hard edge, so there are many small ones. Embedded textures are only for single weapons, not faction arsenals. There are no LODs or animation clips yet, only motion metadata. The roadmap lives in the [brief](docs/PROJECT_BRIEF.md#8-practical-milestones-suggested-not-prescribed).
 
 ## Development
 

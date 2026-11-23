@@ -7,6 +7,7 @@
 import type { Vec3 } from '../core/geometry.js';
 import type { Weapon } from '../core/weapon.js';
 import { MATERIAL_SLOTS } from '../types.js';
+import { weaponAtlas } from '../texture/atlas.js';
 import type { MaterialDef, MaterialSlot } from '../types.js';
 
 export const GENERATOR = 'BadGun';
@@ -35,6 +36,20 @@ export interface Manifest {
   sockets: { name: string; parent: string; position: Vec3; forward: Vec3; description: string }[];
   bounds: { min: Vec3; max: Vec3; size: Vec3 };
   collision: { type: 'box'; center: Vec3; size: Vec3 };
+  /** UV channels and the texture atlas layout. */
+  uv: {
+    /** What each glTF UV set holds (default export: tiling in TEXCOORD_0, atlas in TEXCOORD_1). */
+    tiling: string;
+    atlas: string;
+    /** Number of UV islands in the atlas. */
+    charts: number;
+    /** Share of the atlas square covered by island bounding boxes. */
+    coverage: number;
+    /** Texture pixels per meter of surface, at 1024 and 2048. */
+    texelsPerMeter: { 1024: number; 2048: number };
+    /** Gap between islands, in pixels at 1024. */
+    padding: number;
+  };
   stats: { triangles: number; vertices: number; meshes: number; primitives: number; materials: number };
 }
 
@@ -51,7 +66,7 @@ export function usedSlots(w: Weapon): MaterialSlot[] {
 }
 
 /** Weapon-space position of a component's pivot (pivots are already in weapon space). */
-export function buildManifest(w: Weapon): Manifest {
+export function buildManifest(w: Weapon, uvLayout: UvLayout = 'tiling'): Manifest {
   const min: Vec3 = [Infinity, Infinity, Infinity];
   const max: Vec3 = [-Infinity, -Infinity, -Infinity];
   let triangles = 0, vertices = 0, primitives = 0, meshes = 0;
@@ -96,7 +111,7 @@ export function buildManifest(w: Weapon): Manifest {
       forward: '+Z (muzzle direction)',
       left: '+X (the ejection port is on the right, -X)',
       origin: 'Trigger hand on the pistol grip (SOCKET_Hand_Grip)',
-      uv: `TEXCOORD_0 is a physical unwrap: 1 UV unit = ${1 / UV_UNITS_PER_METER} m, consistent texel density, tiling-friendly (islands may overlap)`,
+      uv: `Two UV sets. Tiling: a physical unwrap, 1 UV unit = ${1 / UV_UNITS_PER_METER} m, for tiling textures and trim sheets (islands may overlap). Atlas: every surface packed once into the 0..1 square with uniform texel density and no overlaps, for hand painting, baking and unique texture sets. See "uv" for which set is which.`,
       materials: 'One shared material per semantic slot (MAT_<Slot>); names are stable across regenerations',
       sockets: 'Empty nodes named SOCKET_*; their +Z axis is the socket forward direction',
     },
@@ -105,7 +120,23 @@ export function buildManifest(w: Weapon): Manifest {
     sockets: w.sockets.map((s) => ({ ...s, position: round3(s.position), forward: round3(s.forward) })),
     bounds: { min: round3(min), max: round3(max), size: round3(size) },
     collision: { type: 'box', center: round3(center), size: round3(size) },
+    uv: uvInfo(w, uvLayout),
     stats: { triangles, vertices, meshes, primitives, materials: slots.length },
+  };
+}
+
+/** Which UV set goes first (TEXCOORD_0). The other one is TEXCOORD_1. */
+export type UvLayout = 'tiling' | 'atlas';
+
+function uvInfo(w: Weapon, first: UvLayout): Manifest['uv'] {
+  const a = weaponAtlas(w);
+  return {
+    tiling: first === 'tiling' ? 'TEXCOORD_0' : 'TEXCOORD_1',
+    atlas: first === 'atlas' ? 'TEXCOORD_0' : 'TEXCOORD_1',
+    charts: a.charts,
+    coverage: Math.round(a.coverage * 1000) / 1000,
+    texelsPerMeter: { 1024: Math.round(a.uvPerMeter * 1024), 2048: Math.round(a.uvPerMeter * 2048) },
+    padding: a.padding,
   };
 }
 

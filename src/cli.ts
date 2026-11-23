@@ -6,6 +6,7 @@
  *   badgun --recipe my-gun.json --out exports/
  *   badgun --style modern --seed 1 --count 10          -> 10 variants, seeds 1..10
  *   badgun --style scifi --seed 7 --param bulk=0.9 --optic scope --color Body=#ff3366
+ *   badgun --style diesel --seed 3 --maps 2048 --uv atlas  -> + texture maps, atlas UVs first
  *   badgun --list
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -14,6 +15,10 @@ import { generate } from './generate.js';
 import { toGLB } from './export/glb.js';
 import { factionToGLB, generateFaction, summary as factionSummary } from './faction.js';
 import { buildManifest, weaponName } from './export/manifest.js';
+import type { UvLayout } from './export/manifest.js';
+import { bakeTexture } from './texture/bake.js';
+import { encodePNG } from './texture/png.js';
+import type { Weapon } from './core/weapon.js';
 import { STYLES } from './styles/index.js';
 import { ARCHETYPES } from './archetypes/index.js';
 import { OPTIC_NAMES } from './parts/sight.js';
@@ -34,6 +39,11 @@ Options:
   --recipe <file>       load a recipe JSON (other flags override it)
   --out <dir>           output folder                          (default: out)
   --faction             generate a whole matching arsenal (uses --style and --seed)
+  --uv <set>            tiling | atlas: which UV set is TEXCOORD_0 (default: tiling;
+                        the other set is TEXCOORD_1)
+  --texture [size]      embed a base color texture in the .glb (default size 1024)
+  --maps [size]         also write texture maps: _BaseColor, _ID (one color per
+                        material slot) and _UVTemplate .png (default size 1024)
   --list                show styles, parts and optics
   --help`;
 
@@ -87,6 +97,20 @@ function main(): void {
     recipe.palette = { ...recipe.palette, [k as MaterialSlot]: v };
   }
 
+  const uv = (o.uv?.[0] ?? 'tiling') as UvLayout;
+  if (uv !== 'tiling' && uv !== 'atlas') throw new Error(`--uv must be "tiling" or "atlas", not "${uv}"`);
+  const sizeOf = (v: string[] | undefined) => (v ? (v[0] === 'true' ? 1024 : Number(v[0])) : 0);
+  const textureSize = sizeOf(o.texture), mapSize = sizeOf(o.maps);
+  for (const n of [textureSize, mapSize]) if (n && !(n >= 64 && n <= 8192)) throw new Error('texture sizes must be between 64 and 8192');
+  const glb = (w: Weapon) => toGLB(w, { uv, texture: textureSize || undefined });
+  const maps = (w: Weapon, dir: string) => {
+    if (!mapSize) return;
+    for (const [mode, suffix] of [['basecolor', 'BaseColor'], ['id', 'ID'], ['layout', 'UVTemplate']] as const) {
+      const img = bakeTexture(w, mode, { size: mapSize });
+      writeFileSync(join(dir, `${weaponName(w)}_${suffix}.png`), encodePNG(img.data, img.width, img.height));
+    }
+  };
+
   const outDir = o.out?.[0] ?? 'out';
   mkdirSync(outDir, { recursive: true });
 
@@ -97,8 +121,11 @@ function main(): void {
     const slug = f.name.replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '');
     const dir = join(outDir, slug);
     mkdirSync(dir, { recursive: true });
-    for (const m of f.members) writeFileSync(join(dir, `${weaponName(m.weapon)}.glb`), toGLB(m.weapon));
-    writeFileSync(join(dir, `${slug}_arsenal.glb`), factionToGLB(f));
+    for (const m of f.members) {
+      writeFileSync(join(dir, `${weaponName(m.weapon)}.glb`), glb(m.weapon));
+      maps(m.weapon, dir);
+    }
+    writeFileSync(join(dir, `${slug}_arsenal.glb`), factionToGLB(f, { uv }));
     writeFileSync(join(dir, `${slug}.faction.json`), JSON.stringify(factionSummary(f), null, 2));
     console.log(`${f.name}  (${f.style}, ${f.livery} livery in ${f.color}, ${f.insignia.shape} insignia)`);
     for (const m of f.members) console.log(`  ${m.archetype.padEnd(9)} ${Object.entries(m.weapon.parts).map(([k, v]) => `${k}:${v}`).join(' ')}`);
@@ -110,8 +137,9 @@ function main(): void {
     const r: Recipe = { ...recipe, seed: typeof recipe.seed === 'number' ? recipe.seed + i : count > 1 ? `${recipe.seed}-${i}` : recipe.seed };
     const weapon = generate(r);
     const name = weaponName(weapon);
-    const manifest = buildManifest(weapon);
-    writeFileSync(join(outDir, `${name}.glb`), toGLB(weapon));
+    const manifest = buildManifest(weapon, uv);
+    writeFileSync(join(outDir, `${name}.glb`), glb(weapon));
+    maps(weapon, outDir);
     writeFileSync(join(outDir, `${name}.json`), JSON.stringify(manifest, null, 2));
     const parts = Object.entries(weapon.parts).map(([k, v]) => `${k}:${v}`).join(' ');
     console.log(`${name}.glb  ${manifest.stats.triangles} tris, ${manifest.stats.materials} materials, palette "${weapon.paletteName}"  [${parts}]`);
