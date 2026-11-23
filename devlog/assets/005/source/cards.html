@@ -1,0 +1,182 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@500;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#121419; --ink:#f1eee8; --dim:#9aa0aa; --orange:#ff6b3d; --yellow:#ffd23d; --cyan:#42e2ff; --brass:#e0b25a; --pink:#ff5fc0; }
+* { box-sizing: border-box; margin: 0; }
+body { background: #333; font-family: 'Space Grotesk', sans-serif; color: var(--ink); padding: 20px; display: grid; gap: 20px; justify-content: start; }
+.card { width: 1200px; position: relative; overflow: hidden; border-radius: 28px; padding: 48px 56px;
+  background:
+    radial-gradient(900px 500px at 80% 30%, rgba(255,107,61,.13), transparent 60%),
+    radial-gradient(700px 400px at 10% 100%, rgba(66,226,255,.08), transparent 60%),
+    linear-gradient(160deg, #181b22, #101216);
+}
+.card::before { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+  background-size: 32px 32px; mask-image: radial-gradient(circle at 60% 40%, #000 30%, transparent 85%); }
+.kicker { font: 700 14px 'JetBrains Mono', monospace; letter-spacing: 3px; color: var(--orange); text-transform: uppercase; }
+h1 { font-size: 76px; line-height: .95; letter-spacing: -3px; font-weight: 700; margin: 18px 0 18px; }
+h1 em { font-style: normal; color: var(--orange); }
+h2 { font-size: 44px; letter-spacing: -1.5px; line-height: 1; margin: 10px 0 8px; }
+.sub { font-size: 22px; color: var(--dim); max-width: 520px; line-height: 1.35; }
+.chip { display: inline-block; font: 700 13px 'JetBrains Mono', monospace; letter-spacing: 2px; padding: 6px 12px; border-radius: 999px; border: 1.5px solid currentColor; }
+.note { font-family: 'Caveat', cursive; font-weight: 700; color: var(--yellow); }
+img { display: block; }
+.logo { position: absolute; right: 40px; bottom: 30px; font: 700 15px 'JetBrains Mono', monospace; color: #5b616c; letter-spacing: 2px; }
+.logo b { color: var(--orange); }
+
+/* banner */
+#banner { height: 560px; }
+#banner .guns { position: absolute; right: -40px; top: 40px; width: 760px; height: 500px; }
+#banner .guns img { position: absolute; filter: drop-shadow(0 30px 30px rgba(0,0,0,.45)); }
+#banner .g1 { width: 600px; right: 110px; top: 10px; opacity: .97; }
+#banner .g2 { width: 700px; right: 40px; top: 150px; }
+#banner .g3 { width: 600px; right: 130px; top: 320px; }
+#banner .stamp { position: absolute; left: 56px; bottom: 48px; display: flex; gap: 10px; }
+#banner .scribble { position: absolute; left: 58px; top: 405px; transform: rotate(-3deg); font-size: 28px; }
+
+/* worlds */
+.world { display: grid; grid-template-columns: 330px 1fr; align-items: center; gap: 20px; padding: 18px 0; border-top: 1px dashed rgba(255,255,255,.1); position: relative; }
+.world:first-of-type { border-top: 0; }
+.world p { color: var(--dim); font-size: 18px; line-height: 1.4; }
+.world img { width: 780px; justify-self: center; filter: drop-shadow(0 18px 22px rgba(0,0,0,.5)); }
+
+/* grids */
+.grid { display: grid; gap: 6px 26px; margin-top: 26px; }
+.grid img { width: 100%; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.colhead { margin-bottom: 4px; }
+.cell { position: relative; padding: 10px 6px; }
+.cell .label { position: absolute; left: 6px; top: 2px; font: 700 13px 'JetBrains Mono', monospace; color: var(--dim); letter-spacing: 1px; }
+
+/* exploded */
+#exploded .stage { position: relative; width: 1088px; margin-top: 30px; }
+#exploded .stage img { width: 100%; filter: drop-shadow(0 16px 18px rgba(0,0,0,.5)); }
+.tag { position: absolute; font-family: 'Caveat', cursive; font-weight: 700; font-size: 30px; color: var(--yellow); white-space: nowrap; transform: rotate(-3deg); }
+.tag::before { content: '↙ '; }
+.tag.r::before { content: ''; } .tag.r::after { content: ' ↘'; }
+.tag.d::before { content: '↖ '; }
+.tag.n::before { content: ''; }
+
+/* stats */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 30px; }
+.stat { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 20px; padding: 22px 24px; }
+.stat .n { font-size: 54px; font-weight: 700; letter-spacing: -2px; color: var(--ink); }
+.stat .n small { font-size: 26px; color: var(--dim); letter-spacing: 0; }
+.stat .t { color: var(--dim); font-size: 17px; line-height: 1.35; margin-top: 4px; }
+.stat.hot { border-color: rgba(255,107,61,.5); background: rgba(255,107,61,.08); }
+.stat.hot .n { color: var(--orange); }
+
+.fam { display: grid; grid-template-columns: 140px repeat(3, 1fr); gap: 4px 18px; align-items: center; margin-top: 26px; }
+.fam .rowlab { font: 700 15px 'JetBrains Mono', monospace; letter-spacing: 2px; color: var(--dim); text-transform: uppercase; }
+.fam img { width: 100%; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.fam .cell { height: 128px; display: flex; align-items: center; justify-content: center; }
+.fam .cell img { max-height: 120px; width: auto; max-width: 100%; }
+.trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 30px; align-items: end; }
+.trio .item img { width: 100%; filter: drop-shadow(0 14px 16px rgba(0,0,0,.5)); }
+.trio .item h3 { font-size: 26px; margin: 14px 0 4px; letter-spacing: -.5px; }
+.trio .item p { color: var(--dim); font-size: 16px; line-height: 1.4; }
+.xb { display: grid; gap: 4px; margin-top: 20px; }
+.xb .row { display: grid; grid-template-columns: 300px 1fr; gap: 20px; align-items: center; }
+.xb .row img { width: 100%; filter: drop-shadow(0 16px 18px rgba(0,0,0,.5)); }
+.xb .row p { color: var(--dim); font-size: 17px; line-height: 1.4; }
+.xb .row h3 { font-size: 28px; margin: 10px 0 6px; }
+.cat { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 30px; margin-top: 26px; }
+.cat .c { position: relative; padding-top: 34px; }
+.cat .c img { width: 100%; filter: drop-shadow(0 12px 14px rgba(0,0,0,.5)); }
+.cat .c .note { position: absolute; left: 4px; top: 0; font-size: 28px; transform: rotate(-2deg); }
+#banner2 { height: 560px; }
+#banner2 .g { position: absolute; filter: drop-shadow(0 26px 26px rgba(0,0,0,.5)); }
+
+.ba { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 26px; }
+.ba .col h3 { font: 700 15px 'JetBrains Mono', monospace; letter-spacing: 3px; margin: 0 0 6px; }
+.ba .col .sub2 { color: var(--dim); font-size: 17px; margin-bottom: 10px; }
+.ba .col img { width: 100%; display: block; margin: 4px 0; filter: drop-shadow(0 8px 10px rgba(0,0,0,.5)); }
+.ba .before { opacity: .92; }
+.bows { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 24px; align-items: start; }
+.bows .b { text-align: center; }
+.bows .b img { height: 520px; width: 100%; object-fit: contain; filter: drop-shadow(0 14px 14px rgba(0,0,0,.5)); }
+.bows .b h3 { font-size: 22px; margin: 10px 0 2px; }
+.bows .b p { color: var(--dim); font-size: 14px; margin: 0; line-height: 1.35; }
+.quad { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 30px; margin-top: 24px; }
+.quad .c { position: relative; padding-top: 36px; }
+.quad .c img { width: 100%; filter: drop-shadow(0 12px 14px rgba(0,0,0,.5)); }
+.quad .c .note { position: absolute; left: 4px; top: 0; font-size: 28px; transform: rotate(-2deg); }
+#banner3 { height: 560px; }
+#banner3 .g { position: absolute; filter: drop-shadow(0 26px 26px rgba(0,0,0,.5)); }
+
+.fam8 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px 22px; margin-top: 24px; align-items: center; }
+.fam8 .c { text-align: center; }
+.fam8 .c img { width: 100%; max-height: 150px; object-fit: contain; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.fam8 .c span { font: 700 13px 'JetBrains Mono', monospace; letter-spacing: 2px; color: var(--dim); }
+.pals { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 30px; margin-top: 24px; }
+.pals .c img { width: 100%; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.pals .c span { font: 700 14px 'JetBrains Mono', monospace; letter-spacing: 2px; }
+.heroes { display: grid; grid-template-columns: 1.6fr 1fr 0.55fr; gap: 20px; align-items: center; margin-top: 20px; }
+.heroes img { width: 100%; filter: drop-shadow(0 16px 18px rgba(0,0,0,.5)); }
+.heroes .note { font-size: 26px; display: block; margin-bottom: 6px; transform: rotate(-2deg); }
+#banner4 { height: 560px; }
+#banner4 .g { position: absolute; filter: drop-shadow(0 26px 26px rgba(0,0,0,.5)); }
+
+.eras { display: grid; grid-template-columns: 120px repeat(3, 1fr); gap: 4px 26px; margin-top: 24px; align-items: center; }
+.eras .rowlab { font: 700 15px 'JetBrains Mono', monospace; letter-spacing: 2px; color: var(--dim); }
+.eras .rowlab small { display: block; font-weight: 500; font-size: 11px; letter-spacing: 1px; margin-top: 2px; }
+.eras .cell { height: 120px; display: flex; align-items: center; justify-content: center; }
+.eras .cell img.pistol { max-height: 86px; }
+.eras .cell img { max-width: 100%; max-height: 112px; filter: drop-shadow(0 8px 10px rgba(0,0,0,.5)); }
+.eras .colhead { font: 700 12px 'JetBrains Mono', monospace; letter-spacing: 2px; color: #6b717c; text-align: center; }
+#banner5 { height: 560px; }
+#banner5 .g { position: absolute; filter: drop-shadow(0 26px 26px rgba(0,0,0,.5)); }
+.cat .c img.small { width: auto; max-height: 200px; margin-left: 60px; }
+</style></head><body>
+<section class="card" id="banner5">
+  <div class="kicker">Bad Ideas Works · Devlog #005</div>
+  <h1>Wood, Steel<br>&amp; <em>History.</em></h1>
+  <p class="sub" style="max-width:460px">Three new worlds from the 20th century: World War I, World War II and the Vietnam era.</p>
+  <img class="g" src="r5/c_bolt.png" style="width:640px; right:20px; top:40px;">
+  <img class="g" src="r5/c_wcmg.png" style="width:430px; right:40px; top:200px;">
+  <img class="g" src="r5/c_broom.png" style="width:240px; right:470px; top:330px;">
+  <div style="position:absolute; left:56px; bottom:48px; display:flex; gap:10px;">
+    <span class="chip" style="color:#c9ccd2">8 WORLDS</span><span class="chip" style="color:var(--yellow)">3 ERAS</span>
+  </div>
+</section>
+
+<section class="card" id="eras">
+  <div class="kicker">Three eras</div>
+  <h2>Every weapon type, three times through history.</h2>
+  <p class="sub" style="max-width:940px">Same factory, same lucky number (#2). Only the era changes: the materials, the furniture, the way things were built.</p>
+  <div class="eras"><div class="rowlab" style="grid-row: span 2">WW1<small>1914–1918</small></div><div class="cell"><img src="r5/c_fam_ww1_rifle.png"></div><div class="cell"><img src="r5/c_fam_ww1_smg.png"></div><div class="cell"><img src="r5/c_fam_ww1_shotgun.png"></div><div class="cell"><img src="r5/c_fam_ww1_sniper.png"></div><div class="cell"><img src="r5/c_fam_ww1_lmg.png"></div><div class="cell"><img class="pistol" src="r5/c_fam_ww1_pistol.png"></div><div class="rowlab" style="grid-row: span 2">WW2<small>1939–1945</small></div><div class="cell"><img src="r5/c_fam_ww2_rifle.png"></div><div class="cell"><img src="r5/c_fam_ww2_smg.png"></div><div class="cell"><img src="r5/c_fam_ww2_shotgun.png"></div><div class="cell"><img src="r5/c_fam_ww2_sniper.png"></div><div class="cell"><img src="r5/c_fam_ww2_lmg.png"></div><div class="cell"><img class="pistol" src="r5/c_fam_ww2_pistol.png"></div><div class="rowlab" style="grid-row: span 2">VIETNAM<small>1955–1975</small></div><div class="cell"><img src="r5/c_fam_vietnam_rifle.png"></div><div class="cell"><img src="r5/c_fam_vietnam_smg.png"></div><div class="cell"><img src="r5/c_fam_vietnam_shotgun.png"></div><div class="cell"><img src="r5/c_fam_vietnam_sniper.png"></div><div class="cell"><img src="r5/c_fam_vietnam_lmg.png"></div><div class="cell"><img class="pistol" src="r5/c_fam_vietnam_pistol.png"></div></div>
+  <div class="logo">BAD<b>GUN</b></div>
+</section>
+
+<section class="card" id="period">
+  <div class="kicker">Period pieces</div>
+  <h2>What the factory learned.</h2>
+  <div class="cat">
+    <div class="c"><span class="note">bolt action, full wooden stock, bayonet</span><img src="r5/c_bolt.png"></div>
+    <div class="c"><span class="note">water-cooled machine gun + pan magazine</span><img src="r5/c_wcmg.png"></div>
+    <div class="c"><span class="note">stamped SMG, long stick magazine</span><img src="r5/c_stick.png"></div>
+    <div class="c"><span class="note">machine gun fed from the top</span><img src="r5/c_topmg.png"></div>
+    <div class="c"><span class="note">drum magazine, cooling fins</span><img src="r5/c_drum.png"></div>
+    <div class="c"><span class="note">carry handle, ribbed handguard</span><img src="r5/c_vn_black.png"></div>
+    <div class="c"><span class="note">wood and steel, curved magazine</span><img src="r5/c_vn_wood.png"></div>
+    <div class="c"><span class="note">long double-barrel shotgun</span><img src="r5/c_trench.png"></div>
+    <div class="c"><span class="note">magazine in front of the trigger</span><img class="small" src="r5/c_broom.png"></div>
+    <div class="c"><span class="note">toggle-lock pistol</span><img class="small" src="r5/c_toggle.png"></div>
+  </div>
+  <div class="logo">BAD<b>GUN</b></div>
+</section>
+
+<section class="card" id="stats5">
+  <div class="kicker">By the numbers</div>
+  <h2>Update #5, in numbers.</h2>
+  <div class="stats">
+    <div class="stat hot"><div class="n">8</div><div class="t">worlds, three of them from history.</div></div>
+    <div class="stat"><div class="n">132</div><div class="t">part variants, plus 8 sights and scopes (up from 122).</div></div>
+    <div class="stat"><div class="n">2,896</div><div class="t">test weapons built and checked for every update.</div></div>
+    <div class="stat"><div class="n">3</div><div class="t">bayonet lengths: long in 1916, shorter by 1942, shorter still by 1968.</div></div>
+    <div class="stat"><div class="n">4</div><div class="t">paint buckets on a WW1 rifle. Wood and steel. That's it. It's enough.</div></div>
+    <div class="stat"><div class="n">0</div><div class="t">bee launchers. Not even historically. 🐝</div></div>
+  </div>
+  <div class="logo">BAD<b>GUN</b></div>
+</section>
+</body></html>

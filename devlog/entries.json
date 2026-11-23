@@ -30,5 +30,13 @@
     "date": "2026-11-23",
     "summary": "World #5 is fantasy, and a pile of reference pictures teaches the factory lever actions, machine pistols, hunting stocks and more.",
     "cover": "assets/004/banner.webp"
+  },
+  {
+    "slug": "005-wood-steel-and-history",
+    "number": "005",
+    "title": "Wood, Steel & History",
+    "date": "2026-11-23",
+    "summary": "Three new worlds from the 20th century: World War I, World War II and the Vietnam era.",
+    "cover": "assets/005/banner.webp"
   }
 ]

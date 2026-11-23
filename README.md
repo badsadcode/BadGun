@@ -7,7 +7,7 @@
 <p align="center">
   <b>Procedural, game-ready weapon assets.</b><br>
   Weapon type + style + seed = a reproducible, coherent, already-painted 3D weapon (<code>.glb</code>).<br>
-  Rifles · SMGs · shotguns · snipers · LMGs · pistols · crossbows · bows, in modern, steampunk, sci-fi, survivor and fantasy.
+  Rifles · SMGs · shotguns · snipers · LMGs · pistols · crossbows · bows, in modern, steampunk, sci-fi, survivor, fantasy, WW1, WW2 and Vietnam-era styles.
 </p>
 
 <p align="center">
@@ -27,7 +27,7 @@
 
 ## What it does
 
-- **Eight weapon types (archetypes), five worlds.** The archetype (rifle, SMG, shotgun, sniper, LMG, pistol, crossbow, bow) owns proportions and what parts it needs; the style (modern, steampunk, sci-fi, survivor, fantasy) owns design language, part choices and palettes. They're independent, so a new style works with every archetype.
+- **Eight weapon types (archetypes), eight worlds.** The archetype (rifle, SMG, shotgun, sniper, LMG, pistol, crossbow, bow) owns proportions and what parts it needs; the style (modern, steampunk, sci-fi, survivor, fantasy, WW1, WW2, Vietnam) owns design language, part choices and palettes. They're independent, so a new style works with every archetype.
 - **Every weapon has its own shape.** Seeded shape genes vary proportions (receiver length/height, grip rake, magazine position, bare barrel, stock drop), and layouts vary too: standard, bullpup, lever action, machine pistol (magazine through the grip) or box-fed shotgun; break-action doubles, one-piece stocks, stockless.
 - **Deterministic.** Same recipe + seed gives a byte-identical `.glb`. Every decision draws from a *named* random stream, so tweaking the stock never reshuffles the barrel.
 - **Painted on arrival.** Style-appropriate PBR materials (base color, metallic, roughness, emissive, glass), with multiple palette variants per style.
@@ -138,16 +138,16 @@ A recipe is the whole description of a weapon. Save it, share it, batch it. A re
 | Moving parts | node `extras.badgun.motion` = `{ type, axis, range, purpose }` |
 | Manifest | `<name>.json` sidecar + root node `extras.badgun` |
 
-## What's in v0.4
+## What's in v0.5
 
 | Archetype | Part kinds |
 |---|---|
-| rifle · smg · shotgun · sniper · lmg | 5 layouts · 10 receivers · 14 barrels (incl. doubles) · 13 handguards · 14 muzzles (incl. soda-can, bottle and crystal) · 14 stocks (incl. one-piece and folding frame) · 11 grips (incl. loop) · 13 magazines (incl. crystal and orb power sources), plus accessories (bipod, bolt handle, carry handle, foregrip, shell holder, lever) |
-| pistol | 8 frames (slide, revolver, blaster, pipe zip gun, flintlock, loop blaster, hand cannon, flare gun) · 5 grips · muzzles |
+| rifle · smg · shotgun · sniper · lmg | 5 layouts · 12 receivers · 14 barrels (incl. doubles) · 14 handguards · 14 muzzles (incl. soda-can, bottle and crystal) · 15 stocks (incl. one-piece, military and folding frame) · 11 grips (incl. loop) · 16 magazines (incl. internal, stick, top-fed, crystal and orb), plus accessories (bipod, bolt handle, carry handle, foregrip, shell holder, lever, bayonet, heat shield) |
+| pistol | 10 frames (slide, revolver, blaster, pipe zip gun, flintlock, loop blaster, hand cannon, flare gun, broomhandle, toggle-lock) · 6 grips · muzzles |
 | crossbow | 4 tillers · 5 prods (recurve, compound, energy, leaf spring, arcane) · stocks · grips; drawn string + loaded bolt |
 | bow | 6 bows (longbow, recurve, compound, energy, pipe, elven) · 6 arrows; string with draw motion |
 
-122 part variants and 7 optics in total. Archetypes enforce what they need (shotguns get a pump and tube magazine, or break open if double-barreled; snipers get a scope and bolt handle; bullpups get a butt stock). Otherwise any part works with any style, and the style's palette repaints it, so the Frankengun is a supported feature.
+132 part variants and 8 optics in total. The historical styles (WW1, WW2, Vietnam) add bolt-action and tubular receivers, full-length military stocks, internal/stick/top-fed magazines, leaf sights, bayonets and period pistols: generic period shapes, not replicas of particular models. Archetypes enforce what they need (shotguns get a pump and tube magazine, or break open if double-barreled; snipers get a scope and bolt handle; bullpups get a butt stock). Otherwise any part works with any style, and the style's palette repaints it, so the Frankengun is a supported feature.
 
 **Known limitations:** UV islands can overlap (fine for tiling and trim textures, not yet for unique hand-painted atlases). There are no LODs or animation clips yet, only motion metadata. Faction families and more worlds (dieselpunk, cyberpunk) are next. The roadmap lives in the [brief](docs/PROJECT_BRIEF.md#8-practical-milestones-suggested-not-prescribed).
 

@@ -1,0 +1,406 @@
+[
+ {
+  "out": "r5/fam_ww1_rifle.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "ww1",
+   "seed": 2,
+   "paletteVariant": 0
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 400
+ },
+ {
+  "out": "r5/fam_ww1_smg.png",
+  "recipe": {
+   "archetype": "smg",
+   "style": "ww1",
+   "seed": 2,
+   "paletteVariant": 0
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 400
+ },
+ {
+  "out": "r5/fam_ww1_shotgun.png",
+  "recipe": {
+   "archetype": "shotgun",
+   "style": "ww1",
+   "seed": 2,
+   "paletteVariant": 0
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 400
+ },
+ {
+  "out": "r5/fam_ww1_sniper.png",
+  "recipe": {
+   "archetype": "sniper",
+   "style": "ww1",
+   "seed": 2,
+   "paletteVariant": 0
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 400
+ },
+ {
+  "out": "r5/fam_ww1_lmg.png",
+  "recipe": {
+   "archetype": "lmg",
+   "style": "ww1",
+   "seed": 2,
+   "paletteVariant": 0
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 400
+ },
+ {
+  "out": "r5/fam_ww1_pistol.png",
+  "recipe": {
+   "archetype": "pistol",
+   "style": "ww1",
+   "seed": 2,
+   "paletteVariant": 0
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 400
+ },
+ {
+  "out": "r5/fam_ww2_rifle.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "ww2",
+   "seed": 2,
+   "paletteVariant": 0
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 400
+ },
+ {
+  "out": "r5/fam_ww2_smg.png",
+  "recipe": {
+   "archetype": "smg",
+   "style": "ww2",
+   "seed": 2,
+   "paletteVariant": 0
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 400
+ },
+ {
+  "out": "r5/fam_ww2_shotgun.png",
+  "recipe": {
+   "archetype": "shotgun",
+   "style": "ww2",
+   "seed": 2,
+   "paletteVariant": 0
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 400
+ },
+ {
+  "out": "r5/fam_ww2_sniper.png",
+  "recipe": {
+   "archetype": "sniper",
+   "style": "ww2",
+   "seed": 2,
+   "paletteVariant": 0
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 400
+ },
+ {
+  "out": "r5/fam_ww2_lmg.png",
+  "recipe": {
+   "archetype": "lmg",
+   "style": "ww2",
+   "seed": 2,
+   "paletteVariant": 0
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 400
+ },
+ {
+  "out": "r5/fam_ww2_pistol.png",
+  "recipe": {
+   "archetype": "pistol",
+   "style": "ww2",
+   "seed": 2,
+   "paletteVariant": 0
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 400
+ },
+ {
+  "out": "r5/fam_vietnam_rifle.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "vietnam",
+   "seed": 2,
+   "paletteVariant": 2
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 400
+ },
+ {
+  "out": "r5/fam_vietnam_smg.png",
+  "recipe": {
+   "archetype": "smg",
+   "style": "vietnam",
+   "seed": 2,
+   "paletteVariant": 2
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 400
+ },
+ {
+  "out": "r5/fam_vietnam_shotgun.png",
+  "recipe": {
+   "archetype": "shotgun",
+   "style": "vietnam",
+   "seed": 2,
+   "paletteVariant": 2
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 400
+ },
+ {
+  "out": "r5/fam_vietnam_sniper.png",
+  "recipe": {
+   "archetype": "sniper",
+   "style": "vietnam",
+   "seed": 2,
+   "paletteVariant": 2
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 400
+ },
+ {
+  "out": "r5/fam_vietnam_lmg.png",
+  "recipe": {
+   "archetype": "lmg",
+   "style": "vietnam",
+   "seed": 2,
+   "paletteVariant": 2
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 400
+ },
+ {
+  "out": "r5/fam_vietnam_pistol.png",
+  "recipe": {
+   "archetype": "pistol",
+   "style": "vietnam",
+   "seed": 2,
+   "paletteVariant": 2
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 400
+ },
+ {
+  "out": "r5/bolt.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "ww1",
+   "seed": 3,
+   "parts": {
+    "receiver": "boltaction",
+    "stock": "military",
+    "magazine": "internal"
+   },
+   "optic": "leaf"
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 1300,
+  "height": 600
+ },
+ {
+  "out": "r5/wcmg.png",
+  "recipe": {
+   "archetype": "lmg",
+   "style": "ww1",
+   "seed": 4,
+   "parts": {
+    "handguard": "jacket",
+    "magazine": "pan"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 420
+ },
+ {
+  "out": "r5/stick.png",
+  "recipe": {
+   "archetype": "smg",
+   "style": "ww2",
+   "seed": 5,
+   "parts": {
+    "receiver": "tubular",
+    "magazine": "stick",
+    "stock": "wire"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 420
+ },
+ {
+  "out": "r5/topmg.png",
+  "recipe": {
+   "archetype": "lmg",
+   "style": "ww2",
+   "seed": 6,
+   "parts": {
+    "magazine": "top"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 420
+ },
+ {
+  "out": "r5/drum.png",
+  "recipe": {
+   "archetype": "smg",
+   "style": "ww2",
+   "seed": 8,
+   "parts": {
+    "magazine": "drum",
+    "barrel": "finned",
+    "stock": "classic",
+    "receiver": "stamped"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 420
+ },
+ {
+  "out": "r5/vn_black.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "vietnam",
+   "seed": 8,
+   "parts": {
+    "receiver": "angular",
+    "handguard": "triangle",
+    "stock": "fixed",
+    "muzzle": "flash"
+   },
+   "optic": "irons",
+   "paletteVariant": 2
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 420
+ },
+ {
+  "out": "r5/vn_wood.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "vietnam",
+   "seed": 7,
+   "parts": {
+    "receiver": "stamped",
+    "magazine": "curved",
+    "stock": "fixed",
+    "handguard": "forend"
+   },
+   "paletteVariant": 1
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 420
+ },
+ {
+  "out": "r5/trench.png",
+  "recipe": {
+   "archetype": "shotgun",
+   "style": "ww1",
+   "seed": 5,
+   "parts": {
+    "stock": "classic"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 420
+ },
+ {
+  "out": "r5/broom.png",
+  "recipe": {
+   "archetype": "pistol",
+   "style": "ww1",
+   "seed": 3,
+   "parts": {
+    "frame": "broomhandle",
+    "grip": "broom"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 700,
+  "height": 460
+ },
+ {
+  "out": "r5/toggle.png",
+  "recipe": {
+   "archetype": "pistol",
+   "style": "ww2",
+   "seed": 4,
+   "parts": {
+    "frame": "toggle",
+    "grip": "birdshead"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 700,
+  "height": 460
+ }
+]

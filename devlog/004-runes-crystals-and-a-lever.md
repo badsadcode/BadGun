@@ -121,5 +121,5 @@ Try the new stuff in the **[playground](https://badsadcode.github.io/BadGun/)**:
 ---
 
 <p align="center">
-  <a href="README.md">← All devlogs</a> · <a href="../README.md">BadGun home</a>
+  <a href="README.md">← All devlogs</a> · <a href="../README.md">BadGun home</a> · <a href="005-wood-steel-and-history.md">Next: #005 →</a>
 </p>
