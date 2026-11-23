@@ -86,5 +86,5 @@ There's a new **⚑ Faction** button in the **[playground](https://badsadcode.gi
 ---
 
 <p align="center">
-  <a href="README.md">← All devlogs</a> · <a href="../README.md">BadGun home</a>
+  <a href="README.md">← All devlogs</a> · <a href="../README.md">BadGun home</a> · <a href="007-diesel-and-neon.md">Next: #007 →</a>
 </p>

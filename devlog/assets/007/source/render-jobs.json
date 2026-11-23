@@ -1,0 +1,442 @@
+[
+ {
+  "out": "d_rifle_side.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "diesel",
+   "seed": 3,
+   "parts": {
+    "receiver": "deco",
+    "muzzle": "exhaust",
+    "config": "standard",
+    "magazine": "jerrycan",
+    "handguard": "radiator",
+    "stock": "deco"
+   },
+   "optic": "lamp",
+   "paletteVariant": 1
+  },
+  "view": "side",
+  "width": 1400,
+  "height": 700,
+  "bg": "none",
+  "scale": 1
+ },
+ {
+  "out": "d_rifle_three-quarter.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "diesel",
+   "seed": 3,
+   "parts": {
+    "receiver": "deco",
+    "muzzle": "exhaust",
+    "config": "standard",
+    "magazine": "jerrycan",
+    "handguard": "radiator",
+    "stock": "deco"
+   },
+   "optic": "lamp",
+   "paletteVariant": 1
+  },
+  "view": "three-quarter",
+  "width": 1400,
+  "height": 700,
+  "bg": "none",
+  "scale": 1
+ },
+ {
+  "out": "d_smg_side.png",
+  "recipe": {
+   "archetype": "smg",
+   "style": "diesel",
+   "seed": 5,
+   "parts": {
+    "receiver": "riveted",
+    "magazine": "drum",
+    "muzzle": "exhaust"
+   },
+   "paletteVariant": 2
+  },
+  "view": "side",
+  "width": 1400,
+  "height": 700,
+  "bg": "none",
+  "scale": 1
+ },
+ {
+  "out": "d_smg_three-quarter.png",
+  "recipe": {
+   "archetype": "smg",
+   "style": "diesel",
+   "seed": 5,
+   "parts": {
+    "receiver": "riveted",
+    "magazine": "drum",
+    "muzzle": "exhaust"
+   },
+   "paletteVariant": 2
+  },
+  "view": "three-quarter",
+  "width": 1400,
+  "height": 700,
+  "bg": "none",
+  "scale": 1
+ },
+ {
+  "out": "d_lmg_side.png",
+  "recipe": {
+   "archetype": "lmg",
+   "style": "diesel",
+   "seed": 7,
+   "parts": {
+    "receiver": "riveted",
+    "handguard": "radiator"
+   },
+   "paletteVariant": 2
+  },
+  "view": "side",
+  "width": 1400,
+  "height": 700,
+  "bg": "none",
+  "scale": 1
+ },
+ {
+  "out": "d_lmg_three-quarter.png",
+  "recipe": {
+   "archetype": "lmg",
+   "style": "diesel",
+   "seed": 7,
+   "parts": {
+    "receiver": "riveted",
+    "handguard": "radiator"
+   },
+   "paletteVariant": 2
+  },
+  "view": "three-quarter",
+  "width": 1400,
+  "height": 700,
+  "bg": "none",
+  "scale": 1
+ },
+ {
+  "out": "d_shotgun_side.png",
+  "recipe": {
+   "archetype": "shotgun",
+   "style": "diesel",
+   "seed": 4,
+   "parts": {
+    "receiver": "deco"
+   },
+   "optic": "lamp",
+   "paletteVariant": 3
+  },
+  "view": "side",
+  "width": 1400,
+  "height": 700,
+  "bg": "none",
+  "scale": 1
+ },
+ {
+  "out": "d_shotgun_three-quarter.png",
+  "recipe": {
+   "archetype": "shotgun",
+   "style": "diesel",
+   "seed": 4,
+   "parts": {
+    "receiver": "deco"
+   },
+   "optic": "lamp",
+   "paletteVariant": 3
+  },
+  "view": "three-quarter",
+  "width": 1400,
+  "height": 700,
+  "bg": "none",
+  "scale": 1
+ },
+ {
+  "out": "d_pistol_side.png",
+  "recipe": {
+   "archetype": "pistol",
+   "style": "diesel",
+   "seed": 3,
+   "parts": {
+    "frame": "deco",
+    "muzzle": "exhaust"
+   },
+   "paletteVariant": 3
+  },
+  "view": "side",
+  "width": 1400,
+  "height": 700,
+  "bg": "none",
+  "scale": 1
+ },
+ {
+  "out": "d_pistol_three-quarter.png",
+  "recipe": {
+   "archetype": "pistol",
+   "style": "diesel",
+   "seed": 3,
+   "parts": {
+    "frame": "deco",
+    "muzzle": "exhaust"
+   },
+   "paletteVariant": 3
+  },
+  "view": "three-quarter",
+  "width": 1400,
+  "height": 700,
+  "bg": "none",
+  "scale": 1
+ },
+ {
+  "out": "d_sniper_side.png",
+  "recipe": {
+   "archetype": "sniper",
+   "style": "diesel",
+   "seed": 6,
+   "parts": {
+    "receiver": "deco"
+   },
+   "paletteVariant": 0
+  },
+  "view": "side",
+  "width": 1400,
+  "height": 700,
+  "bg": "none",
+  "scale": 1
+ },
+ {
+  "out": "d_sniper_three-quarter.png",
+  "recipe": {
+   "archetype": "sniper",
+   "style": "diesel",
+   "seed": 6,
+   "parts": {
+    "receiver": "deco"
+   },
+   "paletteVariant": 0
+  },
+  "view": "three-quarter",
+  "width": 1400,
+  "height": 700,
+  "bg": "none",
+  "scale": 1
+ },
+ {
+  "out": "c_rifle_side.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "cyber",
+   "seed": 4,
+   "parts": {
+    "receiver": "chassis",
+    "muzzle": "smart",
+    "magazine": "smartmag",
+    "config": "standard",
+    "stock": "blade",
+    "grip": "neon",
+    "handguard": "cabled"
+   },
+   "optic": "smart",
+   "paletteVariant": 1
+  },
+  "view": "side",
+  "width": 1400,
+  "height": 700,
+  "bg": "none",
+  "scale": 1
+ },
+ {
+  "out": "c_rifle_three-quarter.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "cyber",
+   "seed": 4,
+   "parts": {
+    "receiver": "chassis",
+    "muzzle": "smart",
+    "magazine": "smartmag",
+    "config": "standard",
+    "stock": "blade",
+    "grip": "neon",
+    "handguard": "cabled"
+   },
+   "optic": "smart",
+   "paletteVariant": 1
+  },
+  "view": "three-quarter",
+  "width": 1400,
+  "height": 700,
+  "bg": "none",
+  "scale": 1
+ },
+ {
+  "out": "c_smg_side.png",
+  "recipe": {
+   "archetype": "smg",
+   "style": "cyber",
+   "seed": 2,
+   "parts": {
+    "receiver": "street",
+    "magazine": "smartmag",
+    "config": "standard"
+   },
+   "optic": "smart",
+   "paletteVariant": 2
+  },
+  "view": "side",
+  "width": 1400,
+  "height": 700,
+  "bg": "none",
+  "scale": 1
+ },
+ {
+  "out": "c_smg_three-quarter.png",
+  "recipe": {
+   "archetype": "smg",
+   "style": "cyber",
+   "seed": 2,
+   "parts": {
+    "receiver": "street",
+    "magazine": "smartmag",
+    "config": "standard"
+   },
+   "optic": "smart",
+   "paletteVariant": 2
+  },
+  "view": "three-quarter",
+  "width": 1400,
+  "height": 700,
+  "bg": "none",
+  "scale": 1
+ },
+ {
+  "out": "c_sniper_side.png",
+  "recipe": {
+   "archetype": "sniper",
+   "style": "cyber",
+   "seed": 3,
+   "parts": {
+    "receiver": "chassis"
+   },
+   "paletteVariant": 3
+  },
+  "view": "side",
+  "width": 1400,
+  "height": 700,
+  "bg": "none",
+  "scale": 1
+ },
+ {
+  "out": "c_sniper_three-quarter.png",
+  "recipe": {
+   "archetype": "sniper",
+   "style": "cyber",
+   "seed": 3,
+   "parts": {
+    "receiver": "chassis"
+   },
+   "paletteVariant": 3
+  },
+  "view": "three-quarter",
+  "width": 1400,
+  "height": 700,
+  "bg": "none",
+  "scale": 1
+ },
+ {
+  "out": "c_shotgun_side.png",
+  "recipe": {
+   "archetype": "shotgun",
+   "style": "cyber",
+   "seed": 1,
+   "paletteVariant": 1
+  },
+  "view": "side",
+  "width": 1400,
+  "height": 700,
+  "bg": "none",
+  "scale": 1
+ },
+ {
+  "out": "c_shotgun_three-quarter.png",
+  "recipe": {
+   "archetype": "shotgun",
+   "style": "cyber",
+   "seed": 1,
+   "paletteVariant": 1
+  },
+  "view": "three-quarter",
+  "width": 1400,
+  "height": 700,
+  "bg": "none",
+  "scale": 1
+ },
+ {
+  "out": "c_pistol_side.png",
+  "recipe": {
+   "archetype": "pistol",
+   "style": "cyber",
+   "seed": 3,
+   "parts": {
+    "frame": "smartgun",
+    "muzzle": "smart"
+   },
+   "paletteVariant": 2
+  },
+  "view": "side",
+  "width": 1400,
+  "height": 700,
+  "bg": "none",
+  "scale": 1
+ },
+ {
+  "out": "c_pistol_three-quarter.png",
+  "recipe": {
+   "archetype": "pistol",
+   "style": "cyber",
+   "seed": 3,
+   "parts": {
+    "frame": "smartgun",
+    "muzzle": "smart"
+   },
+   "paletteVariant": 2
+  },
+  "view": "three-quarter",
+  "width": 1400,
+  "height": 700,
+  "bg": "none",
+  "scale": 1
+ },
+ {
+  "out": "c_lmg_side.png",
+  "recipe": {
+   "archetype": "lmg",
+   "style": "cyber",
+   "seed": 2,
+   "paletteVariant": 3
+  },
+  "view": "side",
+  "width": 1400,
+  "height": 700,
+  "bg": "none",
+  "scale": 1
+ },
+ {
+  "out": "c_lmg_three-quarter.png",
+  "recipe": {
+   "archetype": "lmg",
+   "style": "cyber",
+   "seed": 2,
+   "paletteVariant": 3
+  },
+  "view": "three-quarter",
+  "width": 1400,
+  "height": 700,
+  "bg": "none",
+  "scale": 1
+ }
+]

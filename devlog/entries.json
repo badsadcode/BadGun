@@ -46,5 +46,13 @@
     "date": "2026-11-23",
     "summary": "Faction families: one lucky number, one whole matching arsenal, with a name, a badge and a favorite set of parts.",
     "cover": "assets/006/banner.webp"
+  },
+  {
+    "slug": "007-diesel-and-neon",
+    "number": "007",
+    "title": "Diesel & Neon",
+    "date": "2026-11-23",
+    "summary": "Two new worlds: chrome-and-rivets dieselpunk and cable-and-sticker cyberpunk, with searchlights, exhaust stacks and LED ammo counters.",
+    "cover": "assets/007/banner.webp"
   }
 ]
