@@ -22,5 +22,13 @@
     "date": "2026-11-23",
     "summary": "Every weapon gets its own shape, double barrels snap open, a whole scavenger world arrives, and so do the first bows.",
     "cover": "assets/003/banner.webp"
+  },
+  {
+    "slug": "004-runes-crystals-and-a-lever",
+    "number": "004",
+    "title": "Runes, Crystals & a Lever",
+    "date": "2026-11-23",
+    "summary": "World #5 is fantasy, and a pile of reference pictures teaches the factory lever actions, machine pistols, hunting stocks and more.",
+    "cover": "assets/004/banner.webp"
   }
 ]

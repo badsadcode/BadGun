@@ -1,0 +1,325 @@
+[
+ {
+  "out": "r4/fam_rifle.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "fantasy",
+   "seed": 3,
+   "paletteVariant": 0
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 420
+ },
+ {
+  "out": "r4/fam_smg.png",
+  "recipe": {
+   "archetype": "smg",
+   "style": "fantasy",
+   "seed": 3,
+   "paletteVariant": 1
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 420
+ },
+ {
+  "out": "r4/fam_shotgun.png",
+  "recipe": {
+   "archetype": "shotgun",
+   "style": "fantasy",
+   "seed": 3,
+   "paletteVariant": 2
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 420
+ },
+ {
+  "out": "r4/fam_sniper.png",
+  "recipe": {
+   "archetype": "sniper",
+   "style": "fantasy",
+   "seed": 3,
+   "paletteVariant": 3
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 420
+ },
+ {
+  "out": "r4/fam_lmg.png",
+  "recipe": {
+   "archetype": "lmg",
+   "style": "fantasy",
+   "seed": 3,
+   "paletteVariant": 0
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 420
+ },
+ {
+  "out": "r4/fam_pistol.png",
+  "recipe": {
+   "archetype": "pistol",
+   "style": "fantasy",
+   "seed": 3,
+   "paletteVariant": 1
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 420
+ },
+ {
+  "out": "r4/fam_crossbow.png",
+  "recipe": {
+   "archetype": "crossbow",
+   "style": "fantasy",
+   "seed": 3,
+   "paletteVariant": 2
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 800,
+  "height": 420
+ },
+ {
+  "out": "r4/fam_bow.png",
+  "recipe": {
+   "archetype": "bow",
+   "style": "fantasy",
+   "seed": 3,
+   "paletteVariant": 3
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 700
+ },
+ {
+  "out": "r4/pal_0.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "fantasy",
+   "seed": 3,
+   "paletteVariant": 0
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 360
+ },
+ {
+  "out": "r4/pal_1.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "fantasy",
+   "seed": 3,
+   "paletteVariant": 1
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 360
+ },
+ {
+  "out": "r4/pal_2.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "fantasy",
+   "seed": 3,
+   "paletteVariant": 2
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 360
+ },
+ {
+  "out": "r4/pal_3.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "fantasy",
+   "seed": 3,
+   "paletteVariant": 3
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 360
+ },
+ {
+  "out": "r4/hero.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "fantasy",
+   "seed": 3,
+   "optic": "rune"
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 1300,
+  "height": 640
+ },
+ {
+  "out": "r4/hero_pistol.png",
+  "recipe": {
+   "archetype": "pistol",
+   "style": "fantasy",
+   "seed": 5,
+   "parts": {
+    "frame": "flintlock",
+    "muzzle": "crystal"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 520
+ },
+ {
+  "out": "r4/hero_bow.png",
+  "recipe": {
+   "archetype": "bow",
+   "style": "fantasy",
+   "seed": 2,
+   "parts": {
+    "bow": "elven"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 600,
+  "height": 900
+ },
+ {
+  "out": "r4/lever_rifle.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "steampunk",
+   "seed": 2,
+   "parts": {
+    "config": "lever"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 460
+ },
+ {
+  "out": "r4/mpistol.png",
+  "recipe": {
+   "archetype": "smg",
+   "style": "modern",
+   "seed": 4,
+   "parts": {
+    "config": "machinepistol"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 460
+ },
+ {
+  "out": "r4/boxfed.png",
+  "recipe": {
+   "archetype": "shotgun",
+   "style": "modern",
+   "seed": 6,
+   "parts": {
+    "config": "boxfed",
+    "magazine": "drum"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 460
+ },
+ {
+  "out": "r4/sporter.png",
+  "recipe": {
+   "archetype": "sniper",
+   "style": "modern",
+   "seed": 3,
+   "parts": {
+    "stock": "sporter"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 460
+ },
+ {
+  "out": "r4/battle.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "modern",
+   "seed": 9,
+   "parts": {
+    "stock": "frame",
+    "handguard": "railed"
+   },
+   "optic": "irons"
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 460
+ },
+ {
+  "out": "r4/lever_shotgun.png",
+  "recipe": {
+   "archetype": "shotgun",
+   "style": "modern",
+   "seed": 3,
+   "parts": {
+    "config": "lever"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 460
+ },
+ {
+  "out": "r4/p_flare.png",
+  "recipe": {
+   "archetype": "pistol",
+   "style": "scrap",
+   "seed": 4,
+   "parts": {
+    "frame": "flare"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 460
+ },
+ {
+  "out": "r4/p_loop.png",
+  "recipe": {
+   "archetype": "pistol",
+   "style": "scifi",
+   "seed": 2,
+   "parts": {
+    "frame": "loop"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 460
+ }
+]

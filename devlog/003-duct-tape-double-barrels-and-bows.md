@@ -132,5 +132,5 @@ Try all of it in the **[playground](https://badsadcode.github.io/BadGun/)**: pre
 ---
 
 <p align="center">
-  <a href="README.md">← All devlogs</a> · <a href="../README.md">BadGun home</a>
+  <a href="README.md">← All devlogs</a> · <a href="../README.md">BadGun home</a> · <a href="004-runes-crystals-and-a-lever.md">Next: #004 →</a>
 </p>

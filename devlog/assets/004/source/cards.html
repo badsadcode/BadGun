@@ -1,0 +1,193 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@500;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#121419; --ink:#f1eee8; --dim:#9aa0aa; --orange:#ff6b3d; --yellow:#ffd23d; --cyan:#42e2ff; --brass:#e0b25a; --pink:#ff5fc0; }
+* { box-sizing: border-box; margin: 0; }
+body { background: #333; font-family: 'Space Grotesk', sans-serif; color: var(--ink); padding: 20px; display: grid; gap: 20px; justify-content: start; }
+.card { width: 1200px; position: relative; overflow: hidden; border-radius: 28px; padding: 48px 56px;
+  background:
+    radial-gradient(900px 500px at 80% 30%, rgba(255,107,61,.13), transparent 60%),
+    radial-gradient(700px 400px at 10% 100%, rgba(66,226,255,.08), transparent 60%),
+    linear-gradient(160deg, #181b22, #101216);
+}
+.card::before { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+  background-size: 32px 32px; mask-image: radial-gradient(circle at 60% 40%, #000 30%, transparent 85%); }
+.kicker { font: 700 14px 'JetBrains Mono', monospace; letter-spacing: 3px; color: var(--orange); text-transform: uppercase; }
+h1 { font-size: 76px; line-height: .95; letter-spacing: -3px; font-weight: 700; margin: 18px 0 18px; }
+h1 em { font-style: normal; color: var(--orange); }
+h2 { font-size: 44px; letter-spacing: -1.5px; line-height: 1; margin: 10px 0 8px; }
+.sub { font-size: 22px; color: var(--dim); max-width: 520px; line-height: 1.35; }
+.chip { display: inline-block; font: 700 13px 'JetBrains Mono', monospace; letter-spacing: 2px; padding: 6px 12px; border-radius: 999px; border: 1.5px solid currentColor; }
+.note { font-family: 'Caveat', cursive; font-weight: 700; color: var(--yellow); }
+img { display: block; }
+.logo { position: absolute; right: 40px; bottom: 30px; font: 700 15px 'JetBrains Mono', monospace; color: #5b616c; letter-spacing: 2px; }
+.logo b { color: var(--orange); }
+
+/* banner */
+#banner { height: 560px; }
+#banner .guns { position: absolute; right: -40px; top: 40px; width: 760px; height: 500px; }
+#banner .guns img { position: absolute; filter: drop-shadow(0 30px 30px rgba(0,0,0,.45)); }
+#banner .g1 { width: 600px; right: 110px; top: 10px; opacity: .97; }
+#banner .g2 { width: 700px; right: 40px; top: 150px; }
+#banner .g3 { width: 600px; right: 130px; top: 320px; }
+#banner .stamp { position: absolute; left: 56px; bottom: 48px; display: flex; gap: 10px; }
+#banner .scribble { position: absolute; left: 58px; top: 405px; transform: rotate(-3deg); font-size: 28px; }
+
+/* worlds */
+.world { display: grid; grid-template-columns: 330px 1fr; align-items: center; gap: 20px; padding: 18px 0; border-top: 1px dashed rgba(255,255,255,.1); position: relative; }
+.world:first-of-type { border-top: 0; }
+.world p { color: var(--dim); font-size: 18px; line-height: 1.4; }
+.world img { width: 780px; justify-self: center; filter: drop-shadow(0 18px 22px rgba(0,0,0,.5)); }
+
+/* grids */
+.grid { display: grid; gap: 6px 26px; margin-top: 26px; }
+.grid img { width: 100%; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.colhead { margin-bottom: 4px; }
+.cell { position: relative; padding: 10px 6px; }
+.cell .label { position: absolute; left: 6px; top: 2px; font: 700 13px 'JetBrains Mono', monospace; color: var(--dim); letter-spacing: 1px; }
+
+/* exploded */
+#exploded .stage { position: relative; width: 1088px; margin-top: 30px; }
+#exploded .stage img { width: 100%; filter: drop-shadow(0 16px 18px rgba(0,0,0,.5)); }
+.tag { position: absolute; font-family: 'Caveat', cursive; font-weight: 700; font-size: 30px; color: var(--yellow); white-space: nowrap; transform: rotate(-3deg); }
+.tag::before { content: '↙ '; }
+.tag.r::before { content: ''; } .tag.r::after { content: ' ↘'; }
+.tag.d::before { content: '↖ '; }
+.tag.n::before { content: ''; }
+
+/* stats */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 30px; }
+.stat { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 20px; padding: 22px 24px; }
+.stat .n { font-size: 54px; font-weight: 700; letter-spacing: -2px; color: var(--ink); }
+.stat .n small { font-size: 26px; color: var(--dim); letter-spacing: 0; }
+.stat .t { color: var(--dim); font-size: 17px; line-height: 1.35; margin-top: 4px; }
+.stat.hot { border-color: rgba(255,107,61,.5); background: rgba(255,107,61,.08); }
+.stat.hot .n { color: var(--orange); }
+
+.fam { display: grid; grid-template-columns: 140px repeat(3, 1fr); gap: 4px 18px; align-items: center; margin-top: 26px; }
+.fam .rowlab { font: 700 15px 'JetBrains Mono', monospace; letter-spacing: 2px; color: var(--dim); text-transform: uppercase; }
+.fam img { width: 100%; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.fam .cell { height: 128px; display: flex; align-items: center; justify-content: center; }
+.fam .cell img { max-height: 120px; width: auto; max-width: 100%; }
+.trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 30px; align-items: end; }
+.trio .item img { width: 100%; filter: drop-shadow(0 14px 16px rgba(0,0,0,.5)); }
+.trio .item h3 { font-size: 26px; margin: 14px 0 4px; letter-spacing: -.5px; }
+.trio .item p { color: var(--dim); font-size: 16px; line-height: 1.4; }
+.xb { display: grid; gap: 4px; margin-top: 20px; }
+.xb .row { display: grid; grid-template-columns: 300px 1fr; gap: 20px; align-items: center; }
+.xb .row img { width: 100%; filter: drop-shadow(0 16px 18px rgba(0,0,0,.5)); }
+.xb .row p { color: var(--dim); font-size: 17px; line-height: 1.4; }
+.xb .row h3 { font-size: 28px; margin: 10px 0 6px; }
+.cat { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 30px; margin-top: 26px; }
+.cat .c { position: relative; padding-top: 34px; }
+.cat .c img { width: 100%; filter: drop-shadow(0 12px 14px rgba(0,0,0,.5)); }
+.cat .c .note { position: absolute; left: 4px; top: 0; font-size: 28px; transform: rotate(-2deg); }
+#banner2 { height: 560px; }
+#banner2 .g { position: absolute; filter: drop-shadow(0 26px 26px rgba(0,0,0,.5)); }
+
+.ba { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 26px; }
+.ba .col h3 { font: 700 15px 'JetBrains Mono', monospace; letter-spacing: 3px; margin: 0 0 6px; }
+.ba .col .sub2 { color: var(--dim); font-size: 17px; margin-bottom: 10px; }
+.ba .col img { width: 100%; display: block; margin: 4px 0; filter: drop-shadow(0 8px 10px rgba(0,0,0,.5)); }
+.ba .before { opacity: .92; }
+.bows { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 24px; align-items: start; }
+.bows .b { text-align: center; }
+.bows .b img { height: 520px; width: 100%; object-fit: contain; filter: drop-shadow(0 14px 14px rgba(0,0,0,.5)); }
+.bows .b h3 { font-size: 22px; margin: 10px 0 2px; }
+.bows .b p { color: var(--dim); font-size: 14px; margin: 0; line-height: 1.35; }
+.quad { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 30px; margin-top: 24px; }
+.quad .c { position: relative; padding-top: 36px; }
+.quad .c img { width: 100%; filter: drop-shadow(0 12px 14px rgba(0,0,0,.5)); }
+.quad .c .note { position: absolute; left: 4px; top: 0; font-size: 28px; transform: rotate(-2deg); }
+#banner3 { height: 560px; }
+#banner3 .g { position: absolute; filter: drop-shadow(0 26px 26px rgba(0,0,0,.5)); }
+
+.fam8 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px 22px; margin-top: 24px; align-items: center; }
+.fam8 .c { text-align: center; }
+.fam8 .c img { width: 100%; max-height: 150px; object-fit: contain; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.fam8 .c span { font: 700 13px 'JetBrains Mono', monospace; letter-spacing: 2px; color: var(--dim); }
+.pals { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 30px; margin-top: 24px; }
+.pals .c img { width: 100%; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.pals .c span { font: 700 14px 'JetBrains Mono', monospace; letter-spacing: 2px; }
+.heroes { display: grid; grid-template-columns: 1.6fr 1fr 0.55fr; gap: 20px; align-items: center; margin-top: 20px; }
+.heroes img { width: 100%; filter: drop-shadow(0 16px 18px rgba(0,0,0,.5)); }
+.heroes .note { font-size: 26px; display: block; margin-bottom: 6px; transform: rotate(-2deg); }
+#banner4 { height: 560px; }
+#banner4 .g { position: absolute; filter: drop-shadow(0 26px 26px rgba(0,0,0,.5)); }
+</style></head><body>
+<section class="card" id="banner4">
+  <div class="kicker">Bad Ideas Works · Devlog #004</div>
+  <h1>Runes,<br>Crystals &amp;<br>a <em>Lever.</em></h1>
+  <p class="sub" style="max-width:470px">World #5 is pure fantasy. And thanks to a pile of reference pictures from Tom, a whole bunch of new shapes.</p>
+  <img class="g" src="r4/c_hero.png" style="width:560px; right:30px; top:40px;">
+  <img class="g" src="r4/c_hero_pistol.png" style="width:330px; right:300px; top:300px;">
+  <img class="g" src="r4/c_hero_bow.png" style="height:420px; right:40px; top:120px;">
+  <div style="position:absolute; left:56px; bottom:48px; display:flex; gap:10px;">
+    <span class="chip" style="color:#c9ccd2">5 WORLDS</span><span class="chip" style="color:var(--yellow)">122 PARTS</span>
+  </div>
+</section>
+
+<section class="card" id="fantasy">
+  <div class="kicker">World #5</div>
+  <h2>Fantasy.</h2>
+  <p class="sub" style="max-width:940px">Every weapon type, now with gold filigree, set gems, glowing runes and crystals.</p>
+  <div class="fam8"><div class="c"><img src="r4/c_fam_rifle.png"><br><span>RIFLE</span></div><div class="c"><img src="r4/c_fam_smg.png"><br><span>SMG</span></div><div class="c"><img src="r4/c_fam_shotgun.png"><br><span>SHOTGUN</span></div><div class="c"><img src="r4/c_fam_sniper.png"><br><span>SNIPER</span></div><div class="c"><img src="r4/c_fam_lmg.png"><br><span>LMG</span></div><div class="c"><img src="r4/c_fam_pistol.png"><br><span>PISTOL</span></div><div class="c"><img src="r4/c_fam_crossbow.png"><br><span>CROSSBOW</span></div><div class="c"><img src="r4/c_hero_bow.png"><br><span>BOW</span></div></div>
+  <div class="logo">BAD<b>GUN</b></div>
+</section>
+
+<section class="card" id="palettes4">
+  <div class="kicker">Four kingdoms</div>
+  <h2>Same rifle, four kingdoms.</h2>
+  <div class="pals">
+    <div class="c"><span style="color:#d9c27a">ELVEN SILVER</span><img src="r4/c_pal_0.png"></div>
+    <div class="c"><span style="color:#ff9a4a">DWARVEN FORGE</span><img src="r4/c_pal_1.png"></div>
+    <div class="c"><span style="color:#b46bff">ARCANE VIOLET</span><img src="r4/c_pal_2.png"></div>
+    <div class="c"><span style="color:#5fd4ff">FROSTBOUND</span><img src="r4/c_pal_3.png"></div>
+  </div>
+  <div class="logo">BAD<b>GUN</b></div>
+</section>
+
+<section class="card" id="closeup">
+  <div class="kicker">Up close</div>
+  <h2>Every inscription is different.</h2>
+  <p class="sub" style="max-width:940px">The runes are made up on the spot from each weapon's lucky number. No two guns say the same thing. (We don't know what they say. Probably "handle with care".)</p>
+  <div class="heroes">
+    <div><span class="note">runes, a set gem, a crystal-claw muzzle</span><img src="r4/c_hero.png"></div>
+    <div><span class="note">a flintlock that holds a crystal</span><img src="r4/c_hero_pistol.png"></div>
+    <div><span class="note">elven bow</span><img src="r4/c_hero_bow.png"></div>
+  </div>
+  <div class="logo">BAD<b>GUN</b></div>
+</section>
+
+<section class="card" id="inspired">
+  <div class="kicker">Homework from Tom</div>
+  <h2>New shapes, from a pile of reference pictures.</h2>
+  <div class="cat">
+    <div class="c"><span class="note">lever action (with a finger loop)</span><img src="r4/c_lever_rifle.png"></div>
+    <div class="c"><span class="note">machine pistol: magazine through the grip</span><img src="r4/c_mpistol.png"></div>
+    <div class="c"><span class="note">drum-fed shotgun</span><img src="r4/c_boxfed.png"></div>
+    <div class="c"><span class="note">one-piece hunting stock</span><img src="r4/c_sporter.png"></div>
+    <div class="c"><span class="note">carry handle, A-frame sight, folding stock, foregrip</span><img src="r4/c_battle.png"></div>
+    <div class="c"><span class="note">lever-action shotgun</span><img src="r4/c_lever_shotgun.png"></div>
+    <div class="c"><span class="note">flare gun</span><img src="r4/c_p_flare.png" style="width:auto;max-height:220px;margin-left:60px"></div>
+    <div class="c"><span class="note">sci-fi loop blaster</span><img src="r4/c_p_loop.png" style="width:auto;max-height:220px;margin-left:60px"></div>
+  </div>
+  <div class="logo">BAD<b>GUN</b></div>
+</section>
+
+<section class="card" id="stats4">
+  <div class="kicker">By the numbers</div>
+  <h2>Update #4, in numbers.</h2>
+  <div class="stats">
+    <div class="stat hot"><div class="n">5</div><div class="t">worlds: modern, steampunk, sci-fi, survivor and fantasy.</div></div>
+    <div class="stat"><div class="n">122</div><div class="t">part variants, plus 7 sights and scopes.</div></div>
+    <div class="stat"><div class="n">5</div><div class="t">layouts: standard, bullpup, lever, machine pistol, box-fed.</div></div>
+    <div class="stat"><div class="n">1,695</div><div class="t">test weapons built and checked for every update.</div></div>
+    <div class="stat"><div class="n">∞</div><div class="t">rune inscriptions. None of them are spelling checked.</div></div>
+    <div class="stat"><div class="n">0</div><div class="t">bee launchers. The orb magazine is just an orb. Please. 🐝</div></div>
+  </div>
+  <div class="logo">BAD<b>GUN</b></div>
+</section>
+</body></html>
