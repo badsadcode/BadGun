@@ -80,6 +80,8 @@
     .hud { left: 12px; right: 12px; bottom: 8px; font-size: 10px; }
     .toolbar { right: 10px; top: 10px; }
     .toolbar button { padding: 6px 8px; font-size: 12px; }
+    .uvpanel { width: 36vw; top: 52px; right: 10px; padding: 6px; }
+    .uvpanel .cap { font-size: 9px; }
     .links span { display: none; }
   }
 </style>
@@ -517,7 +519,7 @@ function drawUvMap() {
   const ctx = $('uvcanvas').getContext('2d');
   ctx.putImageData(new ImageData(new Uint8ClampedArray(img.data.buffer, img.data.byteOffset, img.data.byteLength), size, size), 0, 0);
   const a = BadGun.weaponAtlas(currentWeapon);
-  $('uvcap').innerHTML = `${currentFaction ? 'first member · ' : ''}<b>${a.charts}</b> islands · ${Math.round(a.coverage * 100)}% used<br>${Math.round(a.uvPerMeter * 1024 / 100)} px/cm at 1024 · ${Math.round(a.uvPerMeter * 2048 / 100)} px/cm at 2048`;
+  $('uvcap').innerHTML = `${currentFaction ? 'first member · ' : ''}<b>${a.charts}</b> islands · ${Math.round(a.coverage * 100)}% used<br>${Math.round(a.uvPerMeter * 1024 / 100)} px/cm @1K · ${Math.round(a.uvPerMeter * 2048 / 100)} @2K`;
 }
 $('checker').onclick = () => { showChecker = !showChecker; applyChecker(); };
 $('uvmap').onclick = () => { showUv = !showUv; drawUvMap(); };
