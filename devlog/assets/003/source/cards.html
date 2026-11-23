@@ -1,0 +1,198 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@500;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#121419; --ink:#f1eee8; --dim:#9aa0aa; --orange:#ff6b3d; --yellow:#ffd23d; --cyan:#42e2ff; --brass:#e0b25a; --pink:#ff5fc0; }
+* { box-sizing: border-box; margin: 0; }
+body { background: #333; font-family: 'Space Grotesk', sans-serif; color: var(--ink); padding: 20px; display: grid; gap: 20px; justify-content: start; }
+.card { width: 1200px; position: relative; overflow: hidden; border-radius: 28px; padding: 48px 56px;
+  background:
+    radial-gradient(900px 500px at 80% 30%, rgba(255,107,61,.13), transparent 60%),
+    radial-gradient(700px 400px at 10% 100%, rgba(66,226,255,.08), transparent 60%),
+    linear-gradient(160deg, #181b22, #101216);
+}
+.card::before { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+  background-size: 32px 32px; mask-image: radial-gradient(circle at 60% 40%, #000 30%, transparent 85%); }
+.kicker { font: 700 14px 'JetBrains Mono', monospace; letter-spacing: 3px; color: var(--orange); text-transform: uppercase; }
+h1 { font-size: 76px; line-height: .95; letter-spacing: -3px; font-weight: 700; margin: 18px 0 18px; }
+h1 em { font-style: normal; color: var(--orange); }
+h2 { font-size: 44px; letter-spacing: -1.5px; line-height: 1; margin: 10px 0 8px; }
+.sub { font-size: 22px; color: var(--dim); max-width: 520px; line-height: 1.35; }
+.chip { display: inline-block; font: 700 13px 'JetBrains Mono', monospace; letter-spacing: 2px; padding: 6px 12px; border-radius: 999px; border: 1.5px solid currentColor; }
+.note { font-family: 'Caveat', cursive; font-weight: 700; color: var(--yellow); }
+img { display: block; }
+.logo { position: absolute; right: 40px; bottom: 30px; font: 700 15px 'JetBrains Mono', monospace; color: #5b616c; letter-spacing: 2px; }
+.logo b { color: var(--orange); }
+
+/* banner */
+#banner { height: 560px; }
+#banner .guns { position: absolute; right: -40px; top: 40px; width: 760px; height: 500px; }
+#banner .guns img { position: absolute; filter: drop-shadow(0 30px 30px rgba(0,0,0,.45)); }
+#banner .g1 { width: 600px; right: 110px; top: 10px; opacity: .97; }
+#banner .g2 { width: 700px; right: 40px; top: 150px; }
+#banner .g3 { width: 600px; right: 130px; top: 320px; }
+#banner .stamp { position: absolute; left: 56px; bottom: 48px; display: flex; gap: 10px; }
+#banner .scribble { position: absolute; left: 58px; top: 405px; transform: rotate(-3deg); font-size: 28px; }
+
+/* worlds */
+.world { display: grid; grid-template-columns: 330px 1fr; align-items: center; gap: 20px; padding: 18px 0; border-top: 1px dashed rgba(255,255,255,.1); position: relative; }
+.world:first-of-type { border-top: 0; }
+.world p { color: var(--dim); font-size: 18px; line-height: 1.4; }
+.world img { width: 780px; justify-self: center; filter: drop-shadow(0 18px 22px rgba(0,0,0,.5)); }
+
+/* grids */
+.grid { display: grid; gap: 6px 26px; margin-top: 26px; }
+.grid img { width: 100%; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.colhead { margin-bottom: 4px; }
+.cell { position: relative; padding: 10px 6px; }
+.cell .label { position: absolute; left: 6px; top: 2px; font: 700 13px 'JetBrains Mono', monospace; color: var(--dim); letter-spacing: 1px; }
+
+/* exploded */
+#exploded .stage { position: relative; width: 1088px; margin-top: 30px; }
+#exploded .stage img { width: 100%; filter: drop-shadow(0 16px 18px rgba(0,0,0,.5)); }
+.tag { position: absolute; font-family: 'Caveat', cursive; font-weight: 700; font-size: 30px; color: var(--yellow); white-space: nowrap; transform: rotate(-3deg); }
+.tag::before { content: '↙ '; }
+.tag.r::before { content: ''; } .tag.r::after { content: ' ↘'; }
+.tag.d::before { content: '↖ '; }
+.tag.n::before { content: ''; }
+
+/* stats */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 30px; }
+.stat { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 20px; padding: 22px 24px; }
+.stat .n { font-size: 54px; font-weight: 700; letter-spacing: -2px; color: var(--ink); }
+.stat .n small { font-size: 26px; color: var(--dim); letter-spacing: 0; }
+.stat .t { color: var(--dim); font-size: 17px; line-height: 1.35; margin-top: 4px; }
+.stat.hot { border-color: rgba(255,107,61,.5); background: rgba(255,107,61,.08); }
+.stat.hot .n { color: var(--orange); }
+
+.fam { display: grid; grid-template-columns: 140px repeat(3, 1fr); gap: 4px 18px; align-items: center; margin-top: 26px; }
+.fam .rowlab { font: 700 15px 'JetBrains Mono', monospace; letter-spacing: 2px; color: var(--dim); text-transform: uppercase; }
+.fam img { width: 100%; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.fam .cell { height: 128px; display: flex; align-items: center; justify-content: center; }
+.fam .cell img { max-height: 120px; width: auto; max-width: 100%; }
+.trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 30px; align-items: end; }
+.trio .item img { width: 100%; filter: drop-shadow(0 14px 16px rgba(0,0,0,.5)); }
+.trio .item h3 { font-size: 26px; margin: 14px 0 4px; letter-spacing: -.5px; }
+.trio .item p { color: var(--dim); font-size: 16px; line-height: 1.4; }
+.xb { display: grid; gap: 4px; margin-top: 20px; }
+.xb .row { display: grid; grid-template-columns: 300px 1fr; gap: 20px; align-items: center; }
+.xb .row img { width: 100%; filter: drop-shadow(0 16px 18px rgba(0,0,0,.5)); }
+.xb .row p { color: var(--dim); font-size: 17px; line-height: 1.4; }
+.xb .row h3 { font-size: 28px; margin: 10px 0 6px; }
+.cat { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 30px; margin-top: 26px; }
+.cat .c { position: relative; padding-top: 34px; }
+.cat .c img { width: 100%; filter: drop-shadow(0 12px 14px rgba(0,0,0,.5)); }
+.cat .c .note { position: absolute; left: 4px; top: 0; font-size: 28px; transform: rotate(-2deg); }
+#banner2 { height: 560px; }
+#banner2 .g { position: absolute; filter: drop-shadow(0 26px 26px rgba(0,0,0,.5)); }
+
+.ba { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 26px; }
+.ba .col h3 { font: 700 15px 'JetBrains Mono', monospace; letter-spacing: 3px; margin: 0 0 6px; }
+.ba .col .sub2 { color: var(--dim); font-size: 17px; margin-bottom: 10px; }
+.ba .col img { width: 100%; display: block; margin: 4px 0; filter: drop-shadow(0 8px 10px rgba(0,0,0,.5)); }
+.ba .before { opacity: .92; }
+.bows { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 24px; align-items: start; }
+.bows .b { text-align: center; }
+.bows .b img { height: 520px; width: 100%; object-fit: contain; filter: drop-shadow(0 14px 14px rgba(0,0,0,.5)); }
+.bows .b h3 { font-size: 22px; margin: 10px 0 2px; }
+.bows .b p { color: var(--dim); font-size: 14px; margin: 0; line-height: 1.35; }
+.quad { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 30px; margin-top: 24px; }
+.quad .c { position: relative; padding-top: 36px; }
+.quad .c img { width: 100%; filter: drop-shadow(0 12px 14px rgba(0,0,0,.5)); }
+.quad .c .note { position: absolute; left: 4px; top: 0; font-size: 28px; transform: rotate(-2deg); }
+#banner3 { height: 560px; }
+#banner3 .g { position: absolute; filter: drop-shadow(0 26px 26px rgba(0,0,0,.5)); }
+</style></head><body>
+<section class="card" id="banner3">
+  <div class="kicker">Bad Ideas Works · Devlog #003</div>
+  <h1>Duct Tape,<br>Double Barrels<br>&amp; <em>Bows.</em></h1>
+  <p class="sub" style="max-width:470px">New shapes for everything, a whole new scavenger world, and the factory's first bows.</p>
+  <img class="g" src="r3/c_sv_rifle.png" style="width:540px; right:40px; top:30px;">
+  <img class="g" src="r3/c_db_sawn.png" style="width:290px; right:380px; top:300px;">
+  <img class="g" src="r3/c_bow_compound.png" style="height:350px; right:40px; top:195px;">
+  <div style="position:absolute; left:56px; bottom:48px; display:flex; gap:10px;">
+    <span class="chip" style="color:#c9ccd2">8 WEAPON TYPES</span><span class="chip" style="color:var(--yellow)">4 WORLDS</span>
+  </div>
+</section>
+
+<section class="card" id="beforeafter">
+  <div class="kicker">The family problem</div>
+  <h2>Siblings → strangers.</h2>
+  <p class="sub" style="max-width:940px">Same style, same six lucky numbers, before and after today. Left: very clearly one family. Right: they've stopped borrowing each other's clothes.</p>
+  <div class="ba">
+    <div class="col before"><h3 style="color:var(--dim)">BEFORE</h3><div class="sub2">Same proportions, parts swapped around.</div><img src="r3/c_before_1.png"><img src="r3/c_before_2.png"><img src="r3/c_before_3.png"><img src="r3/c_before_4.png"><img src="r3/c_before_5.png"><img src="r3/c_before_6.png"></div>
+    <div class="col"><h3 style="color:var(--orange)">AFTER</h3><div class="sub2">Own proportions, own layout, own attitude.</div><img src="r3/c_after_1.png"><img src="r3/c_after_2.png"><img src="r3/c_after_3.png"><img src="r3/c_after_4.png"><img src="r3/c_after_5.png"><img src="r3/c_after_6.png"></div>
+  </div>
+  <div class="logo">BAD<b>GUN</b></div>
+</section>
+
+<section class="card" id="shapes">
+  <div class="kicker">New silhouettes</div>
+  <h2>More shapes in the shape bin.</h2>
+  <div class="cat">
+    <div class="c"><span class="note">bullpup: magazine behind the grip</span><img src="r3/c_sh_bullpup2.png"></div>
+    <div class="c"><span class="note">pan magazine on top + cooling jacket</span><img src="r3/c_sh_pan.png"></div>
+    <div class="c"><span class="note">thumbhole stock</span><img src="r3/c_sh_thumb.png"></div>
+    <div class="c"><span class="note">cooling fins</span><img src="r3/c_sh_finned.png"></div>
+    <div class="c"><span class="note">no stock at all</span><img src="r3/c_sh_stockless.png"></div>
+    <div class="c"><span class="note">sci-fi bullpup</span><img src="r3/c_sh_bullpup.png"></div>
+  </div>
+  <div class="logo">BAD<b>GUN</b></div>
+</section>
+
+<section class="card" id="doubles">
+  <div class="kicker">Two is better than one</div>
+  <h2>Double barrels.</h2>
+  <p class="sub" style="max-width:940px">Side by side or stacked. They snap open on a hinge to reload, so no magazine needed.</p>
+  <div class="quad">
+    <div class="c"><span class="note">side by side</span><img src="r3/c_db_sxs.png"></div>
+    <div class="c"><span class="note">over-under</span><img src="r3/c_db_ou.png"></div>
+    <div class="c"><span class="note">a gentleman's double rifle</span><img src="r3/c_db_rifle.png"></div>
+    <div class="c"><span class="note">sawed-off (no stock, short barrels)</span><img src="r3/c_db_sawn.png"></div>
+  </div>
+  <div class="logo">BAD<b>GUN</b></div>
+</section>
+
+<section class="card" id="survivor">
+  <div class="kicker">World #4</div>
+  <h2>Survivor.</h2>
+  <p class="sub" style="max-width:940px">Salvaged, patched and held together with duct tape and hope. Every one is crooked in its own way.</p>
+  <div class="cat">
+    <div class="c"><span class="note">bottle suppressor + paint-can drum</span><img src="r3/c_sv_rifle.png"></div>
+    <div class="c"><span class="note">pipe zip gun (bottle included)</span><img src="r3/c_sv_zip.png"></div>
+    <div class="c"><span class="note">sawed-off from a scrap pile</span><img src="r3/c_sv_sawn.png"></div>
+    <div class="c"><span class="note">car leaf spring crossbow</span><img src="r3/c_sv_xbow.png"></div>
+    <div class="c"><span class="note">soda-can suppressor</span><img src="r3/c_sv_smg.png"></div>
+    <div class="c"><span class="note">welded boxes + pipe scope</span><img src="r3/c_sv_welded.png"></div>
+  </div>
+  <div class="logo">BAD<b>GUN</b></div>
+</section>
+
+<section class="card" id="bows">
+  <div class="kicker">Weapon type #8</div>
+  <h2>Bows.</h2>
+  <div class="bows">
+    <div class="b"><img src="r3/c_bow_longbow.png"><h3>Longbow</h3><p>One piece of wood. Very old. Still works.</p></div>
+    <div class="b"><img src="r3/c_bow_recurve.png"><h3>Recurve</h3><p>Tips curl forward for extra snap.</p></div>
+    <div class="b"><img src="r3/c_bow_compound.png"><h3>Compound</h3><p>Wheels, cables and glowing sight pins.</p></div>
+    <div class="b"><img src="r3/c_bow_energy.png"><h3>Energy</h3><p>Light-blade limbs. String included (also light).</p></div>
+    <div class="b"><img src="r3/c_bow_pvc.png"><h3>Pipe bow</h3><p>Plumbing aisle, reimagined.</p></div>
+  </div>
+  <div class="logo">BAD<b>GUN</b></div>
+</section>
+
+<section class="card" id="stats3">
+  <div class="kicker">By the numbers</div>
+  <h2>Update #3, in numbers.</h2>
+  <div class="stats">
+    <div class="stat hot"><div class="n">8</div><div class="t">weapon types. Bows joined the party.</div></div>
+    <div class="stat"><div class="n">4</div><div class="t">worlds: modern, steampunk, sci-fi and now survivor.</div></div>
+    <div class="stat"><div class="n">96</div><div class="t">part variants, plus 6 sights and scopes (up from 61).</div></div>
+    <div class="stat"><div class="n">1,116</div><div class="t">test weapons built and checked for every update.</div></div>
+    <div class="stat"><div class="n">2</div><div class="t">suppressors made of trash: a soda can and a plastic bottle.</div></div>
+    <div class="stat"><div class="n">0</div><div class="t">bee launchers. The pipe bow is not a bee launcher. Stop asking. 🐝</div></div>
+  </div>
+  <div class="logo">BAD<b>GUN</b></div>
+</section>
+</body></html>

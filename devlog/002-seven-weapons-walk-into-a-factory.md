@@ -148,5 +148,5 @@ Until next time. Keep the bad ideas coming.
 ---
 
 <p align="center">
-  <a href="README.md">← All devlogs</a> · <a href="../README.md">BadGun home</a>
+  <a href="README.md">← All devlogs</a> · <a href="../README.md">BadGun home</a> · <a href="003-duct-tape-double-barrels-and-bows.md">Next: #003 →</a>
 </p>

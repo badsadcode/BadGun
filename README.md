@@ -7,7 +7,7 @@
 <p align="center">
   <b>Procedural, game-ready weapon assets.</b><br>
   Weapon type + style + seed = a reproducible, coherent, already-painted 3D weapon (<code>.glb</code>).<br>
-  Rifles · SMGs · shotguns · snipers · LMGs · pistols · crossbows, in modern, steampunk and sci-fi.
+  Rifles · SMGs · shotguns · snipers · LMGs · pistols · crossbows · bows, in modern, steampunk, sci-fi and survivor.
 </p>
 
 <p align="center">
@@ -27,7 +27,8 @@
 
 ## What it does
 
-- **Seven weapon types (archetypes), three worlds.** The archetype (rifle, SMG, shotgun, sniper, LMG, pistol, crossbow) owns proportions and what parts it needs; the style (modern, steampunk, sci-fi) owns design language, part choices and palettes. They're independent, so a new style works with every archetype.
+- **Eight weapon types (archetypes), four worlds.** The archetype (rifle, SMG, shotgun, sniper, LMG, pistol, crossbow, bow) owns proportions and what parts it needs; the style (modern, steampunk, sci-fi, survivor) owns design language, part choices and palettes. They're independent, so a new style works with every archetype.
+- **Every weapon has its own shape.** Seeded shape genes vary proportions (receiver length/height, grip rake, magazine position, bare barrel, stock drop), and layouts vary too: standard or bullpup, magazine below or pan on top, break-action doubles, stockless.
 - **Deterministic.** Same recipe + seed gives a byte-identical `.glb`. Every decision draws from a *named* random stream, so tweaking the stock never reshuffles the barrel.
 - **Painted on arrival.** Style-appropriate PBR materials (base color, metallic, roughness, emissive, glass), with multiple palette variants per style.
 - **Easy to texture.** 11 semantic material slots (`MAT_Body`, `MAT_Grip`, `MAT_Stock`, `MAT_Barrel`, `MAT_Trim`, `MAT_Glass`, `MAT_Emissive`, …), shared across parts and stable across regenerations. Recolor any slot without touching geometry.
@@ -137,17 +138,18 @@ A recipe is the whole description of a weapon. Save it, share it, batch it. A re
 | Moving parts | node `extras.badgun.motion` = `{ type, axis, range, purpose }` |
 | Manifest | `<name>.json` sidecar + root node `extras.badgun` |
 
-## What's in v0.2
+## What's in v0.3
 
 | Archetype | Part kinds |
 |---|---|
-| rifle · smg · shotgun · sniper · lmg | 5 receivers · 8 barrels · 7 handguards · 9 muzzles · 6 stocks · 6 grips · 8 magazines, plus accessories (bipod, bolt handle, carry handle, shell holder) |
-| pistol | 3 frames (slide, revolver, blaster) · 3 grips · muzzles |
-| crossbow | 3 tillers · 3 prods (recurve, compound, energy) · stocks · grips; drawn string + loaded bolt |
+| rifle · smg · shotgun · sniper · lmg | layout (standard/bullpup) · 7 receivers · 12 barrels (incl. side-by-side and over-under doubles) · 11 handguards · 11 muzzles (incl. soda-can and bottle suppressors) · 11 stocks · 8 grips · 11 magazines, plus accessories (bipod, bolt handle, carry handle, shell holder) |
+| pistol | 4 frames (slide, revolver, blaster, pipe zip gun) · 4 grips · muzzles |
+| crossbow | 4 tillers · 4 prods (recurve, compound, energy, leaf spring) · stocks · grips; drawn string + loaded bolt |
+| bow | 5 bows (longbow, recurve, compound, energy, pipe) · 5 arrows; string with draw motion |
 
-61 part variants and 5 optics in total. Archetypes enforce what they need (shotguns always get a pump and tube magazine, snipers a scope and bolt handle). Otherwise any part works with any style, and the style's palette repaints it, so the Frankengun is a supported feature.
+96 part variants and 6 optics in total. Archetypes enforce what they need (shotguns get a pump and tube magazine, or break open if double-barreled; snipers get a scope and bolt handle; bullpups get a butt stock). Otherwise any part works with any style, and the style's palette repaints it, so the Frankengun is a supported feature.
 
-**Known limitations:** UV islands can overlap (fine for tiling and trim textures, not yet for unique hand-painted atlases). There are no LODs or animation clips yet, only motion metadata. Bows are next. The roadmap lives in the [brief](docs/PROJECT_BRIEF.md#8-practical-milestones-suggested-not-prescribed).
+**Known limitations:** UV islands can overlap (fine for tiling and trim textures, not yet for unique hand-painted atlases). There are no LODs or animation clips yet, only motion metadata. More worlds (fantasy, dieselpunk) are next. The roadmap lives in the [brief](docs/PROJECT_BRIEF.md#8-practical-milestones-suggested-not-prescribed).
 
 ## Development
 

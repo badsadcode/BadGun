@@ -1,0 +1,448 @@
+[
+ {
+  "out": "r3/after_1.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "modern",
+   "seed": 1
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 380
+ },
+ {
+  "out": "r3/after_2.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "modern",
+   "seed": 2
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 380
+ },
+ {
+  "out": "r3/after_3.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "modern",
+   "seed": 3
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 380
+ },
+ {
+  "out": "r3/after_4.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "modern",
+   "seed": 4
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 380
+ },
+ {
+  "out": "r3/after_5.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "modern",
+   "seed": 5
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 380
+ },
+ {
+  "out": "r3/after_6.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "modern",
+   "seed": 6
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 380
+ },
+ {
+  "out": "r3/sv_rifle.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "scrap",
+   "seed": 1
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 460
+ },
+ {
+  "out": "r3/sv_sawn.png",
+  "recipe": {
+   "archetype": "shotgun",
+   "style": "scrap",
+   "seed": 3,
+   "parts": {
+    "barrel": "double",
+    "stock": "none"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 460
+ },
+ {
+  "out": "r3/sv_zip.png",
+  "recipe": {
+   "archetype": "pistol",
+   "style": "scrap",
+   "seed": 1,
+   "parts": {
+    "muzzle": "bottle"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 460
+ },
+ {
+  "out": "r3/sv_xbow.png",
+  "recipe": {
+   "archetype": "crossbow",
+   "style": "scrap",
+   "seed": 1
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 1000,
+  "height": 620
+ },
+ {
+  "out": "r3/sv_smg.png",
+  "recipe": {
+   "archetype": "smg",
+   "style": "scrap",
+   "seed": 2
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 460
+ },
+ {
+  "out": "r3/sv_welded.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "scrap",
+   "seed": 4
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 460
+ },
+ {
+  "out": "r3/db_sxs.png",
+  "recipe": {
+   "archetype": "shotgun",
+   "style": "steampunk",
+   "seed": 2,
+   "parts": {
+    "barrel": "double"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 460
+ },
+ {
+  "out": "r3/db_ou.png",
+  "recipe": {
+   "archetype": "shotgun",
+   "style": "modern",
+   "seed": 5,
+   "parts": {
+    "barrel": "overunder"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 460
+ },
+ {
+  "out": "r3/db_rifle.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "steampunk",
+   "seed": 7,
+   "parts": {
+    "barrel": "double",
+    "stock": "classic"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 460
+ },
+ {
+  "out": "r3/db_sawn.png",
+  "recipe": {
+   "archetype": "shotgun",
+   "style": "scrap",
+   "seed": 3,
+   "parts": {
+    "barrel": "double",
+    "stock": "none"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 460
+ },
+ {
+  "out": "r3/bow_longbow.png",
+  "recipe": {
+   "archetype": "bow",
+   "style": "steampunk",
+   "seed": 1,
+   "parts": {
+    "bow": "longbow"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 600,
+  "height": 900
+ },
+ {
+  "out": "r3/bow_recurve.png",
+  "recipe": {
+   "archetype": "bow",
+   "style": "modern",
+   "seed": 1,
+   "parts": {
+    "bow": "recurve"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 600,
+  "height": 900
+ },
+ {
+  "out": "r3/bow_compound.png",
+  "recipe": {
+   "archetype": "bow",
+   "style": "modern",
+   "seed": 1,
+   "parts": {
+    "bow": "compound"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 600,
+  "height": 900
+ },
+ {
+  "out": "r3/bow_energy.png",
+  "recipe": {
+   "archetype": "bow",
+   "style": "scifi",
+   "seed": 1,
+   "parts": {
+    "bow": "energy"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 600,
+  "height": 900
+ },
+ {
+  "out": "r3/bow_pvc.png",
+  "recipe": {
+   "archetype": "bow",
+   "style": "scrap",
+   "seed": 1,
+   "parts": {
+    "bow": "pvc"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 600,
+  "height": 900
+ },
+ {
+  "out": "r3/sh_bullpup.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "scifi",
+   "seed": 4
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 460
+ },
+ {
+  "out": "r3/sh_pan.png",
+  "recipe": {
+   "archetype": "lmg",
+   "style": "steampunk",
+   "seed": 3,
+   "parts": {
+    "magazine": "pan",
+    "handguard": "jacket"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 460
+ },
+ {
+  "out": "r3/sh_thumb.png",
+  "recipe": {
+   "archetype": "sniper",
+   "style": "modern",
+   "seed": 2,
+   "parts": {
+    "stock": "thumbhole"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 460
+ },
+ {
+  "out": "r3/sh_finned.png",
+  "recipe": {
+   "archetype": "smg",
+   "style": "steampunk",
+   "seed": 3,
+   "parts": {
+    "barrel": "finned"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 460
+ },
+ {
+  "out": "r3/sh_bullpup2.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "modern",
+   "seed": 6
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 460
+ },
+ {
+  "out": "r3/sh_stockless.png",
+  "recipe": {
+   "archetype": "smg",
+   "style": "modern",
+   "seed": 8,
+   "parts": {
+    "stock": "none",
+    "magazine": "curved"
+   }
+  },
+  "view": "three-quarter",
+  "bg": "none",
+  "width": 900,
+  "height": 460
+ },
+ {
+  "out": "r3/before_1.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "modern",
+   "seed": 1
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 380
+ },
+ {
+  "out": "r3/before_2.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "modern",
+   "seed": 2
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 380
+ },
+ {
+  "out": "r3/before_3.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "modern",
+   "seed": 3
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 380
+ },
+ {
+  "out": "r3/before_4.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "modern",
+   "seed": 4
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 380
+ },
+ {
+  "out": "r3/before_5.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "modern",
+   "seed": 5
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 380
+ },
+ {
+  "out": "r3/before_6.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "modern",
+   "seed": 6
+  },
+  "view": "side",
+  "bg": "none",
+  "width": 800,
+  "height": 380
+ }
+]

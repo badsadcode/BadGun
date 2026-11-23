@@ -14,5 +14,13 @@
     "date": "2026-11-23",
     "summary": "Pistols, shotguns, snipers, machine guns, SMGs and crossbows. Plus 30 new parts, and an official statement regarding bees.",
     "cover": "assets/002/banner.webp"
+  },
+  {
+    "slug": "003-duct-tape-double-barrels-and-bows",
+    "number": "003",
+    "title": "Duct Tape, Double Barrels & Bows",
+    "date": "2026-11-23",
+    "summary": "Every weapon gets its own shape, double barrels snap open, a whole scavenger world arrives, and so do the first bows.",
+    "cover": "assets/003/banner.webp"
   }
 ]

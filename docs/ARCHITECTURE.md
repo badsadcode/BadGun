@@ -23,9 +23,9 @@ Recipe ──► resolveParams / resolveParts ──► layout ──► part bu
 | `src/styles/*.ts` | Style profiles: palettes, param ranges, weighted part variants, optic weights, traits |
 | `src/archetypes/archetype.ts` | `ArchetypeDef`: part tables, weight rules, layout, build, origin |
 | `src/archetypes/longgun.ts` | Rifle, SMG, shotgun, sniper, LMG: one assembly line + per-archetype proportion presets and part rules |
-| `src/archetypes/pistol.ts`, `crossbow.ts` | Handguns and crossbows |
+| `src/archetypes/pistol.ts`, `crossbow.ts`, `bow.ts` | Handguns, crossbows and bows (bows stand upright in the YZ plane) |
 | `src/archetypes/index.ts` | Archetype registry and root component names (`Receiver`, `Frame`, `Tiller`) |
-| `src/parts/*.ts` | Part builders, keyed by variant name: `receiver.ts`, `front.ts` (barrel/handguard/muzzle), `lower.ts` (grip/magazine), `stock.ts`, `sight.ts`, `extra.ts` (later long-gun variants), `accessory.ts` (bipod, bolt handle…), `pistol.ts`, `crossbow.ts` |
+| `src/parts/*.ts` | Part builders, keyed by variant name: `receiver.ts`, `front.ts` (barrel/handguard/muzzle), `lower.ts` (grip/magazine), `stock.ts`, `sight.ts`, `extra.ts` and `variety.ts` (later long-gun variants: doubles, bullpup butt, pan magazine…), `scrap.ts` (survivor/makeshift parts), `accessory.ts` (bipod, bolt handle…), `pistol.ts`, `crossbow.ts`, `bow.ts` |
 | `src/materials/palette.ts` | Color utils, wear, overrides |
 | `src/export/glb.ts` | Dependency-free GLB writer |
 | `src/export/manifest.ts` | Manifest (recipe, parts, sockets, bounds, stats, conventions) |
@@ -37,6 +37,10 @@ Recipe ──► resolveParams / resolveParts ──► layout ──► part bu
 ## Key design decisions
 
 **Choosing parts.** For each part kind, the variant comes from (first match wins): the recipe's `parts` override, the style's `byArchetype[archetype][kind]`, the archetype's `weights(style, kind)` rule, the style's generic `parts[kind]`, and finally all variants equally. Pistols and crossbows decide from style *traits* (rails, plumbing, glow), so a brand-new style gets sensible handguns without editing them.
+
+**Linked choices.** Variants are picked independently, then `ArchetypeDef.fixup` makes them consistent without touching anything the recipe pinned: double barrels mean a break action (no magazine, splinter forend, bare muzzle), a bullpup gets the `butt` stock, a top pan magazine removes the optic. Builders can also read `ctx.chosen` to adapt to their neighbors.
+
+**Shape genes.** `longGunLayout` draws seeded multipliers (receiver length/height, magazine position, grip rake, handguard and bare-barrel length, stock length/drop, barrel thickness) from the `layout` stream, so silhouettes differ even when the same variants are picked. The pseudo-kind `config` (standard/bullpup) moves the grip, magazine and optic around.
 
 **Archetype ⟂ style.** An archetype owns *proportions and assembly order* (`LongGunLayout`). A style owns *which variants, which colors, which traits*. Part builders read both through a `BuildContext`. Adding a style means writing a new `StyleProfile` and maybe a few part variants. Archetypes don't change.
 
