@@ -54,5 +54,13 @@
     "date": "2026-11-23",
     "summary": "Two new worlds: chrome-and-rivets dieselpunk and cable-and-sticker cyberpunk, with searchlights, exhaust stacks and LED ammo counters.",
     "cover": "assets/007/banner.webp"
+  },
+  {
+    "slug": "008-ready-to-paint",
+    "number": "008",
+    "title": "Ready to Paint",
+    "date": "2026-11-23",
+    "summary": "Every gun now unfolds flat with no overlaps, plus three free texture maps, so artists can paint it like a canvas.",
+    "cover": "assets/008/banner.webp"
   }
 ]

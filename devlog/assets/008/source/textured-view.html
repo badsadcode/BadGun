@@ -1,0 +1,26 @@
+<!doctype html><html><head><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script></head>
+<body style="margin:0;background:transparent"><script type="module">
+import * as THREE from 'three'; import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'; import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+const q = new URLSearchParams(location.search);
+const W = 1600, H = 800;
+const r = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true }); r.setSize(W, H);
+r.toneMapping = THREE.ACESFilmicToneMapping; document.body.appendChild(r.domElement);
+const sc = new THREE.Scene(); sc.environment = new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(), 0.04).texture; sc.environmentIntensity = 0.9;
+const key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(-1.2, 2.4, 0.9); sc.add(key);
+const rim = new THREE.DirectionalLight(0xbfd4ff, 1.1); rim.position.set(1.5, 0.9, -1.4); sc.add(rim);
+const cam = new THREE.PerspectiveCamera(30, W / H, 0.01, 10);
+const g = await new GLTFLoader().loadAsync(q.get('glb'));
+sc.add(g.scene);
+if (q.get('paint')) {
+  const t = await new THREE.TextureLoader().loadAsync(q.get('paint'));
+  t.flipY = false; t.colorSpace = THREE.SRGBColorSpace; t.channel = 0; t.anisotropy = 8;
+  g.scene.traverse((o) => { if (o.isMesh) { o.material.map = t; o.material.needsUpdate = true; } });
+}
+const box = new THREE.Box3().setFromObject(g.scene), size = box.getSize(new THREE.Vector3()), c = box.getCenter(new THREE.Vector3());
+const tanHalf = Math.tan((cam.fov * Math.PI) / 360);
+const side = q.get('view') === 'side';
+const dist = 1.12 * Math.max((size.z * (side ? 1.12 : 1.02)) / (2 * tanHalf * cam.aspect), (size.y * 1.3) / (2 * tanHalf)) + size.x / 2;
+const dir = side ? new THREE.Vector3(-1, 0.06, 0) : new THREE.Vector3(-1, 0.3, 0.5);
+cam.position.copy(c).add(dir.normalize().multiplyScalar(dist)); cam.lookAt(c);
+r.render(sc, cam); window.__ready = true;
+</script></body></html>

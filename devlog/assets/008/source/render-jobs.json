@@ -1,0 +1,80 @@
+[
+ {
+  "view": "three-quarter",
+  "width": 1600,
+  "height": 800,
+  "out": "chk_diesel.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "diesel",
+   "seed": 3,
+   "parts": {
+    "receiver": "deco",
+    "muzzle": "exhaust",
+    "config": "standard",
+    "magazine": "jerrycan",
+    "handguard": "radiator",
+    "stock": "deco"
+   },
+   "optic": "lamp",
+   "paletteVariant": 1
+  },
+  "query": "checker",
+  "bg": "none"
+ },
+ {
+  "view": "three-quarter",
+  "width": 1600,
+  "height": 800,
+  "out": "chk_steam.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "steampunk",
+   "seed": 4
+  },
+  "query": "checker",
+  "bg": "none"
+ },
+ {
+  "view": "three-quarter",
+  "width": 1600,
+  "height": 800,
+  "out": "plain_steam.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "steampunk",
+   "seed": 4
+  },
+  "bg": "none"
+ },
+ {
+  "view": "three-quarter",
+  "width": 1600,
+  "height": 800,
+  "out": "chk_pistol.png",
+  "recipe": {
+   "archetype": "pistol",
+   "style": "diesel",
+   "seed": 3,
+   "parts": {
+    "frame": "deco",
+    "muzzle": "exhaust"
+   }
+  },
+  "query": "checker",
+  "bg": "none"
+ },
+ {
+  "view": "three-quarter",
+  "width": 1600,
+  "height": 800,
+  "out": "chk_bow.png",
+  "recipe": {
+   "archetype": "crossbow",
+   "style": "steampunk",
+   "seed": 1
+  },
+  "query": "checker",
+  "bg": "none"
+ }
+]

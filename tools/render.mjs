@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Batch-render recipes to PNG with the preview page and headless Chromium (Playwright).
 //   node tools/render.mjs jobs.json
-// jobs.json: [{ "out": "a.png", "recipe": {...}, "view": "side"|"three-quarter", "bg": "15171b"|"none", "width": 1600, "height": 800, "scale": 1 }]
+// jobs.json: [{ "out": "a.png", "recipe": {...}, "view": "side"|"three-quarter", "bg": "15171b"|"none", "width": 1600, "height": 800, "scale": 1, "query": "checker&uvmap" }]
 import { createRequire } from 'node:module';
 import { spawn } from 'node:child_process';
 import { readFileSync } from 'node:fs';
@@ -15,10 +15,10 @@ await new Promise((r) => server.stdout.once('data', r));
 const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
 try {
   for (const job of jobs) {
-    const { out, recipe, view = 'three-quarter', bg = '15171b', width = 1600, height = 800, scale = 1 } = job;
+    const { out, recipe, view = 'three-quarter', bg = '15171b', width = 1600, height = 800, scale = 1, query = '' } = job;
     const page = await browser.newPage({ viewport: { width, height }, deviceScaleFactor: scale });
     page.on('pageerror', (e) => console.error('pageerror', e.message));
-    await page.goto(`http://localhost:${port}/tools/preview/index.html?shot=1&view=${view}&bg=${bg}#${encodeURIComponent(JSON.stringify(recipe))}`);
+    await page.goto(`http://localhost:${port}/tools/preview/index.html?shot=1&view=${view}&bg=${bg}${query ? '&' + query : ''}#${encodeURIComponent(JSON.stringify(recipe))}`);
     await page.waitForFunction(() => window.__ready === true, null, { timeout: 60000 });
     await page.waitForTimeout(500);
     await page.screenshot({ path: out, omitBackground: bg === 'none' });

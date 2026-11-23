@@ -1,0 +1,229 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@500;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#121419; --ink:#f1eee8; --dim:#9aa0aa; --orange:#ff6b3d; --yellow:#ffd23d; --cyan:#42e2ff; --brass:#e0b25a; --pink:#ff5fc0; }
+* { box-sizing: border-box; margin: 0; }
+body { background: #333; font-family: 'Space Grotesk', sans-serif; color: var(--ink); padding: 20px; display: grid; gap: 20px; justify-content: start; }
+.card { width: 1200px; position: relative; overflow: hidden; border-radius: 28px; padding: 48px 56px;
+  background:
+    radial-gradient(900px 500px at 80% 30%, rgba(255,107,61,.13), transparent 60%),
+    radial-gradient(700px 400px at 10% 100%, rgba(66,226,255,.08), transparent 60%),
+    linear-gradient(160deg, #181b22, #101216);
+}
+.card::before { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+  background-size: 32px 32px; mask-image: radial-gradient(circle at 60% 40%, #000 30%, transparent 85%); }
+.kicker { font: 700 14px 'JetBrains Mono', monospace; letter-spacing: 3px; color: var(--orange); text-transform: uppercase; }
+h1 { font-size: 76px; line-height: .95; letter-spacing: -3px; font-weight: 700; margin: 18px 0 18px; }
+h1 em { font-style: normal; color: var(--orange); }
+h2 { font-size: 44px; letter-spacing: -1.5px; line-height: 1; margin: 10px 0 8px; }
+.sub { font-size: 22px; color: var(--dim); max-width: 520px; line-height: 1.35; }
+.chip { display: inline-block; font: 700 13px 'JetBrains Mono', monospace; letter-spacing: 2px; padding: 6px 12px; border-radius: 999px; border: 1.5px solid currentColor; }
+.note { font-family: 'Caveat', cursive; font-weight: 700; color: var(--yellow); }
+img { display: block; }
+.logo { position: absolute; right: 40px; bottom: 30px; font: 700 15px 'JetBrains Mono', monospace; color: #5b616c; letter-spacing: 2px; }
+.logo b { color: var(--orange); }
+
+/* banner */
+#banner { height: 560px; }
+#banner .guns { position: absolute; right: -40px; top: 40px; width: 760px; height: 500px; }
+#banner .guns img { position: absolute; filter: drop-shadow(0 30px 30px rgba(0,0,0,.45)); }
+#banner .g1 { width: 600px; right: 110px; top: 10px; opacity: .97; }
+#banner .g2 { width: 700px; right: 40px; top: 150px; }
+#banner .g3 { width: 600px; right: 130px; top: 320px; }
+#banner .stamp { position: absolute; left: 56px; bottom: 48px; display: flex; gap: 10px; }
+#banner .scribble { position: absolute; left: 58px; top: 405px; transform: rotate(-3deg); font-size: 28px; }
+
+/* worlds */
+.world { display: grid; grid-template-columns: 330px 1fr; align-items: center; gap: 20px; padding: 18px 0; border-top: 1px dashed rgba(255,255,255,.1); position: relative; }
+.world:first-of-type { border-top: 0; }
+.world p { color: var(--dim); font-size: 18px; line-height: 1.4; }
+.world img { width: 780px; justify-self: center; filter: drop-shadow(0 18px 22px rgba(0,0,0,.5)); }
+
+/* grids */
+.grid { display: grid; gap: 6px 26px; margin-top: 26px; }
+.grid img { width: 100%; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.colhead { margin-bottom: 4px; }
+.cell { position: relative; padding: 10px 6px; }
+.cell .label { position: absolute; left: 6px; top: 2px; font: 700 13px 'JetBrains Mono', monospace; color: var(--dim); letter-spacing: 1px; }
+
+/* exploded */
+#exploded .stage { position: relative; width: 1088px; margin-top: 30px; }
+#exploded .stage img { width: 100%; filter: drop-shadow(0 16px 18px rgba(0,0,0,.5)); }
+.tag { position: absolute; font-family: 'Caveat', cursive; font-weight: 700; font-size: 30px; color: var(--yellow); white-space: nowrap; transform: rotate(-3deg); }
+.tag::before { content: '↙ '; }
+.tag.r::before { content: ''; } .tag.r::after { content: ' ↘'; }
+.tag.d::before { content: '↖ '; }
+.tag.n::before { content: ''; }
+
+/* stats */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 30px; }
+.stat { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 20px; padding: 22px 24px; }
+.stat .n { font-size: 54px; font-weight: 700; letter-spacing: -2px; color: var(--ink); }
+.stat .n small { font-size: 26px; color: var(--dim); letter-spacing: 0; }
+.stat .t { color: var(--dim); font-size: 17px; line-height: 1.35; margin-top: 4px; }
+.stat.hot { border-color: rgba(255,107,61,.5); background: rgba(255,107,61,.08); }
+.stat.hot .n { color: var(--orange); }
+
+.fam { display: grid; grid-template-columns: 140px repeat(3, 1fr); gap: 4px 18px; align-items: center; margin-top: 26px; }
+.fam .rowlab { font: 700 15px 'JetBrains Mono', monospace; letter-spacing: 2px; color: var(--dim); text-transform: uppercase; }
+.fam img { width: 100%; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.fam .cell { height: 128px; display: flex; align-items: center; justify-content: center; }
+.fam .cell img { max-height: 120px; width: auto; max-width: 100%; }
+.trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 30px; align-items: end; }
+.trio .item img { width: 100%; filter: drop-shadow(0 14px 16px rgba(0,0,0,.5)); }
+.trio .item h3 { font-size: 26px; margin: 14px 0 4px; letter-spacing: -.5px; }
+.trio .item p { color: var(--dim); font-size: 16px; line-height: 1.4; }
+.xb { display: grid; gap: 4px; margin-top: 20px; }
+.xb .row { display: grid; grid-template-columns: 300px 1fr; gap: 20px; align-items: center; }
+.xb .row img { width: 100%; filter: drop-shadow(0 16px 18px rgba(0,0,0,.5)); }
+.xb .row p { color: var(--dim); font-size: 17px; line-height: 1.4; }
+.xb .row h3 { font-size: 28px; margin: 10px 0 6px; }
+.cat { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 30px; margin-top: 26px; }
+.cat .c { position: relative; padding-top: 34px; }
+.cat .c img { width: 100%; filter: drop-shadow(0 12px 14px rgba(0,0,0,.5)); }
+.cat .c .note { position: absolute; left: 4px; top: 0; font-size: 28px; transform: rotate(-2deg); }
+#banner2 { height: 560px; }
+#banner2 .g { position: absolute; filter: drop-shadow(0 26px 26px rgba(0,0,0,.5)); }
+
+.ba { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 26px; }
+.ba .col h3 { font: 700 15px 'JetBrains Mono', monospace; letter-spacing: 3px; margin: 0 0 6px; }
+.ba .col .sub2 { color: var(--dim); font-size: 17px; margin-bottom: 10px; }
+.ba .col img { width: 100%; display: block; margin: 4px 0; filter: drop-shadow(0 8px 10px rgba(0,0,0,.5)); }
+.ba .before { opacity: .92; }
+.bows { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 24px; align-items: start; }
+.bows .b { text-align: center; }
+.bows .b img { height: 520px; width: 100%; object-fit: contain; filter: drop-shadow(0 14px 14px rgba(0,0,0,.5)); }
+.bows .b h3 { font-size: 22px; margin: 10px 0 2px; }
+.bows .b p { color: var(--dim); font-size: 14px; margin: 0; line-height: 1.35; }
+.quad { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 30px; margin-top: 24px; }
+.quad .c { position: relative; padding-top: 36px; }
+.quad .c img { width: 100%; filter: drop-shadow(0 12px 14px rgba(0,0,0,.5)); }
+.quad .c .note { position: absolute; left: 4px; top: 0; font-size: 28px; transform: rotate(-2deg); }
+#banner3 { height: 560px; }
+#banner3 .g { position: absolute; filter: drop-shadow(0 26px 26px rgba(0,0,0,.5)); }
+
+.fam8 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px 22px; margin-top: 24px; align-items: center; }
+.fam8 .c { text-align: center; }
+.fam8 .c img { width: 100%; max-height: 150px; object-fit: contain; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.fam8 .c span { font: 700 13px 'JetBrains Mono', monospace; letter-spacing: 2px; color: var(--dim); }
+.pals { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 30px; margin-top: 24px; }
+.pals .c img { width: 100%; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.pals .c span { font: 700 14px 'JetBrains Mono', monospace; letter-spacing: 2px; }
+.heroes { display: grid; grid-template-columns: 1.6fr 1fr 0.55fr; gap: 20px; align-items: center; margin-top: 20px; }
+.heroes img { width: 100%; filter: drop-shadow(0 16px 18px rgba(0,0,0,.5)); }
+.heroes .note { font-size: 26px; display: block; margin-bottom: 6px; transform: rotate(-2deg); }
+#banner4 { height: 560px; }
+#banner4 .g { position: absolute; filter: drop-shadow(0 26px 26px rgba(0,0,0,.5)); }
+
+.eras { display: grid; grid-template-columns: 120px repeat(3, 1fr); gap: 4px 26px; margin-top: 24px; align-items: center; }
+.eras .rowlab { font: 700 15px 'JetBrains Mono', monospace; letter-spacing: 2px; color: var(--dim); }
+.eras .rowlab small { display: block; font-weight: 500; font-size: 11px; letter-spacing: 1px; margin-top: 2px; }
+.eras .cell { height: 120px; display: flex; align-items: center; justify-content: center; }
+.eras .cell img.pistol { max-height: 86px; }
+.eras .cell img { max-width: 100%; max-height: 112px; filter: drop-shadow(0 8px 10px rgba(0,0,0,.5)); }
+.eras .colhead { font: 700 12px 'JetBrains Mono', monospace; letter-spacing: 2px; color: #6b717c; text-align: center; }
+#banner5 { height: 560px; }
+#banner5 .g { position: absolute; filter: drop-shadow(0 26px 26px rgba(0,0,0,.5)); }
+.cat .c img.small { width: auto; max-height: 200px; margin-left: 60px; }
+
+.fgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px 26px; margin-top: 26px; }
+.fcard { background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.08); border-radius: 22px; padding: 16px 18px 14px; display: flex; flex-direction: column; }
+.fcard .top { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
+.fcard h3 { font-size: 21px; margin: 0; letter-spacing: -.4px; line-height: 1.15; }
+.fcard .meta { font: 600 11px 'JetBrains Mono', monospace; color: var(--dim); letter-spacing: 1px; text-transform: uppercase; margin-top: 3px; }
+.fcard .lineup { height: 330px; display: flex; align-items: center; justify-content: center; }
+.fcard .lineup img { max-width: 100%; max-height: 330px; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.fcard .doc { font: 500 12px 'JetBrains Mono', monospace; color: #9aa0aa; margin-top: 6px; line-height: 1.5; }
+.anat { display: grid; grid-template-columns: 1.15fr 1fr; gap: 30px; margin-top: 20px; align-items: center; }
+.anat img { width: 100%; filter: drop-shadow(0 14px 16px rgba(0,0,0,.5)); }
+.anat ol { margin: 0; padding-left: 22px; font-size: 19px; line-height: 1.45; color: #d9d6cf; }
+.anat ol li { margin: 0 0 12px; }
+.anat ol b { color: #fff; }
+.swatch { display: inline-block; width: 16px; height: 16px; border-radius: 4px; vertical-align: -2px; margin-right: 4px; }
+.badges { display: flex; gap: 16px; margin-top: 8px; }
+#banner6 { height: 560px; }
+#banner6 .g { position: absolute; filter: drop-shadow(0 22px 22px rgba(0,0,0,.5)); }
+
+#banner8 { height: 560px; }
+#banner8 .g { position: absolute; filter: drop-shadow(0 22px 22px rgba(0,0,0,.5)); }
+#banner8 .uv { position: absolute; right: 56px; top: 48px; width: 250px; border-radius: 12px; border: 1px solid rgba(255,255,255,.12); box-shadow: 0 20px 40px rgba(0,0,0,.5); transform: rotate(3deg); }
+.flow { display: grid; grid-template-columns: 1.25fr 70px 0.75fr; align-items: center; gap: 10px; margin-top: 24px; }
+.flow img { width: 100%; filter: drop-shadow(0 14px 16px rgba(0,0,0,.5)); }
+.flow img.sheet { border-radius: 12px; border: 1px solid rgba(255,255,255,.12); filter: none; box-shadow: 0 16px 30px rgba(0,0,0,.45); }
+.flow .arrow { font-size: 54px; color: var(--yellow); text-align: center; font-family: 'Caveat', cursive; }
+.caps { display: grid; grid-template-columns: 1.25fr 70px 0.75fr; gap: 10px; margin-top: 10px; }
+.caps p { color: var(--dim); font-size: 17px; line-height: 1.4; }
+.maps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 26px; }
+.maps img { width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,.12); box-shadow: 0 16px 30px rgba(0,0,0,.45); }
+.maps h3 { font-size: 26px; margin: 14px 0 4px; letter-spacing: -.5px; }
+.maps p { color: var(--dim); font-size: 16px; line-height: 1.4; }
+.paint { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 26px; align-items: center; }
+.paint img { width: 100%; filter: drop-shadow(0 14px 16px rgba(0,0,0,.5)); }
+.paint .lab { font: 700 14px 'JetBrains Mono', monospace; letter-spacing: 3px; color: var(--dim); margin-bottom: 6px; }
+.recipe { display: flex; gap: 14px; align-items: center; margin-top: 18px; color: var(--dim); font-size: 17px; }
+.recipe img { width: 120px; border-radius: 8px; border: 1px solid rgba(255,255,255,.12); }
+.recipe b { color: var(--ink); }
+</style></head><body>
+<section class="card" id="banner8">
+  <div class="kicker">Bad Ideas Works · Devlog #008</div>
+  <h1>Ready<br>to <em>Paint.</em></h1>
+  <p class="sub" style="max-width:430px">Every gun now unfolds flat, so artists can paint it like a canvas.</p>
+  <img class="g" src="renders/crop_plain.png" style="width:560px; right:300px; top:80px;">
+  <img class="g" src="renders/crop_chk_diesel.png" style="width:600px; right:230px; top:290px;">
+  <img class="uv" src="renders/layout.png">
+  <div style="position:absolute; left:56px; bottom:48px; display:flex; gap:10px;">
+    <span class="chip" style="color:var(--yellow)">UV ATLAS</span><span class="chip" style="color:#c9ccd2">TEXTURE MAPS</span><span class="chip" style="color:var(--orange)">0 OVERLAPS</span>
+  </div>
+</section>
+
+<section class="card" id="unfold8">
+  <div class="kicker">Unfolding a gun</div>
+  <h2>Like a cardboard box, but pointier.</h2>
+  <div class="flow">
+    <img src="renders/crop_chk_diesel.png">
+    <div class="arrow">→</div>
+    <img class="sheet" src="renders/layout.png">
+  </div>
+  <div class="caps">
+    <p>With the <b style="color:#fff">checker view</b>, every square is the same size everywhere on the gun. That means every surface gets the same amount of detail.</p>
+    <div></div>
+    <p>The same gun, unfolded flat: over a thousand pieces, none of them overlapping.</p>
+  </div>
+</section>
+
+<section class="card" id="maps8">
+  <div class="kicker">Three free maps with every gun</div>
+  <h2>A head start for artists.</h2>
+  <div class="maps">
+    <div><img src="renders/basecolor.png"><h3>Base color</h3><p>The gun's own colors, painted onto the flat layout. Paint right over it.</p></div>
+    <div><img src="renders/id.png"><h3>ID map</h3><p>One loud color per kind of part (body, barrel, grip…), so painting apps can select them in one click.</p></div>
+    <div><img src="renders/layout.png"><h3>UV template</h3><p>Every piece outlined, like a coloring book page, so you know what you're painting.</p></div>
+  </div>
+</section>
+
+<section class="card" id="paint8">
+  <div class="kicker">Does it actually work?</div>
+  <h2>A quick camo test.</h2>
+  <div class="paint">
+    <div><div class="lab">STRAIGHT FROM THE FACTORY</div><img src="renders/crop_plain.png"></div>
+    <div><div class="lab" style="color:var(--yellow)">AFTER A 20-LINE "ARTIST"</div><img src="renders/crop_painted.png"></div>
+  </div>
+  <div class="recipe"><img src="renders/id.png"><span>I used the <b>ID map</b> as a stencil: camo only where it says <b style="color:#ff5a5a">body</b> or <b style="color:#ff6bff">magazine</b>. The wood, the chrome and the grip stay untouched, right up to the edge.</span></div>
+</section>
+
+<section class="card" id="stats8">
+  <div class="kicker">By the numbers</div>
+  <h2>Devlog #008, in digits.</h2>
+  <div class="stats">
+    <div class="stat hot"><div class="n">2</div><div class="t">sets of UVs in every gun: one for repeating textures, one for painting</div></div>
+    <div class="stat"><div class="n">1,243</div><div class="t">pieces in the dieselpunk rifle's unfolded layout</div></div>
+    <div class="stat"><div class="n">0</div><div class="t">overlapping pixels across 240 test guns</div></div>
+    <div class="stat"><div class="n">~12<small> ms</small></div><div class="t">to unfold and pack a whole gun</div></div>
+    <div class="stat"><div class="n">0</div><div class="t">new libraries: even the PNG writer is home-made</div></div>
+    <div class="stat hot"><div class="n">0</div><div class="t">bee launchers. Not even a hand-painted one.</div></div>
+  </div>
+  <div class="logo">BAD IDEAS <b>WORKS</b></div>
+</section>
+</body></html>
