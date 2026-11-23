@@ -63,10 +63,10 @@ export const modern: StyleProfile = {
   },
   parts: {
     receiver: { angular: 1, stamped: 0.6 },
-    barrel: { plain: 1, heavy: 0.6, fluted: 0.6, bull: 0.3 },
+    barrel: { plain: 1, heavy: 0.6, fluted: 0.6, bull: 0.3, finned: 0.15 },
     muzzle: { brake: 1, flash: 1, compensator: 0.6, suppressor: 0.5 },
     handguard: { railed: 1, quad: 0.6, slim: 0.5 },
-    stock: { collapsible: 1, fixed: 0.5, wire: 0.2 },
+    stock: { collapsible: 1, fixed: 0.5, wire: 0.2, thumbhole: 0.4, none: 0.1 },
     grip: { polymer: 1, ergo: 0.8 },
     magazine: { curved: 1, straight: 0.4, twin: 0.15 },
     sight: { auto: 1 },

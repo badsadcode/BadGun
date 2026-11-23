@@ -18,7 +18,7 @@ function frame(ctx: BuildContext, variant: string) {
 }
 
 /** Trigger plus a guard running from the grip forward. */
-function pistolTrigger(ctx: BuildContext, slot: 'Grip' | 'Body' | 'Trim' | 'Detail', round: boolean): void {
+export function pistolTrigger(ctx: BuildContext, slot: 'Grip' | 'Body' | 'Trim' | 'Detail', round: boolean): void {
   const { L, b } = ctx;
   const f = frame(ctx, '-');
   const y = L.rec.bottom;

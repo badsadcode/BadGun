@@ -34,7 +34,8 @@ export function triggerAndGuard(ctx: BuildContext, guardSlot: 'Detail' | 'Trim' 
   ], 0.006, 0.0015);
 
   // Trigger guard: a single U-shaped profile (open at the top).
-  const g0 = L.grip.z - 0.004, g1 = L.magwell.z0 + 0.002;
+  // The guard runs from the grip forward (bullpups have the magazine *behind* the grip).
+  const g0 = L.grip.z - 0.004, g1 = L.magwell.z0 > L.grip.z ? L.magwell.z0 + 0.002 : L.grip.z + 0.052;
   const depth = 0.03, t = 0.0045;
   let guard: Vec2[];
   if (guardStyle === 'round') {

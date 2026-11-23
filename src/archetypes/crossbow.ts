@@ -8,6 +8,8 @@ import { PRODS, TILLERS, stringAndBolt } from '../parts/crossbow.js';
 import { STOCKS } from '../parts/stock.js';
 import { GRIPS } from '../parts/lower.js';
 import { EXTRA_GRIPS, EXTRA_STOCKS } from '../parts/extra.js';
+import { VARIETY_STOCKS } from '../parts/variety.js';
+import { SCRAP_GRIPS, SCRAP_STOCKS, plankTiller } from '../parts/scrap.js';
 import { OPTIC_NAMES, buildOptic } from '../parts/sight.js';
 
 const t = (on: boolean, yes: number, no: number) => (on ? yes : no);
@@ -17,17 +19,18 @@ export const crossbow: ArchetypeDef = {
   name: 'Crossbow',
   description: 'Crossbows: recurve, compound and energy prods on a tiller.',
   parts: {
-    tiller: TILLERS,
+    tiller: { ...TILLERS, plank: plankTiller },
     prod: PRODS,
-    stock: { ...STOCKS, ...EXTRA_STOCKS },
-    grip: { ...GRIPS, ...EXTRA_GRIPS },
+    stock: { ...STOCKS, ...EXTRA_STOCKS, thumbhole: VARIETY_STOCKS.thumbhole, none: VARIETY_STOCKS.none, ...SCRAP_STOCKS },
+    grip: { ...GRIPS, ...EXTRA_GRIPS, ...SCRAP_GRIPS },
   },
   optics: ['none', ...OPTIC_NAMES],
 
   weights(style, kind): Weights | undefined {
     const { rails, plumbing, glow } = style.traits;
-    if (kind === 'tiller') return { rail: t(rails, 3, 0.3), wood: t(plumbing, 3, 0.5), sleek: t(glow, 3, 0.3) };
-    if (kind === 'prod') return { compound: t(rails, 3, 0.3), recurve: t(plumbing, 3, 1), energy: t(glow, 3, 0.2) };
+    const scrap = !!style.traits.scrap;
+    if (kind === 'tiller') return { rail: t(rails, 3, 0.3), wood: t(plumbing, 3, 0.5), sleek: t(glow, 3, 0.3), plank: t(scrap, 4, 0.05) };
+    if (kind === 'prod') return { compound: t(rails, 3, 0.3), recurve: t(plumbing, 3, 1), energy: t(glow, 3, 0.2), leafspring: t(scrap, 4, 0.05) };
     if (kind === 'stock') {
       const w = { ...style.parts.stock };
       delete w.wire;

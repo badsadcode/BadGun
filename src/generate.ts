@@ -52,6 +52,7 @@ export function resolveParts(recipe: Recipe): Record<PartKind, string> {
     const ok = usable(weights, Object.keys(table));
     out[kind] = rng.weighted(ok);
   }
+  arch.fixup?.(out, new Set(Object.keys(recipe.parts ?? {}).concat(recipe.optic && recipe.optic !== 'auto' ? ['sight'] : [])));
   return out;
 }
 
@@ -78,7 +79,7 @@ export function generate(recipe: Recipe): Weapon {
 
   const builder = new WeaponBuilder(ROOT_NAMES[arch.id] ?? 'Receiver');
   const layout = arch.layout(parts, params, Rng.stream(recipe.seed, 'layout'), style);
-  const ctx = makeContext(arch.id, builder, style, params, recipe.seed, layout);
+  const ctx = makeContext(arch.id, builder, style, params, recipe.seed, layout, parts);
   arch.build(ctx, parts);
 
   const weapon: Weapon = {

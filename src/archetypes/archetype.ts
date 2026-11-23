@@ -32,6 +32,12 @@ export interface ArchetypeDef {
   layout(chosen: Record<string, string>, p: Params, rng: Rng, style: StyleProfile): LongGunLayout;
   /** Build everything (parts, accessories, sockets). */
   build(ctx: BuildContext, chosen: Record<string, string>): void;
+  /**
+   * Optional: make linked choices consistent after variants are picked
+   * (double barrels -> break action, no magazine). `forced` lists the kinds
+   * the recipe pinned; never override those.
+   */
+  fixup?(chosen: Record<string, string>, forced: Set<string>): void;
   /** Weapon-space point that becomes the asset origin. */
   origin(ctx: BuildContext): Vec3;
 }

@@ -43,6 +43,8 @@ export interface BuildContext {
   p: Params;
   seed: number | string;
   L: LongGunLayout;
+  /** Variants chosen for every part kind (builders may adapt to each other). */
+  chosen: Record<string, string>;
   /** Independent random stream for a named purpose. */
   rng(name: string): Rng;
   /** Radial segment count for round parts, scaled by smoothness. */
@@ -58,6 +60,7 @@ export function makeContext(
   p: Params,
   seed: number | string,
   L: LongGunLayout,
+  chosen: Record<string, string> = {},
 ): BuildContext {
   return {
     archetype,
@@ -66,6 +69,7 @@ export function makeContext(
     p,
     seed,
     L,
+    chosen,
     rng: (name) => Rng.stream(seed, name),
     seg: (scale = 1) => {
       const base = 5 + (style.traits.roundness - 5) * p.smoothness;

@@ -10,6 +10,7 @@ import type { BuildContext, LongGunLayout } from '../parts/context.js';
 import type { ArchetypeDef, Weights } from './archetype.js';
 import { PISTOL_FRAMES, PISTOL_GRIPS } from '../parts/pistol.js';
 import { MUZZLES } from '../parts/front.js';
+import { pipePistol, tapedPistolGrip } from '../parts/scrap.js';
 import { buildOptic } from '../parts/sight.js';
 
 const t = (on: boolean, yes: number, no: number) => (on ? yes : no);
@@ -18,19 +19,22 @@ export const pistol: ArchetypeDef = {
   id: 'pistol',
   name: 'Pistol',
   description: 'Handguns: slide pistols, revolvers and blasters.',
-  parts: { frame: PISTOL_FRAMES, grip: PISTOL_GRIPS, muzzle: MUZZLES },
+  parts: { frame: { ...PISTOL_FRAMES, pipe: pipePistol }, grip: { ...PISTOL_GRIPS, taped: tapedPistolGrip }, muzzle: MUZZLES },
   optics: ['none', 'reddot', 'holo'],
 
   weights(style, kind): Weights | undefined {
     const { rails, plumbing, glow } = style.traits;
-    if (kind === 'frame') return { slide: t(rails, 3, 0.4), revolver: t(plumbing, 3, 0.4), blaster: t(glow, 3, 0.3) };
-    if (kind === 'grip') return { block: t(rails, 3, 0.4), birdshead: t(plumbing, 3, 0.4), swept: t(glow, 3, 0.3) };
+    const scrap = !!style.traits.scrap;
+    if (kind === 'frame') return { slide: t(rails, 3, 0.4), revolver: t(plumbing, 3, 0.4), blaster: t(glow, 3, 0.3), pipe: t(scrap, 3, 0.03) };
+    if (kind === 'grip') return { block: t(rails, 3, 0.4), birdshead: t(plumbing, 3, 0.4), swept: t(glow, 3, 0.3), taped: t(scrap, 3, 0.05) };
     if (kind === 'muzzle') {
       return {
         none: 3,
         compensator: t(rails, 0.5, 0.1),
         suppressor: t(rails, 0.5, 0),
         bell: t(plumbing, 0.5, 0),
+        can: t(scrap, 0.7, 0),
+        bottle: t(scrap, 0.7, 0),
         crown: t(plumbing, 0.4, 0),
         emitter: t(glow, 1.5, 0),
         prongs: t(glow, 0.8, 0),
@@ -50,7 +54,7 @@ export const pistol: ArchetypeDef = {
     const top = 0.016 + bulk * 0.004;
     const bottom = -0.022 - bulk * 0.004;
     const gripDepth = (frame === 'revolver' ? 0.036 : 0.045) + bulk * 0.006;
-    const gz = z0 + (frame === 'revolver' ? 0.03 : frame === 'blaster' ? 0.065 : 0.07);
+    const gz = z0 + (frame === 'revolver' ? 0.03 : frame === 'blaster' ? 0.065 : frame === 'pipe' ? 0.05 : 0.07);
     const gy = bottom + 0.002;
     return {
       rec: { z0, z1, top, bottom, width: 0.025 + bulk * 0.006 },

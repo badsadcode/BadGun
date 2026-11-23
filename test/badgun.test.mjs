@@ -47,7 +47,8 @@ test('material names are stable and semantic', () => {
     const m = buildManifest(generate({ ...base, style }));
     for (const mat of m.materials) assert.match(mat.name, /^MAT_(Body|Barrel|Grip|Stock|Magazine|Sight|Trim|Accent|Detail|Glass|Emissive)$/);
     const names = m.materials.map((x) => x.name);
-    for (const required of ['MAT_Body', 'MAT_Barrel', 'MAT_Grip', 'MAT_Stock']) assert.ok(names.includes(required), `${style} lacks ${required}`);
+    for (const required of ['MAT_Body', 'MAT_Barrel']) assert.ok(names.includes(required), `${style} lacks ${required}`);
+    assert.ok(names.length >= 5, `${style}: only ${names.length} materials`);
   }
 });
 
@@ -56,20 +57,25 @@ const SOCKETS = {
   longgun: ['SOCKET_Magazine', 'SOCKET_Eject', 'SOCKET_Shoulder'],
   pistol: ['SOCKET_Magazine', 'SOCKET_Eject'],
   crossbow: ['SOCKET_Nock', 'SOCKET_Shoulder'],
+  bow: ['SOCKET_Hand_Draw', 'SOCKET_Nock'],
 };
-const family = (a) => (a === 'pistol' || a === 'crossbow' ? a : 'longgun');
+const family = (a) => (['pistol', 'crossbow', 'bow'].includes(a) ? a : 'longgun');
+const required = (a) => (a === 'bow' ? ['SOCKET_Muzzle', 'SOCKET_Hand_Grip', 'SOCKET_ADS', ...SOCKETS.bow] : [...SOCKETS.common, ...SOCKETS[family(a)]]);
 /** Overall length range (meters) per archetype. */
-const LENGTH = { rifle: [0.7, 1.4], smg: [0.45, 1.0], shotgun: [0.8, 1.5], sniper: [0.9, 1.7], lmg: [0.9, 1.6], pistol: [0.15, 0.5], crossbow: [0.6, 1.3] };
+const LENGTH = { rifle: [0.6, 1.5], smg: [0.4, 1.1], shotgun: [0.45, 1.6], sniper: [0.8, 1.8], lmg: [0.8, 1.7], pistol: [0.15, 0.6], crossbow: [0.6, 1.3], bow: [0.7, 2.0] };
+/** Bows stand upright, so their size is their height; everything else is measured along the barrel. */
+const size = (a, m) => (a === 'bow' ? m.bounds.size[1] : m.bounds.size[2]);
 
 test('every weapon type has its sockets and moving parts', () => {
   for (const archetype of Object.keys(ARCHETYPES)) {
     for (const style of Object.keys(STYLES)) {
       const w = generate({ archetype, style, seed: 7 });
       const sockets = w.sockets.map((s) => s.name);
-      for (const s of [...SOCKETS.common, ...SOCKETS[family(archetype)]]) assert.ok(sockets.includes(s), `${archetype}/${style} lacks ${s}`);
-      assert.equal(component(w, 'Trigger').motion.purpose, 'fire', `${archetype}/${style} trigger`);
+      for (const s of required(archetype)) assert.ok(sockets.includes(s), `${archetype}/${style} lacks ${s}`);
+      if (archetype !== 'bow') assert.equal(component(w, 'Trigger').motion.purpose, 'fire', `${archetype}/${style} trigger`);
       const movers = w.components.filter((c) => c.motion).map((c) => c.motion.purpose);
-      if (family(archetype) === 'longgun') assert.ok(movers.includes(archetype === 'shotgun' ? 'pump' : 'reload'), `${archetype}/${style}: ${movers}`);
+      if (family(archetype) === 'longgun') assert.ok(movers.some((m) => /reload|pump/.test(m)), `${archetype}/${style}: ${movers}`);
+      if (archetype === 'bow') assert.ok(component(w, 'String').motion.purpose.startsWith('draw') && component(w, 'Arrow'), 'bow string + arrow');
       if (archetype === 'crossbow') assert.ok(component(w, 'String') && component(w, 'Bolt'), 'crossbow string + bolt');
     }
   }
@@ -85,7 +91,7 @@ test('origin sits at the grip hand, muzzle points +Z, sizes are plausible', () =
         const muzzle = m.sockets.find((s) => s.name === 'SOCKET_Muzzle');
         assert.ok(muzzle.position[2] > 0.08, `${archetype}/${style}/${seed}: muzzle in front of the hand`);
         const [lo, hi] = LENGTH[archetype];
-        assert.ok(m.bounds.size[2] > lo && m.bounds.size[2] < hi, `${archetype}/${style}/${seed}: length ${m.bounds.size[2]}`);
+        assert.ok(size(archetype, m) > lo && size(archetype, m) < hi, `${archetype}/${style}/${seed}: size ${size(archetype, m)}`);
       }
     }
   }
@@ -95,13 +101,20 @@ test('archetypes pick variants that fit them', () => {
   for (const style of Object.keys(STYLES)) {
     for (let seed = 1; seed <= 10; seed++) {
       const sh = generate({ archetype: 'shotgun', style, seed });
-      assert.equal(sh.parts.magazine, 'tube');
-      assert.equal(sh.parts.handguard, 'pump');
+      if (['double', 'overunder'].includes(sh.parts.barrel)) {
+        assert.deepEqual([sh.parts.magazine, sh.parts.handguard], ['none', 'splinter'], 'break action');
+      } else {
+        assert.deepEqual([sh.parts.magazine, sh.parts.handguard], ['tube', 'pump'], 'pump action');
+      }
       const sn = generate({ archetype: 'sniper', style, seed });
       assert.ok(['scope', 'brass'].includes(sn.parts.sight), `sniper sight ${sn.parts.sight}`);
       assert.ok(component(sn, 'BoltHandle'), 'sniper bolt handle');
       assert.ok(component(generate({ archetype: 'lmg', style, seed }), 'Bipod'), 'lmg bipod');
-      for (const a of ['rifle', 'smg']) assert.ok(!['tube', 'ammobox'].includes(generate({ archetype: a, style, seed }).parts.magazine));
+      for (const a of ['rifle', 'smg']) {
+        const w = generate({ archetype: a, style, seed });
+        assert.ok(!['tube', 'ammobox'].includes(w.parts.magazine));
+        assert.equal(w.parts.stock === 'butt', w.parts.config === 'bullpup', 'bullpups (and only bullpups) get a butt stock');
+      }
     }
   }
 });

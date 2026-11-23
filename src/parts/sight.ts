@@ -122,7 +122,23 @@ const brass: OpticBuilder = (ctx, c, y, z) => {
   return { eyeY: yc, rearZ: z + zb };
 };
 
-const OPTICS: Record<string, OpticBuilder> = { irons, reddot, scope, holo, brass };
+/** Scavenged scope: a steel pipe with bottle-glass lenses, taped to a wooden riser. */
+const tube_: OpticBuilder = (ctx, c, y, z) => {
+  const seg = ctx.seg(1);
+  const yc = y + 0.028;
+  const R = 0.016, len = 0.17;
+  put(ctx, c, 'Stock', box([0, y + 0.007, z], [0.018, 0.014, 0.08], ctx.bevel(0.001)));
+  put(ctx, c, 'Barrel', tube(R, R * 0.82, z - len / 2, z + len / 2, seg), [0, yc, 0]);
+  put(ctx, c, 'Glass', cylinder(R * 0.83, z - len / 2 + 0.01, z - len / 2 + 0.012, seg), [0, yc, 0]);
+  put(ctx, c, 'Glass', cylinder(R * 0.83, z + len / 2 - 0.012, z + len / 2 - 0.01, seg), [0, yc, 0]);
+  for (const dz of [-0.025, 0.025]) {
+    put(ctx, c, 'Accent', lathe([[R, z + dz - 0.008], [R + 0.0012, z + dz - 0.007], [R + 0.0012, z + dz + 0.007], [R, z + dz + 0.008]], seg), [0, yc, 0]);
+    put(ctx, c, 'Accent', box([0, (y + 0.014 + yc) / 2, z + dz], [0.02, yc - y - 0.012, 0.014]));
+  }
+  return { eyeY: yc, rearZ: z - len / 2 };
+};
+
+const OPTICS: Record<string, OpticBuilder> = { irons, reddot, scope, holo, brass, tube: tube_ };
 export const OPTIC_NAMES = Object.keys(OPTICS);
 
 export function buildOptic(ctx: BuildContext, choice: string): void {

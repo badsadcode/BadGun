@@ -101,7 +101,7 @@ export const TILLERS: Record<string, PartBuilder> = { rail: railTiller, wood: wo
 // Prods (the bow): limbs + string + stirrup. Records limb tips for the string.
 // ---------------------------------------------------------------------------
 
-interface LimbShape {
+export interface LimbShape {
   /** Bezier control points (z offset from prod, x) for the right (+X) limb. */
   ctrl: [Vec2, Vec2, Vec2, Vec2];
   width0: number;
@@ -109,7 +109,7 @@ interface LimbShape {
 }
 
 /** Top-view polygon of one limb ([z, x]), built around a Bezier centerline. */
-function limbPolygon(shape: LimbShape, pz: number, mirror: number, steps: number): Vec2[] {
+export function limbPolygon(shape: LimbShape, pz: number, mirror: number, steps: number): Vec2[] {
   const [a, b, c, d] = shape.ctrl.map(([z, x]) => [pz + z, x * mirror] as Vec2);
   const line: Vec2[] = [a, ...bezier(a, b, c, d, steps)];
   const left: Vec2[] = [], right: Vec2[] = [];
@@ -201,7 +201,26 @@ const energy: PartBuilder = (ctx) => {
   stirrup(ctx, 'Trim');
 };
 
-export const PRODS: Record<string, PartBuilder> = { recurve, compound, energy };
+/** Survivor prod: a car leaf spring (stacked steel leaves), U-bolted to the tiller. */
+const leafspring: PartBuilder = (ctx) => {
+  const { L, p } = ctx;
+  const c = prodComponent(ctx, 'leafspring');
+  const W = L.extra.span * 0.9, pz = L.extra.prodZ, y = L.extra.prodY;
+  const leaves = 3 + Math.round(p.bulk);
+  for (let i = 0; i < leaves; i++) {
+    const k = 1 - i * (0.7 / leaves);
+    const shape: LimbShape = { ctrl: [[0, 0.02], [0, W * k * 0.4], [-0.03 * k, W * k * 0.8], [-0.05 * k, W * k]], width0: 0.05, width1: 0.044 };
+    for (const m of [1, -1]) put(ctx, c, i === 0 ? 'Barrel' : 'Body', extrudeTop(limbPolygon(shape, pz, m, 10), 0.006, y + 0.0062 * (i - 1), ctx.bevel(0.0008)));
+  }
+  // Rolled eyes at the tips and U-bolts at the middle.
+  for (const m of [1, -1]) put(ctx, c, 'Barrel', cylinder(0.008, -0.004, 0.004, 10), [m * W, y - 0.006, pz - 0.05], AXIS_Y);
+  for (const x of [0.026, -0.026]) put(ctx, c, 'Detail', box([x, y, pz], [0.008, 0.04, 0.012], ctx.bevel(0.0015)));
+  L.extra.tipX = W;
+  L.extra.tipZ = pz - 0.05;
+  stirrup(ctx, 'Barrel');
+};
+
+export const PRODS: Record<string, PartBuilder> = { recurve, compound, energy, leafspring };
 
 /** String (drawn to the latch) and the loaded bolt. Call after the prod. */
 export function stringAndBolt(ctx: BuildContext): void {

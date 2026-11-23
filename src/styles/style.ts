@@ -39,5 +39,7 @@ export interface StyleProfile {
     rails: boolean;
     /** Base radial segment count for round parts at smoothness 1. */
     roundness: number;
+    /** Salvaged, makeshift construction (tape, pipes, planks). */
+    scrap?: boolean;
   };
 }

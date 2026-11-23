@@ -3,6 +3,7 @@
  */
 import { Vec2, box, cylinder, extrudeSide, lathe, ring, tube, dome } from '../core/geometry.js';
 import { BuildContext, put, side } from './context.js';
+import { bottleMuzzle, canMuzzle } from './scrap.js';
 import type { PartBuilder } from './receiver.js';
 
 function barrelComponent(ctx: BuildContext, variant: string) {
@@ -290,7 +291,7 @@ const compensator: MuzzleBuilder = (ctx, c, a, rb) => {
 /** No muzzle device: the barrel ends bare (the socket still marks the tip). */
 const none: MuzzleBuilder = () => 0;
 
-const MUZZLE_BUILDERS: Record<string, MuzzleBuilder> = { brake, flash, bell, crown, emitter, prongs, suppressor, compensator, none };
+const MUZZLE_BUILDERS: Record<string, MuzzleBuilder> = { brake, flash, bell, crown, emitter, prongs, suppressor, compensator, none, can: canMuzzle, bottle: bottleMuzzle };
 
 export const MUZZLES: Record<string, PartBuilder> = Object.fromEntries(
   Object.entries(MUZZLE_BUILDERS).map(([name, fn]) => [
@@ -302,7 +303,7 @@ export const MUZZLES: Record<string, PartBuilder> = Object.fromEntries(
       ctx.b.socket({
         name: 'SOCKET_Muzzle',
         parent: 'Muzzle',
-        position: [0, 0, L.barrel.z1 + len],
+        position: [L.extra.muzzleX ?? 0, 0, L.barrel.z1 + len],
         forward: [0, 0, 1],
         description: 'Muzzle tip: projectiles, flashes, tracers.',
       });

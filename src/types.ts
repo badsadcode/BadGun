@@ -45,9 +45,9 @@ export type Palette = Record<MaterialSlot, MaterialDef>;
 /** Recolor without regenerating geometry: a hex string or partial material per slot. */
 export type PaletteOverrides = Partial<Record<MaterialSlot, string | Partial<MaterialDef>>>;
 
-export type ArchetypeId = 'rifle' | 'smg' | 'shotgun' | 'sniper' | 'lmg' | 'pistol' | 'crossbow';
-export type StyleId = 'modern' | 'steampunk' | 'scifi';
-export type OpticChoice = 'auto' | 'none' | 'irons' | 'reddot' | 'scope' | 'holo' | 'brass';
+export type ArchetypeId = 'rifle' | 'smg' | 'shotgun' | 'sniper' | 'lmg' | 'pistol' | 'crossbow' | 'bow';
+export type StyleId = 'modern' | 'steampunk' | 'scifi' | 'scrap';
+export type OpticChoice = 'auto' | 'none' | 'irons' | 'reddot' | 'scope' | 'holo' | 'brass' | 'tube';
 
 /**
  * Art-direction controls. All are 0..1. Leave one undefined and the seed
