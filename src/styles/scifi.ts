@@ -65,7 +65,7 @@ export const scifi: StyleProfile = {
   parts: {
     receiver: { sleek: 1, faceted: 0.8, plated: 1, capsule: 0.9, organic: 0.5, skeletal: 0.3 },
     barrel: { shrouded: 1, rails: 0.6, bull: 0.3 },
-    muzzle: { emitter: 1, prongs: 0.8, suppressor: 0.3 },
+    muzzle: { emitter: 1, prongs: 0.8, suppressor: 0.3, baffle: 0.9, vented: 0.3 },
     handguard: { shell: 1, slim: 0.4, jacket: 0.3 },
     stock: { skeletal: 1, solid: 0.8, thumbhole: 0.5, frame: 0.4 },
     grip: { sleek: 1, skeleton: 0.8, loop: 0.9 },

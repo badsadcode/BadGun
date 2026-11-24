@@ -64,6 +64,11 @@ export const pistol: ArchetypeDef = {
         crown: t(plumbing, 0.4, 0),
         emitter: t(glow, 1.5, 0),
         prongs: t(glow, 0.8, 0),
+        tribrake: t(rails, 0.3, 0),
+        shroud: t(rails, 0.25, 0),
+        oilcan: t(scrap, 0.4, 0),
+        baffle: t(glow, 0.5, 0),
+        dragon: t(magic, 0.5, 0),
       };
     }
     return undefined;

@@ -69,7 +69,7 @@ export const cyber: StyleProfile = {
   parts: {
     receiver: { chassis: 1.2, street: 1, plated: 0.5, angular: 0.3, industrial: 0.5, skeletal: 0.5, capsule: 0.3 },
     barrel: { shrouded: 0.8, fluted: 0.8, rails: 0.5, bull: 0.4 },
-    muzzle: { smart: 1.2, suppressor: 0.6, compensator: 0.6, brake: 0.3 },
+    muzzle: { smart: 1.2, suppressor: 0.6, compensator: 0.6, brake: 0.3, vented: 1, shroud: 0.4, baffle: 0.3 },
     handguard: { cabled: 1.2, quad: 0.6, slim: 0.5, shell: 0.3 },
     stock: { blade: 1.2, collapsible: 0.6, frame: 0.6, skeletal: 0.4, thumbhole: 0.3 },
     grip: { neon: 1.2, ergo: 0.6, loop: 0.4, skeleton: 0.4 },

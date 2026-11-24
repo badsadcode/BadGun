@@ -400,7 +400,7 @@ export const shotgun = longGun(
   (_s, kind, w) => {
     if (kind === 'magazine') return { tube: 1 };
     if (kind === 'handguard') return { pump: 1 };
-    if (kind === 'muzzle') return { ...only(w, ['crown', 'bell', 'brake', 'compensator', 'emitter', 'exhaust', 'smart'], {}), none: 1.2 };
+    if (kind === 'muzzle') return { ...only(w, ['crown', 'bell', 'brake', 'compensator', 'emitter', 'exhaust', 'smart', 'tribrake', 'vented', 'dragon', 'flute', 'flashcone'], {}), none: 1.2 };
     if (kind === 'barrel') return { ...(without(w, ['coiled', 'rails', 'finned']) ?? {}), double: 0.9, overunder: 0.6 };
     if (kind === 'stock') return { ...(without(w, ['wire', 'sporter', 'military']) ?? {}), none: (w?.none ?? 0) + 0.15 };
     return w;
@@ -416,7 +416,7 @@ export const sniper = longGun(
     if (kind === 'receiver' && w?.hunter) return { ...w, hunter: w.hunter * 3 };
     if (kind === 'magazine') return only(w, ['straight', 'cell', 'canister', 'crystal', 'internal'], { straight: 1 });
     if (kind === 'barrel') return { ...only(w, ['heavy', 'fluted', 'bull', 'banded', 'shrouded', 'rails'], { heavy: 1 }), fluted: 0.8 };
-    if (kind === 'muzzle') return { ...(without(w, ['bell', 'flash']) ?? {}), suppressor: 0.6, heavybrake: _s.traits.rails ? 0.6 : 0.15 };
+    if (kind === 'muzzle') return { ...(without(w, ['bell', 'flash', 'flute', 'oilcan']) ?? {}), suppressor: 0.6, heavybrake: _s.traits.rails ? 0.6 : 0.15, boxbrake: _s.traits.rails || _s.traits.diesel ? 0.4 : 0.1 };
     if (kind === 'stock') return { ...(without(w, ['wire', 'collapsible']) ?? {}), sporter: 1.4 };
     return w;
   },

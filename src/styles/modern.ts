@@ -64,7 +64,7 @@ export const modern: StyleProfile = {
   parts: {
     receiver: { angular: 1, stamped: 0.6, plated: 0.2, battle: 0.5, skeletal: 0.35, boxy: 0.2, hunter: 0.2, brick: 0.15 },
     barrel: { plain: 1, heavy: 0.6, fluted: 0.6, bull: 0.3, finned: 0.15 },
-    muzzle: { brake: 1, flash: 1, compensator: 0.6, suppressor: 0.5 },
+    muzzle: { brake: 1, flash: 1, compensator: 0.6, suppressor: 0.5, birdcage: 0.8, tribrake: 0.7, shroud: 0.4 },
     handguard: { railed: 1, quad: 0.6, slim: 0.5 },
     stock: { collapsible: 1, fixed: 0.5, wire: 0.2, thumbhole: 0.4, none: 0.1, sporter: 0.25, frame: 0.45 },
     grip: { polymer: 1, ergo: 0.8, loop: 0.1 },

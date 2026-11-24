@@ -67,7 +67,7 @@ export const diesel: StyleProfile = {
   parts: {
     receiver: { deco: 1.2, riveted: 1, stamped: 0.4, tubular: 0.3, industrial: 0.8, brick: 0.4, battle: 0.3 },
     barrel: { heavy: 1, finned: 0.7, plain: 0.5, banded: 0.3 },
-    muzzle: { exhaust: 1.2, brake: 0.6, compensator: 0.4, crown: 0.3 },
+    muzzle: { exhaust: 1.2, brake: 0.6, compensator: 0.4, crown: 0.3, boxbrake: 0.7, tribrake: 0.3 },
     handguard: { radiator: 1.2, jacket: 0.8, slim: 0.3 },
     stock: { deco: 1.2, fixed: 0.5, wire: 0.4, thumbhole: 0.3 },
     grip: { wood: 0.8, polymer: 0.6, ergo: 0.4 },

@@ -130,7 +130,7 @@ const png = encodePNG(id.data, id.width, id.height);         // Uint8Array, writ
 
 Attachments come two ways.
 
-**On the gun.** Long guns have two more part kinds, `underbarrel` (`vgrip`, `angled`, `stubby`, `launcher`) and `side` (`flashlight`, `laser`, `combo`, `lantern`, `crystal`, `taped`). Pistols with a rail-like frame get `underbarrel` lights and lasers. Each world picks what suits it, mostly picking *none*: lanterns for steampunk, glowing crystals for fantasy, duct-taped flashlights for survivors, no lasers in WW2. Each attachment is its own node (`Underbarrel`, `SideAttachment`, `Optic`, `Muzzle`), so a game can hide or swap it.
+**On the gun.** Long guns have two more part kinds, `underbarrel` (`vgrip`, `angled`, `stubby`, `launcher`, `bipodgrip`, `barricade`, `shotgun`, `skeleton`, `wrapped`) and `side` (`flashlight`, `laser`, `combo`, `lantern`, `crystal`, `taped`, `strobe`, `rangefinder`, `ir`, `uvlamp`, `headlamp`, `torch`). Pistols with a rail-like frame get `underbarrel` lights and lasers. Each world picks what suits it, mostly picking *none*: lanterns for steampunk, glowing crystals and braziers for fantasy, duct-taped flashlights and sticks for survivors, chrome headlamps for dieselpunk, no lasers in WW2. Many attachments also carry seeded shape genes (flashlight head and switch, laser layout, grip form, launcher sight and muzzle; suppressor section and cap, brake ports, compensator port pattern), so the same variant looks different from seed to seed. Each attachment is its own node (`Underbarrel`, `SideAttachment`, `Optic`, `Muzzle`), so a game can hide or swap it.
 
 ```bash
 node dist/cli.js --style modern --seed 2 --part underbarrel=launcher --part side=flashlight
@@ -153,11 +153,11 @@ attachmentVariants('side', 'steampunk');                            // { lantern
 | Type | Snaps onto | Variants |
 |---|---|---|
 | `optic` | `SOCKET_Optic` | reddot, scope, holo, brass, tube, rune, lamp, smart |
-| `muzzle` | `SOCKET_Barrel_End` | 15 devices, from suppressors and brakes to soda cans and crystals |
-| `underbarrel` | `SOCKET_Underbarrel` | vgrip, angled, stubby, launcher |
-| `side` | `SOCKET_Side` (pistols: `SOCKET_Underbarrel`, turned to hang down) | flashlight, laser, combo, lantern, crystal, taped |
+| `muzzle` | `SOCKET_Barrel_End` | 25 devices, from suppressors, birdcages and square cans to soda cans, oil filters, trumpet horns and dragon heads |
+| `underbarrel` | `SOCKET_Underbarrel` | vgrip, angled, stubby, launcher, bipodgrip, barricade, shotgun, skeleton, wrapped |
+| `side` | `SOCKET_Side` (pistols: `SOCKET_Underbarrel`, turned to hang down) | flashlight, laser, combo, lantern, crystal, taped, strobe, rangefinder, ir, uvlamp, headlamp, torch |
 
-Attachments carry their own sockets too: `SOCKET_Light`, `SOCKET_Laser`, `SOCKET_Launcher_Muzzle`, and `SOCKET_Hand_Support` on grips.
+Attachments carry their own sockets too: `SOCKET_Light`, `SOCKET_Laser`, `SOCKET_Launcher_Muzzle`, `SOCKET_Shotgun_Muzzle`, and `SOCKET_Hand_Support` on grips.
 
 ## Animation clips
 
@@ -243,7 +243,7 @@ A recipe is the whole description of a weapon. Save it, share it, batch it. A re
 
 | Archetype | Part kinds |
 |---|---|
-| rifle · smg · shotgun · sniper · lmg | 5 layouts · 26 receivers (incl. battle slab, see-through truss, welded box, sci-fi capsule, MG feed-cover brick, sporting hunter, revolving drum, carved wood, hydraulic industrial, ribbed organic) · 14 barrels (incl. doubles) · 16 handguards · 16 muzzles (incl. soda-can, bottle, crystal, exhaust stacks and smart brake) · 17 stocks (incl. one-piece, military and folding frame) · 12 grips (incl. loop and neon) · 18 magazines (incl. internal, stick, top-fed, crystal, orb, jerrycan and smart mag), plus attachments (4 underbarrel: grips, grenade launcher · 6 side rail: lights, lasers, lantern, crystal, taped flashlight) and accessories (bipod, bolt handle, carry handle, shell holder, lever, bayonet, heat shield) |
+| rifle · smg · shotgun · sniper · lmg | 5 layouts · 26 receivers (incl. battle slab, see-through truss, welded box, sci-fi capsule, MG feed-cover brick, sporting hunter, revolving drum, carved wood, hydraulic industrial, ribbed organic) · 14 barrels (incl. doubles) · 16 handguards · 26 muzzles (incl. birdcage, slab brake, square suppressor, box brake, soda-can, bottle, oil filter, crystal, dragon head, brass horn, exhaust stacks and smart brake) · 17 stocks (incl. one-piece, military and folding frame) · 12 grips (incl. loop and neon) · 18 magazines (incl. internal, stick, top-fed, crystal, orb, jerrycan and smart mag), plus attachments (9 underbarrel: grips, bipod grip, thumb-shelf stop, grenade launcher, underbarrel shotgun · 12 side rail: lights, lasers, rangefinder, IR illuminator, lantern, crystal, brazier, headlamp, taped flashlight) and accessories (bipod, bolt handle, carry handle, shell holder, lever, bayonet, heat shield) |
 | pistol | 27 frames (slide, revolver, blaster, pipe zip gun, flintlock, loop blaster, hand cannon, flare gun, broomhandle, toggle-lock, deco streamliner, smartgun, compact, long target slide, polymer striker, magnum, machine pistol, bullpup, holdout, taser, coil gun, needler, derringer, wand, service pistol, rocket gyro, nail gun) · 6 grips · muzzles · under-frame lights and lasers |
 | revolver | 12 frames (classic single-action, service, magnum, snub, top-break, pepperbox, sci-fi heavy and coil, junk, ornate, deco, smart) · 5 cylinders (6-shot fluted, 5-shot, 8-shot, engraved, energy) · 8 barrels · 5 grips · 4 hammers; swing-out cranes and top-breaks animate a Reload |
 | crossbow | 7 tillers (incl. one-hand pistol, bolt-magazine repeater, siege beam with windlass) · 5 prods (recurve, compound, energy, leaf spring, arcane) · stocks · grips; drawn string + loaded bolt |

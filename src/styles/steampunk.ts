@@ -54,7 +54,7 @@ export const steampunk: StyleProfile = {
   parts: {
     receiver: { cylindrical: 1, drum: 0.4, carved: 0.35, hunter: 0.2, industrial: 0.1 },
     barrel: { banded: 1, coiled: 0.7, bull: 0.2, finned: 0.5, double: 0.25 },
-    muzzle: { bell: 1, crown: 0.7 },
+    muzzle: { bell: 1, crown: 0.7, flute: 0.8 },
     handguard: { forend: 1, cage: 0.8, slim: 0.3, jacket: 0.4 },
     stock: { classic: 1, wire: 0.25, thumbhole: 0.3, sporter: 0.6 },
     grip: { wood: 1, wrapped: 0.8 },

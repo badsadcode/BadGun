@@ -7,6 +7,7 @@ import { BuildContext, put, side } from './context.js';
 import { bottleMuzzle, canMuzzle } from './scrap.js';
 import { crystalMuzzle, mawMuzzle } from './fantasy.js';
 import type { PartBuilder } from './receiver.js';
+import { MUZZLES_2 } from './muzzles2.js';
 
 function barrelComponent(ctx: BuildContext, variant: string) {
   return ctx.b.component('Barrel', { kind: 'barrel', variant, pivot: [0, 0, ctx.L.barrel.z0] });
@@ -201,28 +202,53 @@ function muzzleComponent(ctx: BuildContext, variant: string) {
 }
 
 const brake: MuzzleBuilder = (ctx, c, a, rb) => {
-  const R = rb * 1.7;
+  const g = ctx.rng('muzzle:brake-look');
+  const ports = g.int(2, 4), kind = g.pick(['groove', 'window', 'saw'] as const);
+  const R = rb * g.range(1.55, 1.85);
+  const seg = ctx.seg(0.9);
+  if (kind === 'window') {
+    // Round body with rectangular side windows and a stepped crown.
+    const len = 0.012 + ports * 0.013;
+    put(ctx, c, 'Barrel', lathe([[rb * 0.5, a - 0.004], [R, a - 0.004], [R, a + len], [R * 0.82, a + len + 0.005], [rb * 0.55, a + len + 0.005], [rb * 0.55, a + len - 0.004]], seg));
+    for (let i = 0; i < ports; i++) {
+      const z = a + 0.012 + i * 0.013;
+      for (const s of [1, -1]) put(ctx, c, 'Detail', box([s * (R - 0.0006), 0, z], [0.0022, R * 1.1, 0.0075]));
+    }
+    // Flat top so the windows read from above too.
+    put(ctx, c, 'Barrel', box([0, R * 0.92, a + len / 2], [R * 0.9, R * 0.16, len], ctx.bevel(0.001)));
+    return len + 0.005;
+  }
   const prof: Vec2[] = [[rb * 0.5, a - 0.004], [R * 0.9, a - 0.004], [R, a]];
   let z = a + 0.012;
-  for (let i = 0; i < 3; i++) {
-    prof.push([R, z], [R * 0.7, z], [R * 0.7, z + 0.007], [R, z + 0.007]);
+  for (let i = 0; i < ports; i++) {
+    if (kind === 'groove') prof.push([R, z], [R * 0.7, z], [R * 0.7, z + 0.007], [R, z + 0.007]);
+    // Sawtooth: each chamber grows forward and steps down sharply.
+    else prof.push([R * 1.08, z], [R * 0.72, z + 0.001], [R * 0.78, z + 0.007]);
     z += 0.015;
   }
   const end = z;
   prof.push([R, end - 0.003], [R * 0.86, end], [rb * 0.55, end], [rb * 0.55, end - 0.01]);
-  put(ctx, c, 'Barrel', lathe(prof, ctx.seg(0.9)));
+  put(ctx, c, 'Barrel', lathe(prof, kind === 'saw' ? Math.max(6, Math.round(seg / 2)) * 2 : seg));
   return end - a;
 };
 
 const flash: MuzzleBuilder = (ctx, c, a, rb) => {
+  const g = ctx.rng('muzzle:flash-look');
   put(ctx, c, 'Barrel', lathe([[rb * 0.5, a - 0.004], [rb * 1.45, a - 0.004], [rb * 1.45, a + 0.014], [rb * 1.6, a + 0.018], [rb * 1.6, a + 0.024], [rb * 0.9, a + 0.024]], ctx.seg(0.9)));
-  const tines = 5;
+  const tines = g.pick([3, 4, 5, 6]);
+  const tl = g.range(0.024, 0.04), splay = g.pick([0, 0, 0.08]);
+  const thick = rb * g.range(0.38, 0.5);
   for (let i = 0; i < tines; i++) {
     const ang = (i / tines) * Math.PI * 2 + Math.PI / 2;
-    const r = rb * 1.25;
-    put(ctx, c, 'Barrel', box([0, 0, 0], [0.0042, 0.0042, 0.03], ctx.bevel(0.0008)), [Math.cos(ang) * r, Math.sin(ang) * r, a + 0.038], [0, 0, ang]);
+    const r = rb * 1.25 + Math.sin(splay) * tl * 0.5;
+    put(ctx, c, 'Barrel', box([0, 0, 0], [thick, thick, tl], ctx.bevel(0.0008)), [Math.cos(ang) * r, Math.sin(ang) * r, a + 0.023 + tl / 2], [-splay, 0, ang - Math.PI / 2]);
   }
-  return 0.053;
+  // Some hiders close the tines with a ring.
+  if (g.chance(0.35)) {
+    put(ctx, c, 'Barrel', tube(rb * 1.25 + thick / 2 + Math.sin(splay) * tl, rb * 1.25 - thick / 2 + Math.sin(splay) * tl, a + 0.023 + tl - 0.004, a + 0.023 + tl + 0.001, ctx.seg(0.9)));
+    return 0.024 + tl;
+  }
+  return 0.023 + tl;
 };
 
 const bell: MuzzleBuilder = (ctx, c, a, rb) => {
@@ -272,22 +298,60 @@ const prongs: MuzzleBuilder = (ctx, c, a, rb) => {
 };
 
 const suppressor: MuzzleBuilder = (ctx, c, a, rb) => {
+  const g = ctx.rng('muzzle:suppressor-look');
   const R = rb * (2.1 + ctx.p.bulk * 0.5);
   const len = 0.12 + ctx.p.length * 0.05;
-  const seg = ctx.seg(1);
-  put(ctx, c, 'Barrel', lathe([
-    [rb * 0.5, a - 0.004], [rb * 1.3, a - 0.004], [rb * 1.3, a + 0.006], [R * 0.9, a + 0.01], [R, a + 0.016],
-    [R, a + len - 0.008], [R * 0.9, a + len], [rb * 0.6, a + len], [rb * 0.6, a + len - 0.006],
-  ], seg));
-  for (const z of [a + 0.024, a + len - 0.016]) put(ctx, c, 'Trim', lathe([[R, z - 0.003], [R + 0.0008, z - 0.002], [R + 0.0008, z + 0.002], [R, z + 0.003]], seg));
+  // Cross-section: round, octagonal or a faceted hexagon.
+  const section = g.pick(['round', 'round', 'octagon', 'hex'] as const);
+  const seg = section === 'octagon' ? 8 : section === 'hex' ? 6 : ctx.seg(1);
+  const phase = section === 'round' ? 0 : Math.PI / seg;
+  const cap = g.pick(['flat', 'nose', 'step'] as const);
+  const front: Vec2[] =
+    cap === 'flat' ? [[R, a + len - 0.008], [R * 0.9, a + len], [rb * 0.6, a + len], [rb * 0.6, a + len - 0.006]]
+      : cap === 'nose' ? [[R, a + len - 0.022], [R * 0.82, a + len - 0.008], [R * 0.5, a + len], [rb * 0.6, a + len], [rb * 0.6, a + len - 0.006]]
+        : [[R, a + len - 0.014], [R * 0.86, a + len - 0.014], [R * 0.86, a + len - 0.002], [R * 0.8, a + len], [rb * 0.6, a + len], [rb * 0.6, a + len - 0.006]];
+  put(ctx, c, 'Barrel', lathe([[rb * 0.5, a - 0.004], [rb * 1.3, a - 0.004], [rb * 1.3, a + 0.006], [R * 0.9, a + 0.01], [R, a + 0.016], ...front], seg, phase));
+  const skin = g.pick(['bands', 'ribbed', 'sleeve'] as const);
+  const band = (z: number, h: number, r = R) => lathe([[r, z - h], [r + 0.0008, z - h * 0.7], [r + 0.0008, z + h * 0.7], [r, z + h]], seg, phase);
+  if (skin === 'bands') {
+    for (const z of [a + 0.024, a + len - 0.03]) put(ctx, c, 'Trim', band(z, 0.003));
+  } else if (skin === 'ribbed') {
+    const n = Math.floor((len - 0.05) / 0.009);
+    for (let i = 0; i < n; i++) put(ctx, c, 'Trim', band(a + 0.026 + i * 0.009, 0.0022));
+  } else {
+    // A heat sleeve over the rear half.
+    put(ctx, c, 'Accent', lathe([[R, a + 0.018], [R + 0.0022, a + 0.022], [R + 0.0022, a + len * 0.55], [R, a + len * 0.55 + 0.004]], seg, phase));
+  }
   return len;
 };
 
 const compensator: MuzzleBuilder = (ctx, c, a, rb) => {
-  const R = rb * 1.65;
-  put(ctx, c, 'Barrel', lathe([[rb * 0.5, a - 0.004], [R, a - 0.004], [R, a + 0.036], [R * 0.8, a + 0.04], [rb * 0.6, a + 0.04], [rb * 0.6, a + 0.034]], ctx.seg(0.9)));
-  for (let i = 0; i < 3; i++) put(ctx, c, 'Detail', box([0, R - 0.0005, a + 0.009 + i * 0.01], [R * 0.9, 0.002, 0.005]));
-  return 0.04;
+  const g = ctx.rng('muzzle:compensator-look');
+  const R = rb * 1.65, len = g.range(0.034, 0.05);
+  const flat = g.chance(0.4);
+  const seg = flat ? 8 : ctx.seg(0.9);
+  put(ctx, c, 'Barrel', lathe([[rb * 0.5, a - 0.004], [R, a - 0.004], [R, a + len - 0.004], [R * 0.8, a + len], [rb * 0.6, a + len], [rb * 0.6, a + len - 0.006]], seg, flat ? Math.PI / 8 : 0));
+  const top = flat ? R * Math.cos(Math.PI / 8) : R;
+  const pattern = g.pick(['slots', 'holes', 'long', 'vee'] as const);
+  if (pattern === 'slots') {
+    const n = Math.max(2, Math.floor((len - 0.012) / 0.01));
+    for (let i = 0; i < n; i++) put(ctx, c, 'Detail', box([0, top - 0.0005, a + 0.009 + i * 0.01], [R * 0.9, 0.002, 0.005]));
+  } else if (pattern === 'holes') {
+    const n = Math.max(2, Math.floor((len - 0.01) / 0.008));
+    for (let i = 0; i < n; i++) for (const x of [-R * 0.35, R * 0.35]) {
+      put(ctx, c, 'Detail', cylinder(R * 0.17, 0, 0.002, 8), [x, top - 0.0012, a + 0.008 + i * 0.008], [-Math.PI / 2, 0, 0]);
+    }
+  } else if (pattern === 'long') {
+    put(ctx, c, 'Detail', box([0, top - 0.0005, a + len * 0.5], [R * 0.45, 0.002, len * 0.6]));
+    for (const s of [1, -1]) put(ctx, c, 'Detail', box([s * (R * 0.95), R * 0.25, a + len * 0.6], [0.002, R * 0.35, len * 0.35]));
+  } else {
+    // Chevron ports: angled slots meeting on the top center line.
+    const n = Math.max(2, Math.floor((len - 0.012) / 0.011));
+    for (let i = 0; i < n; i++) for (const s of [1, -1]) {
+      put(ctx, c, 'Detail', box([0, 0, 0], [R * 0.6, 0.002, 0.004]), [s * R * 0.25, top - 0.0005, a + 0.01 + i * 0.011], [0, s * 0.6, 0]);
+    }
+  }
+  return len;
 };
 
 /** Heavy two-chamber brake (anti-materiel rifles): a big slab with side ports. */
@@ -305,7 +369,7 @@ const heavybrake: MuzzleBuilder = (ctx, c, a, rb) => {
 /** No muzzle device: the barrel ends bare (the socket still marks the tip). */
 const none: MuzzleBuilder = () => 0;
 
-export const MUZZLE_BUILDERS: Record<string, MuzzleBuilder> = { brake, flash, bell, crown, emitter, prongs, suppressor, compensator, heavybrake, none, can: canMuzzle, bottle: bottleMuzzle, crystal: crystalMuzzle, maw: mawMuzzle, exhaust: exhaustMuzzle, smart: smartMuzzle };
+export const MUZZLE_BUILDERS: Record<string, MuzzleBuilder> = { brake, flash, bell, crown, emitter, prongs, suppressor, compensator, heavybrake, none, can: canMuzzle, bottle: bottleMuzzle, crystal: crystalMuzzle, maw: mawMuzzle, exhaust: exhaustMuzzle, smart: smartMuzzle, ...MUZZLES_2 };
 
 export const MUZZLES: Record<string, PartBuilder> = Object.fromEntries(
   Object.entries(MUZZLE_BUILDERS).map(([name, fn]) => [
