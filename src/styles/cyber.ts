@@ -93,6 +93,6 @@ export const cyber: StyleProfile = {
       arrow: { broadhead: 1, energy: 1, field: 0.5 },
     },
   },
-  optics: { smart: 1.5, reddot: 0.8, holo: 0.8, scope: 0.4 },
+  optics: { smart: 1.5, reddot: 0.8, holo: 0.8, scope: 0.4, hud: 0.6, thermal: 0.45, digital: 0.3, minidot: 0.4, nightvision: 0.2 },
   traits: { rivets: false, plumbing: false, glow: true, rails: true, roundness: 16, cyber: true },
 };

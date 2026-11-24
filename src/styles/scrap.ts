@@ -72,6 +72,6 @@ export const scrap: StyleProfile = {
     magazine: { straight: 0.6, twin: 0.5, can: 0.8, curved: 0.3, pan: 0.15 },
     sight: { auto: 1 },
   },
-  optics: { none: 1, irons: 1, tube: 0.8, reddot: 0.15 },
+  optics: { none: 1, irons: 1, tube: 0.8, reddot: 0.15, tincan: 0.8 },
   traits: { rivets: false, plumbing: false, glow: false, rails: false, roundness: 10, scrap: true },
 };

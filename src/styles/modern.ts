@@ -71,6 +71,6 @@ export const modern: StyleProfile = {
     magazine: { curved: 1, straight: 0.4, twin: 0.15 },
     sight: { auto: 1 },
   },
-  optics: { reddot: 1, scope: 0.6, holo: 0.4, irons: 0.3 },
+  optics: { reddot: 1, scope: 0.6, holo: 0.4, irons: 0.3, prism: 0.45, tubedot: 0.35, magnifier: 0.35, longrange: 0.25, offset: 0.25, minidot: 0.2, digital: 0.15, nightvision: 0.1 },
   traits: { rivets: false, plumbing: false, glow: false, rails: true, roundness: 20 },
 };

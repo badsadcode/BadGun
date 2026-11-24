@@ -41,7 +41,7 @@ export const ww1: StyleProfile = {
     magazine: { internal: 2.5, pan: 0.4, straight: 0.3, drum: 0.15 },
     sight: { auto: 1 },
   },
-  optics: { leaf: 3, irons: 0.4, scope: 0.15 },
+  optics: { leaf: 3, irons: 0.4, scope: 0.15, ladder: 1.5 },
   traits: { rivets: false, plumbing: false, glow: false, rails: false, roundness: 18, era: 1916, bayonet: 0.55 },
 };
 
@@ -66,7 +66,7 @@ export const ww2: StyleProfile = {
     magazine: { internal: 1, stick: 1.2, drum: 0.5, curved: 0.4, top: 0.4 },
     sight: { auto: 1 },
   },
-  optics: { leaf: 2, irons: 0.5, scope: 0.35 },
+  optics: { leaf: 2, irons: 0.5, scope: 0.35, ladder: 0.8 },
   traits: { rivets: false, plumbing: false, glow: false, rails: false, roundness: 18, era: 1942, bayonet: 0.3 },
 };
 
@@ -90,6 +90,6 @@ export const vietnam: StyleProfile = {
     magazine: { straight: 1, curved: 1 },
     sight: { auto: 1 },
   },
-  optics: { irons: 3, scope: 0.3, leaf: 0.3 },
+  optics: { irons: 3, scope: 0.3, leaf: 0.3, ladder: 0.4, nightvision: 0.15 },
   traits: { rivets: false, plumbing: false, glow: false, rails: false, roundness: 18, era: 1968, bayonet: 0.2 },
 };

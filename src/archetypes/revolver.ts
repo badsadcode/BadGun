@@ -93,10 +93,10 @@ const TABLE: Record<string, Record<Flavor, Weights>> = {
 };
 
 const OPTICS: Record<Flavor, Weights> = {
-  modern: { none: 4, reddot: 1, scope: 0.3 },
+  modern: { none: 4, reddot: 1, scope: 0.3, minidot: 0.8 },
   steam: { none: 4, brass: 0.4 },
-  scifi: { none: 4, reddot: 0.8 },
-  cyber: { none: 3, smart: 1.2, reddot: 0.6 },
+  scifi: { none: 4, reddot: 0.8, minidot: 0.5 },
+  cyber: { none: 3, smart: 1.2, reddot: 0.6, minidot: 0.4 },
   diesel: { none: 4, scope: 0.4 },
   scrap: { none: 1 },
   magic: { none: 4, rune: 1 },
@@ -130,7 +130,7 @@ export const revolver: ArchetypeDef = {
   name: 'Revolver',
   description: 'Revolvers: single and double action, snubs, magnums, top-breaks, pepperboxes and energy wheel-guns.',
   parts: { frame: REVOLVER_FRAMES, cylinder: REVOLVER_CYLINDERS, barrel: REVOLVER_BARRELS, grip: REVOLVER_GRIPS, hammer: REVOLVER_HAMMERS },
-  optics: ['none', 'reddot', 'scope', 'brass', 'rune', 'smart'],
+  optics: ['none', 'reddot', 'scope', 'brass', 'rune', 'smart', 'minidot'],
 
   weights: (style, kind): Weights | undefined => TABLE[kind]?.[flavor(style)],
   opticWeights: (style): Weights => OPTICS[flavor(style)],
