@@ -1,0 +1,213 @@
+[
+ {
+  "out": "kit_modern.png",
+  "recipe": {
+   "archetype": "kit",
+   "style": "modern",
+   "seed": 3
+  },
+  "view": "three-quarter",
+  "width": 1600,
+  "height": 900,
+  "bg": "none"
+ },
+ {
+  "out": "kit_steampunk.png",
+  "recipe": {
+   "archetype": "kit",
+   "style": "steampunk",
+   "seed": 3
+  },
+  "view": "three-quarter",
+  "width": 1600,
+  "height": 900,
+  "bg": "none"
+ },
+ {
+  "out": "kit_scrap.png",
+  "recipe": {
+   "archetype": "kit",
+   "style": "scrap",
+   "seed": 3
+  },
+  "view": "three-quarter",
+  "width": 1600,
+  "height": 900,
+  "bg": "none"
+ },
+ {
+  "out": "kit_cyber.png",
+  "recipe": {
+   "archetype": "kit",
+   "style": "cyber",
+   "seed": 3
+  },
+  "view": "three-quarter",
+  "width": 1600,
+  "height": 900,
+  "bg": "none"
+ },
+ {
+  "out": "kit_fantasy.png",
+  "recipe": {
+   "archetype": "kit",
+   "style": "fantasy",
+   "seed": 3
+  },
+  "view": "three-quarter",
+  "width": 1600,
+  "height": 900,
+  "bg": "none"
+ },
+ {
+  "out": "kit_diesel.png",
+  "recipe": {
+   "archetype": "kit",
+   "style": "diesel",
+   "seed": 3
+  },
+  "view": "three-quarter",
+  "width": 1600,
+  "height": 900,
+  "bg": "none"
+ },
+ {
+  "out": "snap_explode.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "modern",
+   "seed": 2,
+   "parts": {
+    "config": "standard",
+    "underbarrel": "launcher",
+    "side": "combo",
+    "muzzle": "suppressor"
+   },
+   "optic": "scope"
+  },
+  "view": "side",
+  "width": 1600,
+  "height": 900,
+  "bg": "none",
+  "query": "explode"
+ },
+ {
+  "out": "snap.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "modern",
+   "seed": 2,
+   "parts": {
+    "config": "standard",
+    "underbarrel": "launcher",
+    "side": "combo",
+    "muzzle": "suppressor"
+   },
+   "optic": "scope"
+  },
+  "view": "side",
+  "width": 1600,
+  "height": 900,
+  "bg": "none"
+ },
+ {
+  "out": "g_lantern.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "steampunk",
+   "seed": 5,
+   "parts": {
+    "config": "standard",
+    "side": "lantern",
+    "underbarrel": "vgrip"
+   }
+  },
+  "view": "three-quarter",
+  "width": 1600,
+  "height": 900,
+  "bg": "none"
+ },
+ {
+  "out": "g_crystal.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "fantasy",
+   "seed": 7,
+   "parts": {
+    "config": "standard",
+    "side": "crystal"
+   }
+  },
+  "view": "three-quarter",
+  "width": 1600,
+  "height": 900,
+  "bg": "none"
+ },
+ {
+  "out": "g_taped.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "scrap",
+   "seed": 5,
+   "parts": {
+    "config": "standard",
+    "side": "taped",
+    "underbarrel": "launcher"
+   }
+  },
+  "view": "three-quarter",
+  "width": 1600,
+  "height": 900,
+  "bg": "none"
+ },
+ {
+  "out": "g_cyber.png",
+  "recipe": {
+   "archetype": "rifle",
+   "style": "cyber",
+   "seed": 6,
+   "parts": {
+    "config": "standard",
+    "side": "combo",
+    "underbarrel": "angled"
+   }
+  },
+  "view": "three-quarter",
+  "width": 1600,
+  "height": 900,
+  "bg": "none"
+ },
+ {
+  "out": "g_pistol.png",
+  "recipe": {
+   "archetype": "pistol",
+   "style": "modern",
+   "seed": 4,
+   "parts": {
+    "frame": "slide",
+    "underbarrel": "flashlight"
+   }
+  },
+  "view": "three-quarter",
+  "width": 1600,
+  "height": 900,
+  "bg": "none"
+ },
+ {
+  "out": "g_diesel.png",
+  "recipe": {
+   "archetype": "smg",
+   "style": "diesel",
+   "seed": 4,
+   "parts": {
+    "config": "standard",
+    "side": "flashlight",
+    "underbarrel": "vgrip"
+   }
+  },
+  "view": "three-quarter",
+  "width": 1600,
+  "height": 900,
+  "bg": "none"
+ }
+]

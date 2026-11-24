@@ -70,5 +70,13 @@
     "date": "2026-11-23",
     "summary": "The guns finally move: firing, reloading, pumping and drawing, with built-in sound markers.",
     "cover": "assets/009/banner.webp"
+  },
+  {
+    "slug": "010-snap-it-on",
+    "number": "010",
+    "title": "Snap It On",
+    "date": "2026-11-24",
+    "summary": "Scopes, silencers, grips, grenade launchers, lights and lasers, as separate pieces that snap onto any gun. Plus a whole kit for every world.",
+    "cover": "assets/010/banner.webp"
   }
 ]

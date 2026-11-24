@@ -93,5 +93,5 @@ All the clips go into the downloaded 3D file too, so they work in game engines.
 ---
 
 <p align="center">
-  <a href="README.md">← All devlogs</a> · <a href="../README.md">BadGun home</a>
+  <a href="README.md">← All devlogs</a> · <a href="../README.md">BadGun home</a> · <a href="010-snap-it-on.md">Next: #010 →</a>
 </p>
