@@ -7,7 +7,7 @@
 <p align="center">
   <b>Procedural, game-ready weapon assets.</b><br>
   Weapon type + style + seed = a reproducible, coherent, already-painted 3D weapon (<code>.glb</code>).<br>
-  Rifles · SMGs · shotguns · snipers · LMGs · pistols · crossbows · bows, in modern, steampunk, sci-fi, survivor, fantasy, WW1, WW2, Vietnam-era, dieselpunk and cyberpunk styles.
+  Rifles · SMGs · shotguns · snipers · LMGs · pistols · crossbows · bows · launchers, in modern, steampunk, sci-fi, survivor, fantasy, WW1, WW2, Vietnam-era, dieselpunk and cyberpunk styles.
 </p>
 
 <p align="center">
@@ -247,6 +247,7 @@ A recipe is the whole description of a weapon. Save it, share it, batch it. A re
 | pistol | 12 frames (slide, revolver, blaster, pipe zip gun, flintlock, loop blaster, hand cannon, flare gun, broomhandle, toggle-lock, deco streamliner, smartgun) · 6 grips · muzzles · under-frame lights and lasers |
 | crossbow | 4 tillers · 5 prods (recurve, compound, energy, leaf spring, arcane) · stocks · grips; drawn string + loaded bolt |
 | bow | 6 bows (longbow, recurve, compound, energy, pipe, elven) · 6 arrows; string with draw motion |
+| launcher | 13 tubes (bazooka, front-loaded rocket tube, disposable, recoilless, multi-tube pod, energy, pipe, brass, arcane, deco, smart, harpoon, mega energy cannon) · 8 projectiles (HEAT, slim missile, bulb, plasma, firework, barbed spear, orb, crystal bolt) · 3 grip sets · 3 shoulder rests · side-mounted sights; `Rocket` fires and reloads, `SOCKET_Backblast` at the rear |
 
 164 part variants and 10 optics in total. The historical styles (WW1, WW2, Vietnam) add bolt-action and tubular receivers, full-length military stocks, internal/stick/top-fed magazines, leaf sights, bayonets and period pistols: generic period shapes, not replicas of particular models. Dieselpunk brings art-deco streamliners, riveted armor, radiator handguards, exhaust stacks, jerrycan magazines and searchlight sights; cyberpunk brings screen-equipped chassis, street-built rifles covered in cables and stickers, smart magazines with LED ammo counters, neon grips, blade stocks and smart-link sights. Archetypes enforce what they need (shotguns get a pump and tube magazine, or break open if double-barreled; snipers get a scope and bolt handle; bullpups get a butt stock). Otherwise any part works with any style, and the style's palette repaints it, so the Frankengun is a supported feature.
 

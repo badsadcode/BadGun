@@ -107,7 +107,22 @@ export function weaponClips(w: Weapon): Clip[] {
     return clips.filter((x): x is Clip => !!x);
   }
 
-  if (archetype === 'crossbow') {
+  const rocket = c('Rocket');
+  if (archetype === 'launcher') {
+    // Front-loaded tubes take the new rocket at the muzzle, the rest at the breech.
+    const at = (n: string) => w.sockets.find((s) => s.name === n)?.position[2] ?? 0;
+    const front = Math.abs(at('SOCKET_Magazine') - at('SOCKET_Muzzle')) < 1e-6;
+    const from = front ? 0.7 : -0.7;
+    clips.push(
+      clip('Fire', 'Pull the trigger: the rocket leaves the tube.', [
+        track(trigger, pulse(0, 0.05, 0.2, 1)),
+        rocket ? { component: rocket.name, keys: k([0.05, 0], [0.35, max(rocket)]) } : null,
+      ], { shot: 0.05 }),
+      clip('Reload', `Slide a new rocket in from the ${front ? 'muzzle' : 'rear'} (starts from the Fire end pose).`, [
+        rocket ? { component: rocket.name, keys: k([0, max(rocket)], [0.3, max(rocket)], [0.301, from], [1.3, 0]) } : null,
+      ], { loadStart: 0.3, rocketIn: 1.3 }, 0.15),
+    );
+  } else if (archetype === 'crossbow') {
     clips.push(
       clip('Fire', 'Pull the trigger: the string snaps forward and the bolt leaves the rail.', [
         track(trigger, pulse(0, 0.05, 0.2, 1)),
