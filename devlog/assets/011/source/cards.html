@@ -1,0 +1,205 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@500;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#121419; --ink:#f1eee8; --dim:#9aa0aa; --orange:#ff6b3d; --yellow:#ffd23d; --cyan:#42e2ff; --brass:#e0b25a; --pink:#ff5fc0; }
+* { box-sizing: border-box; margin: 0; }
+body { background: #333; font-family: 'Space Grotesk', sans-serif; color: var(--ink); padding: 20px; display: grid; gap: 20px; justify-content: start; }
+.card { width: 1200px; position: relative; overflow: hidden; border-radius: 28px; padding: 48px 56px;
+  background:
+    radial-gradient(900px 500px at 80% 30%, rgba(255,107,61,.13), transparent 60%),
+    radial-gradient(700px 400px at 10% 100%, rgba(66,226,255,.08), transparent 60%),
+    linear-gradient(160deg, #181b22, #101216);
+}
+.card::before { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+  background-size: 32px 32px; mask-image: radial-gradient(circle at 60% 40%, #000 30%, transparent 85%); }
+.kicker { font: 700 14px 'JetBrains Mono', monospace; letter-spacing: 3px; color: var(--orange); text-transform: uppercase; }
+h1 { font-size: 76px; line-height: .95; letter-spacing: -3px; font-weight: 700; margin: 18px 0 18px; }
+h1 em { font-style: normal; color: var(--orange); }
+h2 { font-size: 44px; letter-spacing: -1.5px; line-height: 1; margin: 10px 0 8px; }
+.sub { font-size: 22px; color: var(--dim); max-width: 520px; line-height: 1.35; }
+.chip { display: inline-block; font: 700 13px 'JetBrains Mono', monospace; letter-spacing: 2px; padding: 6px 12px; border-radius: 999px; border: 1.5px solid currentColor; }
+.note { font-family: 'Caveat', cursive; font-weight: 700; color: var(--yellow); }
+img { display: block; }
+.logo { position: absolute; right: 40px; bottom: 30px; font: 700 15px 'JetBrains Mono', monospace; color: #5b616c; letter-spacing: 2px; }
+.logo b { color: var(--orange); }
+
+/* banner */
+#banner { height: 560px; }
+#banner .guns { position: absolute; right: -40px; top: 40px; width: 760px; height: 500px; }
+#banner .guns img { position: absolute; filter: drop-shadow(0 30px 30px rgba(0,0,0,.45)); }
+#banner .g1 { width: 600px; right: 110px; top: 10px; opacity: .97; }
+#banner .g2 { width: 700px; right: 40px; top: 150px; }
+#banner .g3 { width: 600px; right: 130px; top: 320px; }
+#banner .stamp { position: absolute; left: 56px; bottom: 48px; display: flex; gap: 10px; }
+#banner .scribble { position: absolute; left: 58px; top: 405px; transform: rotate(-3deg); font-size: 28px; }
+
+/* worlds */
+.world { display: grid; grid-template-columns: 330px 1fr; align-items: center; gap: 20px; padding: 18px 0; border-top: 1px dashed rgba(255,255,255,.1); position: relative; }
+.world:first-of-type { border-top: 0; }
+.world p { color: var(--dim); font-size: 18px; line-height: 1.4; }
+.world img { width: 780px; justify-self: center; filter: drop-shadow(0 18px 22px rgba(0,0,0,.5)); }
+
+/* grids */
+.grid { display: grid; gap: 6px 26px; margin-top: 26px; }
+.grid img { width: 100%; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.colhead { margin-bottom: 4px; }
+.cell { position: relative; padding: 10px 6px; }
+.cell .label { position: absolute; left: 6px; top: 2px; font: 700 13px 'JetBrains Mono', monospace; color: var(--dim); letter-spacing: 1px; }
+
+/* exploded */
+#exploded .stage { position: relative; width: 1088px; margin-top: 30px; }
+#exploded .stage img { width: 100%; filter: drop-shadow(0 16px 18px rgba(0,0,0,.5)); }
+.tag { position: absolute; font-family: 'Caveat', cursive; font-weight: 700; font-size: 30px; color: var(--yellow); white-space: nowrap; transform: rotate(-3deg); }
+.tag::before { content: '↙ '; }
+.tag.r::before { content: ''; } .tag.r::after { content: ' ↘'; }
+.tag.d::before { content: '↖ '; }
+.tag.n::before { content: ''; }
+
+/* stats */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 30px; }
+.stat { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 20px; padding: 22px 24px; }
+.stat .n { font-size: 54px; font-weight: 700; letter-spacing: -2px; color: var(--ink); }
+.stat .n small { font-size: 26px; color: var(--dim); letter-spacing: 0; }
+.stat .t { color: var(--dim); font-size: 17px; line-height: 1.35; margin-top: 4px; }
+.stat.hot { border-color: rgba(255,107,61,.5); background: rgba(255,107,61,.08); }
+.stat.hot .n { color: var(--orange); }
+
+.fam { display: grid; grid-template-columns: 140px repeat(3, 1fr); gap: 4px 18px; align-items: center; margin-top: 26px; }
+.fam .rowlab { font: 700 15px 'JetBrains Mono', monospace; letter-spacing: 2px; color: var(--dim); text-transform: uppercase; }
+.fam img { width: 100%; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.fam .cell { height: 128px; display: flex; align-items: center; justify-content: center; }
+.fam .cell img { max-height: 120px; width: auto; max-width: 100%; }
+.trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 30px; align-items: end; }
+.trio .item img { width: 100%; filter: drop-shadow(0 14px 16px rgba(0,0,0,.5)); }
+.trio .item h3 { font-size: 26px; margin: 14px 0 4px; letter-spacing: -.5px; }
+.trio .item p { color: var(--dim); font-size: 16px; line-height: 1.4; }
+.xb { display: grid; gap: 4px; margin-top: 20px; }
+.xb .row { display: grid; grid-template-columns: 300px 1fr; gap: 20px; align-items: center; }
+.xb .row img { width: 100%; filter: drop-shadow(0 16px 18px rgba(0,0,0,.5)); }
+.xb .row p { color: var(--dim); font-size: 17px; line-height: 1.4; }
+.xb .row h3 { font-size: 28px; margin: 10px 0 6px; }
+.cat { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 30px; margin-top: 26px; }
+.cat .c { position: relative; padding-top: 34px; }
+.cat .c img { width: 100%; filter: drop-shadow(0 12px 14px rgba(0,0,0,.5)); }
+.cat .c .note { position: absolute; left: 4px; top: 0; font-size: 28px; transform: rotate(-2deg); }
+#banner2 { height: 560px; }
+#banner2 .g { position: absolute; filter: drop-shadow(0 26px 26px rgba(0,0,0,.5)); }
+
+.ba { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 26px; }
+.ba .col h3 { font: 700 15px 'JetBrains Mono', monospace; letter-spacing: 3px; margin: 0 0 6px; }
+.ba .col .sub2 { color: var(--dim); font-size: 17px; margin-bottom: 10px; }
+.ba .col img { width: 100%; display: block; margin: 4px 0; filter: drop-shadow(0 8px 10px rgba(0,0,0,.5)); }
+.ba .before { opacity: .92; }
+.bows { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 24px; align-items: start; }
+.bows .b { text-align: center; }
+.bows .b img { height: 520px; width: 100%; object-fit: contain; filter: drop-shadow(0 14px 14px rgba(0,0,0,.5)); }
+.bows .b h3 { font-size: 22px; margin: 10px 0 2px; }
+.bows .b p { color: var(--dim); font-size: 14px; margin: 0; line-height: 1.35; }
+.quad { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 30px; margin-top: 24px; }
+.quad .c { position: relative; padding-top: 36px; }
+.quad .c img { width: 100%; filter: drop-shadow(0 12px 14px rgba(0,0,0,.5)); }
+.quad .c .note { position: absolute; left: 4px; top: 0; font-size: 28px; transform: rotate(-2deg); }
+#banner3 { height: 560px; }
+#banner3 .g { position: absolute; filter: drop-shadow(0 26px 26px rgba(0,0,0,.5)); }
+
+.fam8 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px 22px; margin-top: 24px; align-items: center; }
+.fam8 .c { text-align: center; }
+.fam8 .c img { width: 100%; max-height: 150px; object-fit: contain; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.fam8 .c span { font: 700 13px 'JetBrains Mono', monospace; letter-spacing: 2px; color: var(--dim); }
+.pals { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 30px; margin-top: 24px; }
+.pals .c img { width: 100%; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.pals .c span { font: 700 14px 'JetBrains Mono', monospace; letter-spacing: 2px; }
+.heroes { display: grid; grid-template-columns: 1.6fr 1fr 0.55fr; gap: 20px; align-items: center; margin-top: 20px; }
+.heroes img { width: 100%; filter: drop-shadow(0 16px 18px rgba(0,0,0,.5)); }
+.heroes .note { font-size: 26px; display: block; margin-bottom: 6px; transform: rotate(-2deg); }
+#banner4 { height: 560px; }
+#banner4 .g { position: absolute; filter: drop-shadow(0 26px 26px rgba(0,0,0,.5)); }
+
+.eras { display: grid; grid-template-columns: 120px repeat(3, 1fr); gap: 4px 26px; margin-top: 24px; align-items: center; }
+.eras .rowlab { font: 700 15px 'JetBrains Mono', monospace; letter-spacing: 2px; color: var(--dim); }
+.eras .rowlab small { display: block; font-weight: 500; font-size: 11px; letter-spacing: 1px; margin-top: 2px; }
+.eras .cell { height: 120px; display: flex; align-items: center; justify-content: center; }
+.eras .cell img.pistol { max-height: 86px; }
+.eras .cell img { max-width: 100%; max-height: 112px; filter: drop-shadow(0 8px 10px rgba(0,0,0,.5)); }
+.eras .colhead { font: 700 12px 'JetBrains Mono', monospace; letter-spacing: 2px; color: #6b717c; text-align: center; }
+#banner5 { height: 560px; }
+#banner5 .g { position: absolute; filter: drop-shadow(0 26px 26px rgba(0,0,0,.5)); }
+.cat .c img.small { width: auto; max-height: 200px; margin-left: 60px; }
+
+.fgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px 26px; margin-top: 26px; }
+.fcard { background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.08); border-radius: 22px; padding: 16px 18px 14px; display: flex; flex-direction: column; }
+.fcard .top { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
+.fcard h3 { font-size: 21px; margin: 0; letter-spacing: -.4px; line-height: 1.15; }
+.fcard .meta { font: 600 11px 'JetBrains Mono', monospace; color: var(--dim); letter-spacing: 1px; text-transform: uppercase; margin-top: 3px; }
+.fcard .lineup { height: 330px; display: flex; align-items: center; justify-content: center; }
+.fcard .lineup img { max-width: 100%; max-height: 330px; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.fcard .doc { font: 500 12px 'JetBrains Mono', monospace; color: #9aa0aa; margin-top: 6px; line-height: 1.5; }
+.anat { display: grid; grid-template-columns: 1.15fr 1fr; gap: 30px; margin-top: 20px; align-items: center; }
+.anat img { width: 100%; filter: drop-shadow(0 14px 16px rgba(0,0,0,.5)); }
+.anat ol { margin: 0; padding-left: 22px; font-size: 19px; line-height: 1.45; color: #d9d6cf; }
+.anat ol li { margin: 0 0 12px; }
+.anat ol b { color: #fff; }
+.swatch { display: inline-block; width: 16px; height: 16px; border-radius: 4px; vertical-align: -2px; margin-right: 4px; }
+.badges { display: flex; gap: 16px; margin-top: 8px; }
+#banner6 { height: 560px; }
+#banner6 .g { position: absolute; filter: drop-shadow(0 22px 22px rgba(0,0,0,.5)); }
+
+#banner11 { height: 560px; }
+#banner11 .g { position: absolute; filter: drop-shadow(0 22px 22px rgba(0,0,0,.5)); }
+.grid11 { display: grid; gap: 10px 16px; margin-top: 22px; }
+.grid11 .c { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07); border-radius: 14px; padding: 8px 10px 10px; display: flex; flex-direction: column; }
+.grid11 .c .img { flex: 1; display: flex; align-items: center; justify-content: center; }
+.grid11 .c img { max-width: 100%; filter: drop-shadow(0 8px 10px rgba(0,0,0,.5)); }
+.grid11 .c span { font: 700 12px 'JetBrains Mono', monospace; color: var(--dim); letter-spacing: 1px; text-transform: uppercase; }
+.grid11 .c b { color: var(--yellow); font-weight: 700; }
+</style></head><body>
+<section class="card" id="banner11">
+  <div class="kicker">Bad Ideas Works · Devlog #011</div>
+  <h1>The <em>Big</em><br>Expansion.</h1>
+  <p class="sub" style="max-width:430px">Revolvers, rocket launchers, harpoons, tasers, a nail gun, and a lot of new bodies.</p>
+  <img class="g" src="renders/c_l_megacannon.png" style="width:640px; right:30px; top:40px;">
+  <img class="g" src="renders/c_r_pepperbox.png" style="width:240px; right:500px; top:335px;">
+  <img class="g" src="renders/c_p_nailgun.png" style="width:190px; right:300px; top:320px;">
+  <img class="g" src="renders/c_l_harpoon.png" style="width:330px; right:-20px; top:330px;">
+  <div style="position:absolute; left:56px; bottom:48px; display:flex; gap:10px;">
+    <span class="chip" style="color:var(--yellow)">2 NEW WEAPON TYPES</span><span class="chip" style="color:var(--orange)">253 PARTS</span>
+  </div>
+</section>
+<section class="card" id="rev11">
+  <div class="kicker">New weapon type #1</div>
+  <h2>Revolvers.</h2>
+  <p class="sub" style="max-width:940px">12 frames, 5 cylinders, 8 barrels, 5 grips, 4 hammers. Cylinders swing out or the whole gun breaks open to reload.</p>
+  <div class="grid11" style="grid-template-columns:repeat(4,1fr)"><div class="c" style="height:200px"><span>classic <b>steampunk</b></span><div class="img"><img src="renders/c_r_classic.png" style="max-height:150px"></div></div><div class="c" style="height:200px"><span>service <b>modern</b></span><div class="img"><img src="renders/c_r_service.png" style="max-height:150px"></div></div><div class="c" style="height:200px"><span>magnum <b>modern</b></span><div class="img"><img src="renders/c_r_magnum.png" style="max-height:150px"></div></div><div class="c" style="height:200px"><span>snub <b>vietnam</b></span><div class="img"><img src="renders/c_r_snub.png" style="max-height:150px"></div></div><div class="c" style="height:200px"><span>top-break <b>ww1</b></span><div class="img"><img src="renders/c_r_topbreak.png" style="max-height:150px"></div></div><div class="c" style="height:200px"><span>pepperbox <b>steampunk</b></span><div class="img"><img src="renders/c_r_pepperbox.png" style="max-height:150px"></div></div><div class="c" style="height:200px"><span>heavy <b>sci-fi</b></span><div class="img"><img src="renders/c_r_heavy.png" style="max-height:150px"></div></div><div class="c" style="height:200px"><span>coil <b>sci-fi</b></span><div class="img"><img src="renders/c_r_coil.png" style="max-height:150px"></div></div><div class="c" style="height:200px"><span>junk <b>survivor</b></span><div class="img"><img src="renders/c_r_junk.png" style="max-height:150px"></div></div><div class="c" style="height:200px"><span>ornate <b>fantasy</b></span><div class="img"><img src="renders/c_r_ornate.png" style="max-height:150px"></div></div><div class="c" style="height:200px"><span>deco <b>diesel</b></span><div class="img"><img src="renders/c_r_deco.png" style="max-height:150px"></div></div><div class="c" style="height:200px"><span>smart <b>cyber</b></span><div class="img"><img src="renders/c_r_smart.png" style="max-height:150px"></div></div><div class="c" style="height:200px"><span>reload: <b>swing-out</b></span><div class="img"><img src="renders/c_r_crane.png" style="max-height:150px"></div></div><div class="c" style="height:200px"><span>reload: <b>break open</b></span><div class="img"><img src="renders/c_r_tb.png" style="max-height:150px"></div></div></div>
+</section>
+<section class="card" id="lau11">
+  <div class="kicker">New weapon type #2</div>
+  <h2>Rocket launchers.</h2>
+  <p class="sub" style="max-width:940px">13 tubes and 8 projectiles: rockets, missiles, a harpoon, a glowing orb and one firework.</p>
+  <div class="grid11" style="grid-template-columns:repeat(4,1fr)"><div class="c" style="height:200px"><span>bazooka <b>ww2</b></span><div class="img"><img src="renders/c_l_bazooka.png" style="max-height:150px"></div></div><div class="c" style="height:200px"><span>front-loaded <b>vietnam</b></span><div class="img"><img src="renders/c_l_rpg.png" style="max-height:150px"></div></div><div class="c" style="height:200px"><span>disposable <b>modern</b></span><div class="img"><img src="renders/c_l_disposable.png" style="max-height:150px"></div></div><div class="c" style="height:200px"><span>recoilless <b>modern</b></span><div class="img"><img src="renders/c_l_recoilless.png" style="max-height:150px"></div></div><div class="c" style="height:200px"><span>multi-tube <b>modern</b></span><div class="img"><img src="renders/c_l_multi.png" style="max-height:150px"></div></div><div class="c" style="height:200px"><span>energy <b>sci-fi</b></span><div class="img"><img src="renders/c_l_energy.png" style="max-height:150px"></div></div><div class="c" style="height:200px"><span>pipe <b>survivor</b></span><div class="img"><img src="renders/c_l_pipe.png" style="max-height:150px"></div></div><div class="c" style="height:200px"><span>brass <b>steampunk</b></span><div class="img"><img src="renders/c_l_brass.png" style="max-height:150px"></div></div><div class="c" style="height:200px"><span>arcane <b>fantasy</b></span><div class="img"><img src="renders/c_l_arcane.png" style="max-height:150px"></div></div><div class="c" style="height:200px"><span>deco <b>diesel</b></span><div class="img"><img src="renders/c_l_deco.png" style="max-height:150px"></div></div><div class="c" style="height:200px"><span>smart <b>cyber</b></span><div class="img"><img src="renders/c_l_smart.png" style="max-height:150px"></div></div><div class="c" style="height:200px"><span>harpoon <b>survivor</b></span><div class="img"><img src="renders/c_l_harpoon.png" style="max-height:150px"></div></div><div class="c" style="height:200px"><span>megacannon <b>sci-fi</b></span><div class="img"><img src="renders/c_l_megacannon.png" style="max-height:150px"></div></div><div class="c" style="height:200px"><span>fire! <b>recoilless</b></span><div class="img"><img src="renders/c_l_fire.png" style="max-height:150px"></div></div></div>
+</section>
+<section class="card" id="pis11">
+  <div class="kicker">More bodies</div>
+  <h2>15 new pistols.</h2>
+  <div class="grid11" style="grid-template-columns:repeat(5,1fr)"><div class="c" style="height:170px"><span>compact</span><div class="img"><img src="renders/c_p_compact.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>long slide</span><div class="img"><img src="renders/c_p_longslide.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>polymer</span><div class="img"><img src="renders/c_p_polymer.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>magnum</span><div class="img"><img src="renders/c_p_magnum.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>machine pistol</span><div class="img"><img src="renders/c_p_machine.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>bullpup</span><div class="img"><img src="renders/c_p_bullpup.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>holdout</span><div class="img"><img src="renders/c_p_holdout.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>taser</span><div class="img"><img src="renders/c_p_taser.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>coil gun</span><div class="img"><img src="renders/c_p_coil.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>needler</span><div class="img"><img src="renders/c_p_needler.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>derringer</span><div class="img"><img src="renders/c_p_derringer.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>wand</span><div class="img"><img src="renders/c_p_wand.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>service</span><div class="img"><img src="renders/c_p_service.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>rocket gyro</span><div class="img"><img src="renders/c_p_gyro.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>nail gun</span><div class="img"><img src="renders/c_p_nailgun.png" style="max-height:120px"></div></div></div>
+</section>
+<section class="card" id="bod11">
+  <div class="kicker">More bodies</div>
+  <h2>10 new long guns, 3 new crossbows.</h2>
+  <div class="grid11" style="grid-template-columns:repeat(4,1fr)"><div class="c" style="height:170px"><span>battle rifle</span><div class="img"><img src="renders/c_g_battle.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>skeletal</span><div class="img"><img src="renders/c_g_skeletal.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>welded box SMG</span><div class="img"><img src="renders/c_g_boxy.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>capsule</span><div class="img"><img src="renders/c_g_capsule.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>MG brick</span><div class="img"><img src="renders/c_g_brick.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>hunter</span><div class="img"><img src="renders/c_g_hunter.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>revolving rifle</span><div class="img"><img src="renders/c_g_drum.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>carved wood</span><div class="img"><img src="renders/c_g_carved.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>industrial</span><div class="img"><img src="renders/c_g_industrial.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>organic</span><div class="img"><img src="renders/c_g_organic.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>pistol crossbow</span><div class="img"><img src="renders/c_x_pistol.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>repeater crossbow</span><div class="img"><img src="renders/c_x_repeater.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>siege crossbow</span><div class="img"><img src="renders/c_x_heavy.png" style="max-height:120px"></div></div></div>
+</section>
+<section class="card" id="stats11">
+  <div class="kicker">By the numbers</div>
+  <h2>Devlog #011, in digits.</h2>
+  <div class="stats">
+    <div class="stat hot"><div class="n">10</div><div class="t">weapon types (it was 8 this morning)</div></div>
+    <div class="stat"><div class="n">253</div><div class="t">different parts on the shelf</div></div>
+    <div class="stat"><div class="n">5,600</div><div class="t">test weapons built and checked on every change</div></div>
+    <div class="stat"><div class="n">4</div><div class="t">robot helpers building at the same time</div></div>
+    <div class="stat"><div class="n">1</div><div class="t">harpoon. The rope doesn't follow the spear yet. We're working on it.</div></div>
+    <div class="stat hot"><div class="n">0</div><div class="t">bee launchers. A rocket launcher is not a bee launcher either.</div></div>
+  </div>
+  <div class="logo">BAD IDEAS <b>WORKS</b></div>
+</section>
+</body></html>

@@ -78,5 +78,13 @@
     "date": "2026-11-24",
     "summary": "Scopes, silencers, grips, grenade launchers, lights and lasers, as separate pieces that snap onto any gun. Plus a whole kit for every world.",
     "cover": "assets/010/banner.webp"
+  },
+  {
+    "slug": "011-the-big-expansion",
+    "number": "011",
+    "title": "The Big Expansion",
+    "date": "2026-11-24",
+    "summary": "Revolvers and rocket launchers join the factory, plus harpoons, tasers, a nail gun, a megacannon and dozens of new bodies, built by four robot helpers at once.",
+    "cover": "assets/011/banner.webp"
   }
 ]
