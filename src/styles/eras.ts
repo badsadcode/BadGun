@@ -32,7 +32,7 @@ export const ww1: StyleProfile = {
   ],
   params: { ...params, length: [0.65, 1.0] },
   parts: {
-    receiver: { boltaction: 3, cylindrical: 0.2, tubular: 0.2 },
+    receiver: { boltaction: 3, cylindrical: 0.2, tubular: 0.2, drum: 0.3, hunter: 0.3 },
     barrel: { plain: 1, heavy: 0.3, banded: 0.2 },
     muzzle: { none: 2, crown: 0.6 },
     handguard: { forend: 1, jacket: 0.4, slim: 0.3 },
@@ -57,7 +57,7 @@ export const ww2: StyleProfile = {
   ],
   params,
   parts: {
-    receiver: { boltaction: 1.4, tubular: 1, stamped: 0.6, cylindrical: 0.2 },
+    receiver: { boltaction: 1.4, tubular: 1, stamped: 0.6, cylindrical: 0.2, boxy: 0.5, battle: 0.25, brick: 0.25 },
     barrel: { plain: 1, finned: 0.6, heavy: 0.4 },
     muzzle: { none: 1, crown: 0.5, compensator: 0.4, flash: 0.3 },
     handguard: { forend: 0.6, jacket: 0.6, slim: 0.6 },
@@ -81,7 +81,7 @@ export const vietnam: StyleProfile = {
   ],
   params: { ...params, wear: [0.25, 0.7] },
   parts: {
-    receiver: { angular: 1, stamped: 1, boltaction: 0.2 },
+    receiver: { angular: 1, stamped: 1, boltaction: 0.2, battle: 0.7, boxy: 0.25 },
     barrel: { plain: 1, heavy: 0.3 },
     muzzle: { flash: 1.2, brake: 0.4, none: 0.2 },
     handguard: { triangle: 1.2, forend: 0.6, slim: 0.6 },

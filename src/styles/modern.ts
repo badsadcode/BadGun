@@ -62,7 +62,7 @@ export const modern: StyleProfile = {
     wear: [0.0, 0.35],
   },
   parts: {
-    receiver: { angular: 1, stamped: 0.6, plated: 0.2 },
+    receiver: { angular: 1, stamped: 0.6, plated: 0.2, battle: 0.5, skeletal: 0.35, boxy: 0.2, hunter: 0.2, brick: 0.15 },
     barrel: { plain: 1, heavy: 0.6, fluted: 0.6, bull: 0.3, finned: 0.15 },
     muzzle: { brake: 1, flash: 1, compensator: 0.6, suppressor: 0.5 },
     handguard: { railed: 1, quad: 0.6, slim: 0.5 },

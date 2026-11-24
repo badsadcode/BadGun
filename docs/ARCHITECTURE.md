@@ -30,7 +30,7 @@ Recipe ──► resolveParams / resolveParts ──► layout ──► part bu
 | `src/archetypes/longgun.ts` | Rifle, SMG, shotgun, sniper, LMG: one assembly line + per-archetype proportion presets and part rules |
 | `src/archetypes/pistol.ts`, `crossbow.ts`, `bow.ts` | Handguns, crossbows and bows (bows stand upright in the YZ plane) |
 | `src/archetypes/index.ts` | Archetype registry and root component names (`Receiver`, `Frame`, `Tiller`) |
-| `src/parts/*.ts` | Part builders, keyed by variant name: `receiver.ts`, `front.ts` (barrel/handguard/muzzle), `lower.ts` (grip/magazine), `stock.ts`, `sight.ts`, `extra.ts` and `variety.ts` (later long-gun variants: doubles, bullpup butt, pan magazine…), `scrap.ts` (survivor/makeshift parts), `accessory.ts` (bipod, bolt handle…), `pistol.ts`, `crossbow.ts`, `bow.ts` |
+| `src/parts/*.ts` | Part builders, keyed by variant name: `receiver.ts`, `front.ts` (barrel/handguard/muzzle), `lower.ts` (grip/magazine), `stock.ts`, `sight.ts`, `extra.ts` and `variety.ts` (later long-gun variants: doubles, bullpup butt, pan magazine…), `receiver2.ts` and `tiller2.ts` (more long-gun bodies and crossbow tillers), `scrap.ts` (survivor/makeshift parts), `accessory.ts` (bipod, bolt handle…), `pistol.ts`, `crossbow.ts`, `bow.ts` |
 | `src/materials/palette.ts` | Color utils, wear, overrides |
 | `src/export/glb.ts` | Dependency-free GLB writer |
 | `src/export/manifest.ts` | Manifest (recipe, parts, sockets, bounds, stats, conventions, UV info) |

@@ -67,7 +67,7 @@ export const cyber: StyleProfile = {
     wear: [0.05, 0.4],
   },
   parts: {
-    receiver: { chassis: 1.2, street: 1, plated: 0.5, angular: 0.3 },
+    receiver: { chassis: 1.2, street: 1, plated: 0.5, angular: 0.3, industrial: 0.5, skeletal: 0.5, capsule: 0.3 },
     barrel: { shrouded: 0.8, fluted: 0.8, rails: 0.5, bull: 0.4 },
     muzzle: { smart: 1.2, suppressor: 0.6, compensator: 0.6, brake: 0.3 },
     handguard: { cabled: 1.2, quad: 0.6, slim: 0.5, shell: 0.3 },
@@ -83,7 +83,7 @@ export const cyber: StyleProfile = {
       muzzle: { none: 2, smart: 1, compensator: 0.6, suppressor: 0.5 },
     },
     crossbow: {
-      tiller: { rail: 1.5, sleek: 1 },
+      tiller: { rail: 1.5, sleek: 1, pistol: 0.6, repeater: 0.25 },
       prod: { compound: 1.5, energy: 1 },
       stock: { blade: 1.5, collapsible: 0.6, skeletal: 0.5 },
       grip: { neon: 1.5, ergo: 0.6 },

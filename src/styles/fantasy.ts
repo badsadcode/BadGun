@@ -77,7 +77,7 @@ export const fantasy: StyleProfile = {
     wear: [0.0, 0.3],
   },
   parts: {
-    receiver: { arcane: 1, runic: 0.8, cylindrical: 0.15 },
+    receiver: { arcane: 1, runic: 0.8, cylindrical: 0.15, carved: 0.8, organic: 0.5, drum: 0.3 },
     barrel: { rune: 1, spiral: 0.8, banded: 0.3, double: 0.15 },
     muzzle: { crystal: 1, maw: 0.7, bell: 0.3, crown: 0.3 },
     handguard: { filigree: 1, forend: 0.4, cage: 0.2 },
