@@ -60,11 +60,12 @@ const SOCKETS = {
   revolver: ['SOCKET_Magazine', 'SOCKET_Eject'],
   crossbow: ['SOCKET_Nock', 'SOCKET_Shoulder'],
   bow: ['SOCKET_Hand_Draw', 'SOCKET_Nock'],
+  launcher: ['SOCKET_Magazine', 'SOCKET_Shoulder', 'SOCKET_Backblast'],
 };
-const family = (a) => (['pistol', 'revolver', 'crossbow', 'bow'].includes(a) ? a : 'longgun');
+const family = (a) => (['pistol', 'revolver', 'crossbow', 'bow', 'launcher'].includes(a) ? a : 'longgun');
 const required = (a) => (a === 'bow' ? ['SOCKET_Muzzle', 'SOCKET_Hand_Grip', 'SOCKET_ADS', ...SOCKETS.bow] : [...SOCKETS.common, ...SOCKETS[family(a)]]);
 /** Overall length range (meters) per archetype. */
-const LENGTH = { rifle: [0.6, 1.5], smg: [0.4, 1.1], shotgun: [0.45, 1.6], sniper: [0.8, 1.8], lmg: [0.8, 1.7], pistol: [0.15, 0.6], revolver: [0.12, 0.5], crossbow: [0.6, 1.3], bow: [0.7, 2.0] };
+const LENGTH = { rifle: [0.6, 1.5], smg: [0.4, 1.1], shotgun: [0.45, 1.6], sniper: [0.8, 1.8], lmg: [0.8, 1.7], pistol: [0.15, 0.6], revolver: [0.12, 0.5], crossbow: [0.6, 1.3], bow: [0.7, 2.0], launcher: [0.6, 1.9] };
 /** Bows stand upright, so their size is their height; everything else is measured along the barrel. */
 const size = (a, m) => (a === 'bow' ? m.bounds.size[1] : m.bounds.size[2]);
 
@@ -79,6 +80,7 @@ test('every weapon type has its sockets and moving parts', () => {
       if (family(archetype) === 'longgun') assert.ok(movers.some((m) => /reload|pump|cycle/.test(m)), `${archetype}/${style}: ${movers}`);
       if (archetype === 'bow') assert.ok(component(w, 'String').motion.purpose.startsWith('draw') && component(w, 'Arrow'), 'bow string + arrow');
       if (archetype === 'crossbow') assert.ok(component(w, 'String') && component(w, 'Bolt'), 'crossbow string + bolt');
+      if (archetype === 'launcher') assert.ok(component(w, 'Rocket')?.motion.purpose.startsWith('fire'), 'launcher rocket');
     }
   }
 });
@@ -136,6 +138,9 @@ test('archetypes pick variants that fit them', () => {
       assert.ok(['scope', 'brass', 'rune'].includes(sn.parts.sight), `sniper sight ${sn.parts.sight}`);
       assert.ok(component(sn, 'BoltHandle'), 'sniper bolt handle');
       assert.ok(component(generate({ archetype: 'lmg', style, seed }), 'Bipod'), 'lmg bipod');
+      const ln = generate({ archetype: 'launcher', style, seed });
+      const own = { multi: 'slim', energy: 'plasma', megacannon: 'orb', harpoon: 'spear', arcane: 'crystal' }[ln.parts.tube];
+      if (own) assert.equal(ln.parts.rocket, own, `${ln.parts.tube} fires its own projectile`);
       for (const a of ['rifle', 'smg']) {
         const w = generate({ archetype: a, style, seed });
         assert.ok(!['ammobox'].includes(w.parts.magazine) && (w.parts.magazine !== 'tube' || w.parts.config === 'lever'), `${a}: ${w.parts.magazine}`);
