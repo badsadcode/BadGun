@@ -10,6 +10,7 @@ import type { Vec3 } from '../core/geometry.js';
 import type { BuildContext, LongGunLayout } from '../parts/context.js';
 import type { ArchetypeDef, Weights } from './archetype.js';
 import { PISTOL_FRAMES, PISTOL_GRIPS } from '../parts/pistol.js';
+import { NO_MUZZLE_FRAMES, PISTOL2_LAYOUT, PISTOL_FRAMES_2 } from '../parts/pistol2.js';
 import { MUZZLES } from '../parts/front.js';
 import { pipePistol, tapedPistolGrip } from '../parts/scrap.js';
 import { flintlock, scrollGrip } from '../parts/fantasy.js';
@@ -23,7 +24,7 @@ export const pistol: ArchetypeDef = {
   id: 'pistol',
   name: 'Pistol',
   description: 'Handguns: slide pistols, revolvers and blasters.',
-  parts: { frame: { ...PISTOL_FRAMES, deco: decoPistol, smartgun, pipe: pipePistol, flintlock, broomhandle, toggle }, grip: { ...PISTOL_GRIPS, taped: tapedPistolGrip, scroll: scrollGrip, broom: broomGrip }, muzzle: MUZZLES, underbarrel: PISTOL_UNDERBARREL_PARTS },
+  parts: { frame: { ...PISTOL_FRAMES, ...PISTOL_FRAMES_2, deco: decoPistol, smartgun, pipe: pipePistol, flintlock, broomhandle, toggle }, grip: { ...PISTOL_GRIPS, taped: tapedPistolGrip, scroll: scrollGrip, broom: broomGrip }, muzzle: MUZZLES, underbarrel: PISTOL_UNDERBARREL_PARTS },
   optics: ['none', 'reddot', 'holo', 'rune'],
 
   weights(style, kind): Weights | undefined {
@@ -32,12 +33,23 @@ export const pistol: ArchetypeDef = {
     const era = style.traits.era;
     if (era) {
       // Historical: period handguns only.
-      if (kind === 'frame') return { revolver: 1.2, broomhandle: era < 1950 ? 1.2 : 0, toggle: era < 1950 ? 1 : 0, slide: era > 1930 ? 1.6 : 0.6, flare: 0.15 };
+      if (kind === 'frame') return { revolver: 1, broomhandle: era < 1950 ? 1 : 0, toggle: era < 1950 ? 0.8 : 0, slide: era > 1930 ? 1.2 : 0.4, flare: 0.15, service: 1.2, derringer: era < 1930 ? 0.3 : 0, compact: era > 1960 ? 0.8 : 0, machine: era > 1960 ? 0.4 : 0 };
       if (kind === 'grip') return { block: era > 1950 ? 1 : 0.4, birdshead: 1, broom: era < 1950 ? 0.8 : 0 };
       if (kind === 'muzzle') return { none: 1 };
     }
     const scrap = !!style.traits.scrap, magic = !!style.traits.magic;
-    if (kind === 'frame') return { slide: t(rails, 3, 0.4), revolver: t(plumbing, 3, 0.4) + t(magic, 0.6, 0), blaster: t(glow, 3, 0.3), loop: t(glow, 2.5, 0) + t(rails, 0.2, 0), cannon: t(glow, 1, 0) + t(rails, 0.6, 0) + t(plumbing, 0.3, 0), flare: t(scrap, 1, 0) + t(rails, 0.25, 0) + t(plumbing, 0.3, 0.02), pipe: t(scrap, 3, 0.03), flintlock: t(magic, 3, 0) + t(plumbing, 0.8, 0.05) };
+    if (kind === 'frame') {
+      return {
+        slide: t(rails, 2.2, 0.3), revolver: t(plumbing, 2.4, 0.3) + t(magic, 0.5, 0), blaster: t(glow, 2.2, 0.2), loop: t(glow, 1.8, 0) + t(rails, 0.2, 0),
+        cannon: t(glow, 0.8, 0) + t(rails, 0.5, 0) + t(plumbing, 0.3, 0), flare: t(scrap, 0.8, 0) + t(rails, 0.2, 0) + t(plumbing, 0.3, 0.02), pipe: t(scrap, 2.4, 0.03),
+        flintlock: t(magic, 2.2, 0) + t(plumbing, 0.6, 0.05),
+        // Newer frames (pistol2.ts).
+        compact: t(rails, 1.2, 0), longslide: t(rails, 0.8, 0), polymer: t(rails, 1.4, 0), magnum: t(rails, 0.8, 0) + t(glow, 0.2, 0), machine: t(rails, 0.8, 0) + t(scrap, 0.2, 0),
+        bullpup: t(rails, 0.6, 0) + t(glow, 0.4, 0), holdout: t(glow, 0.3, 0) + t(rails, 0.3, 0), taser: t(rails, 0.3, 0) + t(glow, 0.4, 0),
+        coil: t(glow, 1.6, 0) + t(plumbing, 0.5, 0), needler: t(glow, 1.5, 0), derringer: t(plumbing, 1, 0) + t(magic, 0.5, 0), wand: t(magic, 1.6, 0),
+        service: t(rails, 0.25, 0) + t(scrap, 0.3, 0), gyro: t(plumbing, 0.7, 0), nailgun: t(scrap, 1.6, 0) + t(rails, 0.12, 0),
+      };
+    }
     if (kind === 'grip') return { block: t(rails, 3, 0.4), birdshead: t(plumbing, 3, 0.4), swept: t(glow, 3, 0.3), taped: t(scrap, 3, 0.05), scroll: t(magic, 3, 0.1) };
     if (kind === 'muzzle') {
       return {
@@ -63,21 +75,22 @@ export const pistol: ArchetypeDef = {
     const { bulk, length } = p;
     const frame = chosen.frame;
     const z0 = -0.09;
-    const len = frame === 'revolver' || frame === 'flintlock' || frame === 'cannon' || frame === 'broomhandle' ? 0.2 + length * 0.12 : frame === 'flare' ? 0.15 + length * 0.04 : 0.17 + length * 0.06;
+    const fl = PISTOL2_LAYOUT[frame];
+    const len = fl ? fl.len(length) : frame === 'revolver' || frame === 'flintlock' || frame === 'cannon' || frame === 'broomhandle' ? 0.2 + length * 0.12 : frame === 'flare' ? 0.15 + length * 0.04 : 0.17 + length * 0.06;
     const z1 = z0 + len + rng.range(-0.005, 0.01);
-    const top = 0.016 + bulk * 0.004;
+    const top = 0.016 + bulk * 0.004 + (fl?.top ?? 0);
     const bottom = -0.022 - bulk * 0.004;
     const gripDepth = (frame === 'revolver' ? 0.036 : 0.045) + bulk * 0.006;
-    const gz = z0 + (frame === 'broomhandle' ? 0.035 : frame === 'toggle' ? 0.05 : frame === 'revolver' || frame === 'cannon' ? 0.03 : frame === 'blaster' || frame === 'loop' || frame === 'deco' || frame === 'smartgun' ? 0.065 : frame === 'pipe' || frame === 'flare' ? 0.05 : 0.07);
+    const gz = z0 + (fl ? fl.grip : frame === 'broomhandle' ? 0.035 : frame === 'toggle' ? 0.05 : frame === 'revolver' || frame === 'cannon' ? 0.03 : frame === 'blaster' || frame === 'loop' || frame === 'deco' || frame === 'smartgun' ? 0.065 : frame === 'pipe' || frame === 'flare' ? 0.05 : 0.07);
     const gy = bottom + 0.002;
     return {
       rec: { z0, z1, top, bottom, width: 0.025 + bulk * 0.006 },
       magwell: { z0: gz - gripDepth, z1: gz, y: bottom, flare: false },
       magLength: 0.1,
       trigger: { z: gz + 0.022, y: bottom },
-      grip: { z: gz, y: gy, angle: (frame === 'revolver' ? 0.42 : 0.26) + rng.range(-0.05, 0.06), length: (frame === 'revolver' ? 0.085 : 0.095) + bulk * 0.014 },
+      grip: { z: gz, y: gy, angle: (fl?.angle ?? (frame === 'revolver' ? 0.42 : 0.26)) + rng.range(-0.05, 0.06), length: ((frame === 'revolver' ? 0.085 : 0.095) + bulk * 0.014) * (fl?.gripLen ?? 1) },
       handguard: { z0: gz + 0.055, z1: z1 - 0.004, radius: 0.014 },
-      barrel: { z0: z0 + 0.02, z1: frame === 'blaster' ? z1 + 0.03 + length * 0.02 : frame === 'revolver' || frame === 'flintlock' || frame === 'flare' || frame === 'broomhandle' || frame === 'toggle' ? z1 : frame === 'loop' ? z1 + 0.025 : frame === 'deco' ? z1 + 0.035 + length * 0.02 : frame === 'smartgun' ? z1 + 0.025 : frame === 'cannon' ? z1 + 0.012 : z1 + 0.003, radius: 0.0062 + bulk * 0.0015 },
+      barrel: { z0: z0 + 0.02, z1: fl ? z1 + fl.muzzle : frame === 'blaster' ? z1 + 0.03 + length * 0.02 : frame === 'revolver' || frame === 'flintlock' || frame === 'flare' || frame === 'broomhandle' || frame === 'toggle' ? z1 : frame === 'loop' ? z1 + 0.025 : frame === 'deco' ? z1 + 0.035 + length * 0.02 : frame === 'smartgun' ? z1 + 0.025 : frame === 'cannon' ? z1 + 0.012 : z1 + 0.003, radius: 0.0062 + bulk * 0.0015 },
       stock: { z0, z1: z0, drop: 0 },
       mountY: top,
       opticZ: z0 + 0.045,
@@ -117,6 +130,8 @@ export const pistol: ArchetypeDef = {
   // Lights and lasers need a rail-like frame (no revolvers, flintlocks or zip guns).
   fixup: (chosen, forced) => {
     if (!forced.has('underbarrel') && !PISTOL_RAIL_FRAMES.includes(chosen.frame)) chosen.underbarrel = 'none';
+    // Ported, emitter or tip-loaded noses carry no muzzle device.
+    if (!forced.has('muzzle') && NO_MUZZLE_FRAMES.includes(chosen.frame)) chosen.muzzle = 'none';
   },
   origin: (ctx) => ctx.b.sockets.find((s) => s.name === 'SOCKET_Hand_Grip')?.position ?? [0, 0, 0],
 };

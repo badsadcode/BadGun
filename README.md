@@ -244,7 +244,7 @@ A recipe is the whole description of a weapon. Save it, share it, batch it. A re
 | Archetype | Part kinds |
 |---|---|
 | rifle · smg · shotgun · sniper · lmg | 5 layouts · 16 receivers · 14 barrels (incl. doubles) · 16 handguards · 16 muzzles (incl. soda-can, bottle, crystal, exhaust stacks and smart brake) · 17 stocks (incl. one-piece, military and folding frame) · 12 grips (incl. loop and neon) · 18 magazines (incl. internal, stick, top-fed, crystal, orb, jerrycan and smart mag), plus attachments (4 underbarrel: grips, grenade launcher · 6 side rail: lights, lasers, lantern, crystal, taped flashlight) and accessories (bipod, bolt handle, carry handle, shell holder, lever, bayonet, heat shield) |
-| pistol | 12 frames (slide, revolver, blaster, pipe zip gun, flintlock, loop blaster, hand cannon, flare gun, broomhandle, toggle-lock, deco streamliner, smartgun) · 6 grips · muzzles · under-frame lights and lasers |
+| pistol | 27 frames (slide, revolver, blaster, pipe zip gun, flintlock, loop blaster, hand cannon, flare gun, broomhandle, toggle-lock, deco streamliner, smartgun, compact, long target slide, polymer striker, magnum, machine pistol, bullpup, holdout, taser, coil gun, needler, derringer, wand, service pistol, rocket gyro, nail gun) · 6 grips · muzzles · under-frame lights and lasers |
 | crossbow | 4 tillers · 5 prods (recurve, compound, energy, leaf spring, arcane) · stocks · grips; drawn string + loaded bolt |
 | bow | 6 bows (longbow, recurve, compound, energy, pipe, elven) · 6 arrows; string with draw motion |
 

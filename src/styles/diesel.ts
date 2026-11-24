@@ -76,7 +76,7 @@ export const diesel: StyleProfile = {
   },
   byArchetype: {
     pistol: {
-      frame: { deco: 2.5, revolver: 0.6, slide: 0.6, cannon: 0.6, flare: 0.3 },
+      frame: { deco: 2.2, gyro: 1.5, magnum: 0.8, revolver: 0.5, slide: 0.5, cannon: 0.5, service: 0.4, flare: 0.3, nailgun: 0.2 },
       grip: { block: 1, birdshead: 1, broom: 0.3 },
       muzzle: { none: 2, compensator: 0.5, exhaust: 0.6 },
     },
