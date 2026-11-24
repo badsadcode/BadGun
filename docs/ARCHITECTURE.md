@@ -37,6 +37,8 @@ Recipe ──► resolveParams / resolveParts ──► layout ──► part bu
 | `src/export/glb.ts` | Dependency-free GLB writer |
 | `src/export/manifest.ts` | Manifest (recipe, parts, sockets, bounds, stats, conventions, UV info) |
 | `src/parts/attach.ts`, `src/attachment.ts` | Attachments: underbarrel/side builders in their own mount frame, weapon mount points, style odds; standalone attachments and kits |
+| `src/parts/bayonets.ts`, `src/parts/mags2.ts` | Bayonets (part kind + attachment, built in a lug mount frame) and newer box magazines with their seeded look genes (`mag:<variant>-look`) |
+| `src/loadout.ts` | Suggested FPS stats per attachment (`attachmentStats`), weapon capacity and the manifest `loadout` section |
 | `src/anim/clips.ts` | Animation clips (Fire, Reload, Cycle…) built from component motion metadata; sampled into glTF animations by `glb.ts` |
 | `src/texture/atlas.ts` | Atlas UVs: charts from shared vertices, skyline packing into one square, uniform texel density |
 | `src/texture/bake.ts` | Rasterizer: base color, ID map and UV template images in atlas space |

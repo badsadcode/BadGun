@@ -9,6 +9,7 @@ import type { Weapon } from '../core/weapon.js';
 import { MATERIAL_SLOTS } from '../types.js';
 import { weaponAtlas } from '../texture/atlas.js';
 import { weaponClips } from '../anim/clips.js';
+import { weaponLoadout, type Loadout } from '../loadout.js';
 import type { MaterialDef, MaterialSlot } from '../types.js';
 
 export const GENERATOR = 'BadGun';
@@ -54,6 +55,10 @@ export interface Manifest {
   /** Animation clips in the .glb (by name), with event times for sounds and effects. */
   animations: { name: string; description: string; duration: number; events: Record<string, number>; parts: string[] }[];
   stats: { triangles: number; vertices: number; meshes: number; primitives: number; materials: number };
+  /** Weapons: rounds per reload and every attachment slot with suggested gameplay stats (see loadout.ts). */
+  loadout?: Loadout;
+  /** Standalone attachments: what it is, which weapon socket it snaps onto, suggested gameplay stats. */
+  attachment?: { type: string; variant: string; mountsOn: string; stats: Record<string, number | boolean | string>; note: string };
 }
 
 export function weaponName(w: Weapon): string {
@@ -127,6 +132,9 @@ export function buildManifest(w: Weapon, uvLayout: UvLayout = 'tiling'): Manifes
     uv: uvInfo(w, uvLayout),
     animations: weaponClips(w).map((c) => ({ name: c.name, description: c.description, duration: c.duration, events: c.events, parts: c.tracks.map((t) => t.component) })),
     stats: { triangles, vertices, meshes, primitives, materials: slots.length },
+    ...(w.attachment
+      ? { attachment: { type: w.attachment.type, variant: w.attachment.variant, mountsOn: w.attachment.mountsOn ?? 'SOCKET_Mount', stats: w.attachment.stats ?? {}, note: 'Snap SOCKET_Mount onto mountsOn (a pure translation). Stats are suggestions to tune.' } }
+      : { loadout: weaponLoadout(w) }),
   };
 }
 

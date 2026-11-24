@@ -19,13 +19,15 @@ import { STOCKS } from '../parts/stock.js';
 import { EXTRA_BARRELS, EXTRA_GRIPS, EXTRA_HANDGUARDS, EXTRA_MAGAZINES, EXTRA_RECEIVERS, EXTRA_STOCKS } from '../parts/extra.js';
 import { bipod, boltHandle, carryHandle, sideSaddle } from '../parts/accessory.js';
 import { PLATED_GRIPS, PLATED_RECEIVERS } from '../parts/plated.js';
-import { ERA_HANDGUARDS, ERA_MAGAZINES, ERA_RECEIVERS, ERA_STOCKS, bayonet, heatShield } from '../parts/era.js';
+import { ERA_HANDGUARDS, ERA_MAGAZINES, ERA_RECEIVERS, ERA_STOCKS, heatShield } from '../parts/era.js';
 import { OPTIC_NAMES, buildOptic } from '../parts/sight.js';
 import { VARIETY_BARRELS, VARIETY_GRIPS, VARIETY_HANDGUARDS, VARIETY_MAGAZINES, VARIETY_STOCKS } from '../parts/variety.js';
 import { FANTASY_BARRELS, FANTASY_GRIPS, FANTASY_HANDGUARDS, FANTASY_MAGAZINES, FANTASY_RECEIVERS, FANTASY_STOCKS } from '../parts/fantasy.js';
 import { CYBER_GRIPS, CYBER_HANDGUARDS, CYBER_MAGAZINES, CYBER_RECEIVERS, CYBER_STOCKS, DIESEL_HANDGUARDS, DIESEL_MAGAZINES, DIESEL_RECEIVERS, DIESEL_STOCKS } from '../parts/punk.js';
 import { SIDE_PARTS, UNDERBARREL_PARTS, attachmentWeights, longGunMounts } from '../parts/attach.js';
 import { RECEIVERS2 } from '../parts/receiver2.js';
+import { BAYONET_FAT_MUZZLES, BAYONET_MIN_BARE, BAYONET_PARTS, bayonetMount, bayonetWeights } from '../parts/bayonets.js';
+import { GRIP_MAGAZINES, MAGAZINES2 } from '../parts/mags2.js';
 import { SCRAP_BARRELS, SCRAP_GRIPS, SCRAP_HANDGUARDS, SCRAP_MAGAZINES, SCRAP_RECEIVERS, SCRAP_STOCKS } from '../parts/scrap.js';
 
 /** "config" is the overall layout: standard, or bullpup (magazine behind the grip). */
@@ -39,9 +41,10 @@ export const LONGGUN_PARTS: Record<string, Record<string, PartBuilder>> = {
   muzzle: MUZZLES,
   stock: { ...STOCKS, ...EXTRA_STOCKS, ...VARIETY_STOCKS, ...SCRAP_STOCKS, ...FANTASY_STOCKS, ...ERA_STOCKS, ...DIESEL_STOCKS, ...CYBER_STOCKS },
   grip: { ...GRIPS, ...EXTRA_GRIPS, ...SCRAP_GRIPS, ...FANTASY_GRIPS, ...VARIETY_GRIPS, ...PLATED_GRIPS, ...CYBER_GRIPS },
-  magazine: { ...MAGAZINES, ...EXTRA_MAGAZINES, ...VARIETY_MAGAZINES, ...SCRAP_MAGAZINES, ...FANTASY_MAGAZINES, ...ERA_MAGAZINES, ...DIESEL_MAGAZINES, ...CYBER_MAGAZINES },
+  magazine: { ...MAGAZINES, ...EXTRA_MAGAZINES, ...VARIETY_MAGAZINES, ...SCRAP_MAGAZINES, ...FANTASY_MAGAZINES, ...ERA_MAGAZINES, ...DIESEL_MAGAZINES, ...CYBER_MAGAZINES, ...MAGAZINES2 },
   underbarrel: UNDERBARREL_PARTS,
   side: SIDE_PARTS,
+  bayonet: BAYONET_PARTS,
 };
 
 /** Proportions per archetype. Values are meters; `L` = length param, `B` = bulk param. */
@@ -156,6 +159,8 @@ function longGunLayout(id: string, chosen: Record<string, string>, p: Params, rn
     hgLen *= 0.8;
     bare *= 0.25;
   }
+  // A bayonet needs bare barrel in front of the handguard for its handle.
+  if (chosen.bayonet && chosen.bayonet !== 'none') bare = Math.max(bare, BAYONET_MIN_BARE);
   const hg1 = hgStart + hgLen + rng.range(-0.01, 0.02);
   const barrelEnd = hg1 + bare + rng.range(0, 0.03);
   const rb = pr.barrelRadius(bulk) * rbK;
@@ -226,7 +231,7 @@ function longGunFixup(id: string, chosen: Record<string, string>, forced: Set<st
     set('magazine', 'internal');
   }
   if (chosen.config === 'machinepistol') {
-    if (chosen.magazine !== 'straight' && chosen.magazine !== 'stick') set('magazine', 'straight');
+    if (!GRIP_MAGAZINES.includes(chosen.magazine)) set('magazine', 'straight');
     if (!['wire', 'collapsible', 'none', 'skeletal', 'pipe', 'frame'].includes(chosen.stock)) set('stock', 'wire');
   }
   if (id === 'shotgun' && onePiece(chosen.stock)) set('stock', 'fixed');
@@ -247,6 +252,19 @@ function longGunFixup(id: string, chosen: Record<string, string>, forced: Set<st
   const bareFront = ['pump', 'bare', 'splinter'].includes(chosen.handguard) || chosen.barrel === 'double' || chosen.barrel === 'overunder';
   if (bareFront || id === 'lmg' || id === 'sniper') set('underbarrel', 'none');
   if (bareFront) set('side', 'none');
+  // A helical magazine lies along the bore where an underbarrel grip would go, and needs room in front of the grip.
+  if (chosen.magazine === 'helical') {
+    if (chosen.config === 'bullpup') set('magazine', 'straight');
+    else set('underbarrel', 'none');
+  }
+  // Bayonets: rifles and shotguns with a fixed barrel in front, and no fat can on the muzzle to fit under.
+  if (chosen.bayonet && chosen.bayonet !== 'none') {
+    if (!['rifle', 'shotgun'].includes(id) || breakAction || ['bullpup', 'lever', 'machinepistol'].includes(chosen.config)) set('bayonet', 'none');
+    else if (BAYONET_FAT_MUZZLES.includes(chosen.muzzle)) {
+      if (forced.has('bayonet')) set('muzzle', 'none');
+      else set('bayonet', 'none');
+    }
+  }
 }
 
 function buildLongGun(id: ArchetypeId, ctx: BuildContext, chosen: Record<string, string>): void {
@@ -271,11 +289,8 @@ function buildLongGun(id: ArchetypeId, ctx: BuildContext, chosen: Record<string,
     if (roll < 0.25 + ctx.p.detail * 0.6) sideSaddle(ctx);
   }
 
-  // Period details: fixed bayonets and trench-shotgun heat shields.
+  // Period details: trench-shotgun heat shields. (Bayonets are their own part kind.)
   const st = ctx.style.traits;
-  if (st.bayonet && ['rifle', 'shotgun'].includes(id) && chosen.config !== 'bullpup' && ctx.rng('bayonet').chance(st.bayonet)) {
-    bayonet(ctx, (st.era ?? 2000) < 1925 ? 0.32 : (st.era ?? 2000) < 1950 ? 0.22 : 0.17);
-  }
   if (id === 'shotgun' && chosen.handguard === 'pump' && (st.era ?? 2000) < 1975 && ctx.rng('heatshield').chance(0.5)) heatShield(ctx);
 
   // A grip attachment (underbarrel kind) is where the support hand goes.
@@ -297,6 +312,7 @@ function buildLongGun(id: ArchetypeId, ctx: BuildContext, chosen: Record<string,
   b.socket({ name: 'SOCKET_Underbarrel', parent: hgParent, position: mounts.underbarrel.at, forward: [0, 0, 1], description: 'Underbarrel attachment mount (grip, launcher). Attachments hang down from here.' });
   b.socket({ name: 'SOCKET_Side', parent: hgParent, position: mounts.side.at, forward: [0, 0, 1], description: 'Right-side rail mount (light, laser). Side attachments are built already turned to this side.' });
   b.socket({ name: 'SOCKET_Barrel_End', parent: b.has('Barrel') ? 'Barrel' : b.rootName, position: mounts.barrelEnd, forward: [0, 0, 1], description: 'Bare barrel tip: muzzle devices screw on here.' });
+  b.socket({ name: 'SOCKET_Bayonet', parent: b.has('Barrel') ? 'Barrel' : b.rootName, position: bayonetMount(ctx).at, forward: [0, 0, 1], description: 'Bayonet lug under the barrel: bayonets snap on here, blade toward +Z.' });
   b.socket({
     name: 'SOCKET_Magazine',
     parent: 'Receiver',
@@ -304,6 +320,11 @@ function buildLongGun(id: ArchetypeId, ctx: BuildContext, chosen: Record<string,
     forward: [0, -1, 0],
     description: id === 'shotgun' ? 'Loading port: shells go in here.' : 'Magazine well: magazine attaches here, pointing down.',
   });
+  // Top-fed magazines (pan, top) seat on top of the receiver instead.
+  const mag = b.has('Magazine') ? b.component('Magazine', { kind: '-', variant: '-' }) : null;
+  if (mag && ['pan', 'top'].includes(chosen.magazine)) {
+    b.socket({ name: 'SOCKET_Magazine_Top', parent: 'Receiver', position: [...mag.pivot], forward: [0, 1, 0], description: 'Top-fed magazine seat: pan and top magazines attach here, pointing up.' });
+  }
   b.socket({
     name: 'SOCKET_Eject',
     parent: 'Receiver',
@@ -363,6 +384,7 @@ function longGun(
         };
       }
       if (kind === 'underbarrel' || kind === 'side') return attachmentWeights(style, kind, id);
+      if (kind === 'bayonet') return bayonetWeights(style, id);
       const banned = [...(SPECIALISTS[kind] ?? []), ...(kind === 'receiver' && !['rifle', 'sniper'].includes(id) ? ['boltaction'] : [])];
       return tweak(style, kind, without(style.parts[kind], banned));
     },
@@ -417,7 +439,7 @@ export const sniper = longGun(
   'Bolt-action marksman rifles: long heavy barrel, scope, bipod.',
   (_s, kind, w) => {
     if (kind === 'receiver' && w?.hunter) return { ...w, hunter: w.hunter * 3 };
-    if (kind === 'magazine') return only(w, ['straight', 'cell', 'canister', 'crystal', 'internal'], { straight: 1 });
+    if (kind === 'magazine') return only(w, ['straight', 'cell', 'canister', 'crystal', 'internal', 'ribbed', 'windowed', 'pullloop'], { straight: 1 });
     if (kind === 'barrel') return { ...only(w, ['heavy', 'fluted', 'bull', 'banded', 'shrouded', 'rails'], { heavy: 1 }), fluted: 0.8 };
     if (kind === 'muzzle') return { ...(without(w, ['bell', 'flash', 'flute', 'oilcan']) ?? {}), suppressor: 0.6, heavybrake: _s.traits.rails ? 0.6 : 0.15, boxbrake: _s.traits.rails || _s.traits.diesel ? 0.4 : 0.1 };
     if (kind === 'stock') return { ...(without(w, ['wire', 'collapsible']) ?? {}), sporter: 1.4 };
@@ -435,7 +457,7 @@ export const lmg = longGun(
   'Light machine guns: heavy barrel, big magazine or ammo box, bipod.',
   (_s, kind, w) => {
     if (kind === 'receiver' && w?.brick) return { ...w, brick: w.brick * 4 };
-    if (kind === 'magazine') return { ...only(w, ['drum', 'canister', 'cell', 'can', 'orb', 'crystal'], {}), ammobox: 1, pan: 0.5, top: (_s.parts.magazine?.top ?? 0) * 2.5 };
+    if (kind === 'magazine') return { ...only(w, ['drum', 'canister', 'cell', 'can', 'orb', 'crystal', 'casket', 'helical', 'banana', 'coupled', 'extended'], {}), ammobox: 1, pan: 0.5, top: (_s.parts.magazine?.top ?? 0) * 2.5 };
     if (kind === 'handguard') return { ...w, jacket: (w?.jacket ?? 0) + 0.7 };
     if (kind === 'barrel') return { ...(without(w, ['fluted', 'double', 'overunder']) ?? {}), heavy: 1 };
     if (kind === 'stock') return without(w, ['wire', 'sporter', 'military']) ?? w;
