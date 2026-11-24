@@ -65,7 +65,7 @@ const SOCKETS = {
 const family = (a) => (['pistol', 'revolver', 'crossbow', 'bow', 'launcher'].includes(a) ? a : 'longgun');
 const required = (a) => (a === 'bow' ? ['SOCKET_Muzzle', 'SOCKET_Hand_Grip', 'SOCKET_ADS', ...SOCKETS.bow] : [...SOCKETS.common, ...SOCKETS[family(a)]]);
 /** Overall length range (meters) per archetype. */
-const LENGTH = { rifle: [0.6, 1.5], smg: [0.4, 1.1], shotgun: [0.45, 1.6], sniper: [0.8, 1.8], lmg: [0.8, 1.7], pistol: [0.15, 0.6], revolver: [0.12, 0.5], crossbow: [0.6, 1.3], bow: [0.7, 2.0], launcher: [0.6, 1.9] };
+const LENGTH = { rifle: [0.6, 1.5], smg: [0.4, 1.1], shotgun: [0.45, 1.6], sniper: [0.8, 1.8], lmg: [0.8, 1.7], pistol: [0.15, 0.6], revolver: [0.12, 0.5], crossbow: [0.45, 1.3], bow: [0.7, 2.0], launcher: [0.6, 1.9] };
 /** Bows stand upright, so their size is their height; everything else is measured along the barrel. */
 const size = (a, m) => (a === 'bow' ? m.bounds.size[1] : m.bounds.size[2]);
 

@@ -6,6 +6,7 @@ import { CYBER_GRIPS, CYBER_STOCKS, DIESEL_STOCKS } from '../parts/punk.js';
 import type { BuildContext, LongGunLayout } from '../parts/context.js';
 import type { ArchetypeDef, Weights } from './archetype.js';
 import { PRODS, TILLERS, stringAndBolt } from '../parts/crossbow.js';
+import { TILLERS2 } from '../parts/tiller2.js';
 import { STOCKS } from '../parts/stock.js';
 import { GRIPS } from '../parts/lower.js';
 import { EXTRA_GRIPS, EXTRA_STOCKS } from '../parts/extra.js';
@@ -20,7 +21,7 @@ export const crossbow: ArchetypeDef = {
   name: 'Crossbow',
   description: 'Crossbows: recurve, compound and energy prods on a tiller.',
   parts: {
-    tiller: { ...TILLERS, plank: plankTiller },
+    tiller: { ...TILLERS, plank: plankTiller, ...TILLERS2 },
     prod: PRODS,
     stock: { ...STOCKS, ...EXTRA_STOCKS, thumbhole: VARIETY_STOCKS.thumbhole, none: VARIETY_STOCKS.none, ...SCRAP_STOCKS, ...DIESEL_STOCKS, ...CYBER_STOCKS },
     grip: { ...GRIPS, ...EXTRA_GRIPS, ...SCRAP_GRIPS, ...CYBER_GRIPS },
@@ -30,7 +31,12 @@ export const crossbow: ArchetypeDef = {
   weights(style, kind): Weights | undefined {
     const { rails, plumbing, glow } = style.traits;
     const scrap = !!style.traits.scrap, magic = !!style.traits.magic;
-    if (kind === 'tiller') return { rail: t(rails, 3, 0.3), wood: t(plumbing, 3, 0.5) + t(magic, 3, 0), sleek: t(glow, 3, 0.3), plank: t(scrap, 4, 0.05) };
+    if (kind === 'tiller') {
+      return {
+        rail: t(rails, 3, 0.3), wood: t(plumbing, 3, 0.5) + t(magic, 3, 0), sleek: t(glow, 3, 0.3), plank: t(scrap, 4, 0.05),
+        pistol: t(rails || glow, 0.8, 0.3) + t(scrap, 0.5, 0), repeater: t(plumbing || magic, 1.2, 0.3) + t(scrap, 0.4, 0), heavy: t(magic || plumbing, 0.9, 0.15) + t(scrap, 0.8, 0),
+      };
+    }
     if (kind === 'prod') return { compound: t(rails, 3, 0.3), recurve: t(plumbing, 3, 1), energy: t(glow, 3, 0.2), leafspring: t(scrap, 4, 0.05), arcane: t(magic, 4, 0.05) };
     if (kind === 'stock') {
       const w = { ...style.parts.stock };
@@ -42,11 +48,19 @@ export const crossbow: ArchetypeDef = {
 
   opticWeights: (style) => ({ ...style.optics, none: 0.5 }),
 
-  layout(_chosen, p, rng): LongGunLayout {
+  // Pistol crossbows are one-handed (no stock); repeaters and siege beams carry no optic.
+  fixup(chosen, forced) {
+    if (chosen.tiller === 'pistol' && !forced.has('stock')) chosen.stock = 'none';
+    if ((chosen.tiller === 'repeater' || chosen.tiller === 'heavy') && !forced.has('sight')) chosen.sight = 'none';
+  },
+
+  layout(chosen, p, rng): LongGunLayout {
     const { bulk, length } = p;
     const z0 = -0.12, z1 = 0.02;
     const top = 0.026 + bulk * 0.006, bottom = -0.034 - bulk * 0.006;
-    const prodZ = z1 + 0.3 + length * 0.14 + rng.range(-0.01, 0.02);
+    // Pistol crossbows have a short rail and a small prod; siege beams a wide one.
+    const k = chosen.tiller === 'pistol' ? 0.7 : chosen.tiller === 'heavy' ? 1.12 : 1;
+    const prodZ = z1 + (0.3 + length * 0.14) * (chosen.tiller === 'pistol' ? 0.75 : 1) + rng.range(-0.01, 0.02);
     const trigZ = z0 + 0.07;
     return {
       rec: { z0, z1, top, bottom, width: 0.048 + bulk * 0.008 },
@@ -62,7 +76,7 @@ export const crossbow: ArchetypeDef = {
       extra: {
         prodZ,
         prodY: -0.012,
-        span: 0.27 + bulk * 0.05 + length * 0.05,
+        span: (0.27 + bulk * 0.05 + length * 0.05) * k,
         latchZ: trigZ + 0.006,
       },
     };

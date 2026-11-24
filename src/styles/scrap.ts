@@ -63,7 +63,7 @@ export const scrap: StyleProfile = {
     wear: [0.55, 1.0],
   },
   parts: {
-    receiver: { pipe: 1, welded: 1, stamped: 0.35 },
+    receiver: { pipe: 1, welded: 1, stamped: 0.35, boxy: 0.6, industrial: 0.25, skeletal: 0.2 },
     barrel: { pipe: 1, plain: 0.5, heavy: 0.2, double: 0.35 },
     muzzle: { none: 1, can: 0.8, bottle: 0.8, brake: 0.15 },
     handguard: { plank: 1, taped: 1, slim: 0.2 },

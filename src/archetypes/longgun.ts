@@ -25,6 +25,7 @@ import { VARIETY_BARRELS, VARIETY_GRIPS, VARIETY_HANDGUARDS, VARIETY_MAGAZINES, 
 import { FANTASY_BARRELS, FANTASY_GRIPS, FANTASY_HANDGUARDS, FANTASY_MAGAZINES, FANTASY_RECEIVERS, FANTASY_STOCKS } from '../parts/fantasy.js';
 import { CYBER_GRIPS, CYBER_HANDGUARDS, CYBER_MAGAZINES, CYBER_RECEIVERS, CYBER_STOCKS, DIESEL_HANDGUARDS, DIESEL_MAGAZINES, DIESEL_RECEIVERS, DIESEL_STOCKS } from '../parts/punk.js';
 import { SIDE_PARTS, UNDERBARREL_PARTS, attachmentWeights, longGunMounts } from '../parts/attach.js';
+import { RECEIVERS2 } from '../parts/receiver2.js';
 import { SCRAP_BARRELS, SCRAP_GRIPS, SCRAP_HANDGUARDS, SCRAP_MAGAZINES, SCRAP_RECEIVERS, SCRAP_STOCKS } from '../parts/scrap.js';
 
 /** "config" is the overall layout: standard, or bullpup (magazine behind the grip). */
@@ -32,7 +33,7 @@ const noop: PartBuilder = () => {};
 
 export const LONGGUN_PARTS: Record<string, Record<string, PartBuilder>> = {
   config: { standard: noop, bullpup: noop, lever: noop, machinepistol: noop, boxfed: noop },
-  receiver: { ...RECEIVERS, ...EXTRA_RECEIVERS, ...SCRAP_RECEIVERS, ...FANTASY_RECEIVERS, ...PLATED_RECEIVERS, ...ERA_RECEIVERS, ...DIESEL_RECEIVERS, ...CYBER_RECEIVERS },
+  receiver: { ...RECEIVERS, ...EXTRA_RECEIVERS, ...SCRAP_RECEIVERS, ...FANTASY_RECEIVERS, ...PLATED_RECEIVERS, ...ERA_RECEIVERS, ...DIESEL_RECEIVERS, ...CYBER_RECEIVERS, ...RECEIVERS2 },
   barrel: { ...BARRELS, ...EXTRA_BARRELS, ...VARIETY_BARRELS, ...SCRAP_BARRELS, ...FANTASY_BARRELS },
   handguard: { ...HANDGUARDS, ...EXTRA_HANDGUARDS, ...VARIETY_HANDGUARDS, ...SCRAP_HANDGUARDS, ...FANTASY_HANDGUARDS, ...ERA_HANDGUARDS, ...DIESEL_HANDGUARDS, ...CYBER_HANDGUARDS },
   muzzle: MUZZLES,
@@ -115,7 +116,7 @@ function longGunLayout(id: string, chosen: Record<string, string>, p: Params, rn
     top = (0.027 + bulk * 0.01) * k * hK;
     bottom = -top - 0.014;
     width = top * 2;
-  } else if (receiver === 'sleek' || receiver === 'faceted') {
+  } else if (['sleek', 'faceted', 'capsule', 'organic'].includes(receiver)) {
     top = (0.03 + bulk * 0.01) * k * hK;
     bottom = (-0.036 - bulk * 0.01) * k * hK;
     width = (0.052 + bulk * 0.012) * k;
@@ -218,6 +219,11 @@ function longGunFixup(id: string, chosen: Record<string, string>, forced: Set<st
   } else {
     if (chosen.magazine === 'none' || chosen.magazine === 'tube') set('magazine', 'straight');
     if (chosen.handguard === 'splinter' || chosen.handguard === 'pump') set('handguard', 'slim');
+  }
+  // Revolving rifles feed their cylinder by hand (a loading gate, no box magazine).
+  if (chosen.receiver === 'drum' && ['rifle', 'smg', 'sniper'].includes(id) && !breakAction) {
+    set('config', 'standard');
+    set('magazine', 'internal');
   }
   if (chosen.config === 'machinepistol') {
     if (chosen.magazine !== 'straight' && chosen.magazine !== 'stick') set('magazine', 'straight');
@@ -407,6 +413,7 @@ export const sniper = longGun(
   'Sniper',
   'Bolt-action marksman rifles: long heavy barrel, scope, bipod.',
   (_s, kind, w) => {
+    if (kind === 'receiver' && w?.hunter) return { ...w, hunter: w.hunter * 3 };
     if (kind === 'magazine') return only(w, ['straight', 'cell', 'canister', 'crystal', 'internal'], { straight: 1 });
     if (kind === 'barrel') return { ...only(w, ['heavy', 'fluted', 'bull', 'banded', 'shrouded', 'rails'], { heavy: 1 }), fluted: 0.8 };
     if (kind === 'muzzle') return { ...(without(w, ['bell', 'flash']) ?? {}), suppressor: 0.6, heavybrake: _s.traits.rails ? 0.6 : 0.15 };
@@ -421,6 +428,7 @@ export const lmg = longGun(
   'LMG',
   'Light machine guns: heavy barrel, big magazine or ammo box, bipod.',
   (_s, kind, w) => {
+    if (kind === 'receiver' && w?.brick) return { ...w, brick: w.brick * 4 };
     if (kind === 'magazine') return { ...only(w, ['drum', 'canister', 'cell', 'can', 'orb', 'crystal'], {}), ammobox: 1, pan: 0.5, top: (_s.parts.magazine?.top ?? 0) * 2.5 };
     if (kind === 'handguard') return { ...w, jacket: (w?.jacket ?? 0) + 0.7 };
     if (kind === 'barrel') return { ...(without(w, ['fluted', 'double', 'overunder']) ?? {}), heavy: 1 };

@@ -65,7 +65,7 @@ export const diesel: StyleProfile = {
     wear: [0.2, 0.6],
   },
   parts: {
-    receiver: { deco: 1.2, riveted: 1, stamped: 0.4, tubular: 0.3 },
+    receiver: { deco: 1.2, riveted: 1, stamped: 0.4, tubular: 0.3, industrial: 0.8, brick: 0.4, battle: 0.3 },
     barrel: { heavy: 1, finned: 0.7, plain: 0.5, banded: 0.3 },
     muzzle: { exhaust: 1.2, brake: 0.6, compensator: 0.4, crown: 0.3 },
     handguard: { radiator: 1.2, jacket: 0.8, slim: 0.3 },
@@ -81,7 +81,7 @@ export const diesel: StyleProfile = {
       muzzle: { none: 2, compensator: 0.5, exhaust: 0.6 },
     },
     crossbow: {
-      tiller: { rail: 1, wood: 1 },
+      tiller: { rail: 1, wood: 1, heavy: 0.5, repeater: 0.4 },
       prod: { leafspring: 1.5, recurve: 1, compound: 0.6 },
       stock: { deco: 1.5, fixed: 0.5, wire: 0.3 },
     },

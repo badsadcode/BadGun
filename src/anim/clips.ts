@@ -132,6 +132,8 @@ export function weaponClips(w: Weapon): Clip[] {
       ], { shot: 0.05 }),
       clip('Reload', 'Wind the string back and lay a new bolt on the rail (starts from the Fire end pose).', [
         crank ? { component: crank.name, keys: k([0.2, 0], [1.6, max(crank)]) } : null,
+        // Lever-drawn crossbows (pistol, repeater) work the lever out and back instead.
+        !crank && lever ? { component: lever.name, keys: k([0.2, 0], [0.9, max(lever)], [1.6, 0]) } : null,
         string ? { component: string.name, keys: k([0.2, max(string)], [1.6, 0]) } : null,
         // The old bolt is long gone; the new one slides in from behind the latch.
         crossBolt ? { component: crossBolt.name, keys: k([0, max(crossBolt)], [1.65, max(crossBolt)], [1.651, -0.15], [1.95, 0]) } : null,
