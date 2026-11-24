@@ -4,3 +4,6 @@ out/
 *.log
 .DS_Store
 site/
+
+# Temporary worktrees used by helper agents
+.claude/worktrees/
