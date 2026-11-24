@@ -90,6 +90,6 @@ export const diesel: StyleProfile = {
       arrow: { broadhead: 1, field: 1, wooden: 0.5 },
     },
   },
-  optics: { irons: 1, lamp: 0.6, scope: 0.6, leaf: 0.3 },
+  optics: { irons: 1, lamp: 0.6, scope: 0.6, leaf: 0.3, periscope: 0.5, nightvision: 0.15 },
   traits: { rivets: true, plumbing: false, glow: false, rails: false, roundness: 16, diesel: true },
 };

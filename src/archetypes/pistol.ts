@@ -25,7 +25,7 @@ export const pistol: ArchetypeDef = {
   name: 'Pistol',
   description: 'Handguns: slide pistols, revolvers and blasters.',
   parts: { frame: { ...PISTOL_FRAMES, ...PISTOL_FRAMES_2, deco: decoPistol, smartgun, pipe: pipePistol, flintlock, broomhandle, toggle }, grip: { ...PISTOL_GRIPS, taped: tapedPistolGrip, scroll: scrollGrip, broom: broomGrip }, muzzle: MUZZLES, underbarrel: PISTOL_UNDERBARREL_PARTS },
-  optics: ['none', 'reddot', 'holo', 'rune'],
+  optics: ['none', 'reddot', 'holo', 'rune', 'minidot', 'hud'],
 
   weights(style, kind): Weights | undefined {
     if (kind === 'underbarrel') return pistolAttachmentWeights(style);
@@ -74,7 +74,7 @@ export const pistol: ArchetypeDef = {
     return undefined;
   },
 
-  opticWeights: (style): Weights => style.traits.era ? { none: 1 } : ({ none: 3, reddot: t(style.traits.rails, 1, 0.2), holo: t(style.traits.glow, 0.4, 0), rune: t(!!style.traits.magic, 0.8, 0) }),
+  opticWeights: (style): Weights => style.traits.era ? { none: 1 } : ({ none: 3, reddot: t(style.traits.rails, 1, 0.2), holo: t(style.traits.glow, 0.4, 0), rune: t(!!style.traits.magic, 0.8, 0), minidot: t(style.traits.rails || style.traits.glow, 1.2, 0), hud: t(style.traits.glow, 0.3, 0) }),
 
   layout(chosen, p, rng): LongGunLayout {
     const { bulk, length } = p;

@@ -374,6 +374,9 @@ function longGun(
   };
 }
 
+/** Optics made for long shots: snipers get them, SMGs and shotguns don't. */
+const LONG_RANGE_OPTICS = ['longrange', 'digital', 'thermal', 'nightvision', 'offset', 'periscope'];
+
 const keep = (_s: StyleProfile, _k: string, w: Weights | undefined) => w;
 
 export const rifle = longGun('rifle', 'Rifle', 'Assault rifles and carbines.', keep, (s) => s.optics);
@@ -390,7 +393,7 @@ export const smg = longGun(
     if (kind === 'magazine') return without(w, ['pan']) ?? w;
     return w;
   },
-  (s) => without(s.optics, ['scope', 'brass']) ?? { irons: 1 },
+  (s) => without(s.optics, ['scope', 'brass', ...LONG_RANGE_OPTICS]) ?? { irons: 1 },
 );
 
 export const shotgun = longGun(
@@ -405,7 +408,7 @@ export const shotgun = longGun(
     if (kind === 'stock') return { ...(without(w, ['wire', 'sporter', 'military']) ?? {}), none: (w?.none ?? 0) + 0.15 };
     return w;
   },
-  (s) => ({ ...(without(s.optics, ['scope', 'brass']) ?? {}), none: 0.6, irons: 0.6 }),
+  (s) => ({ ...(without(s.optics, ['scope', 'brass', ...LONG_RANGE_OPTICS]) ?? {}), none: 0.6, irons: 0.6 }),
 );
 
 export const sniper = longGun(
@@ -420,7 +423,10 @@ export const sniper = longGun(
     if (kind === 'stock') return { ...(without(w, ['wire', 'collapsible']) ?? {}), sporter: 1.4 };
     return w;
   },
-  (s) => only(s.optics, ['scope', 'brass', 'rune'], { scope: 1 }),
+  (s) => {
+    const w = only(s.optics, ['scope', 'brass', 'rune', 'eye', ...LONG_RANGE_OPTICS], { scope: 1 });
+    return w.longrange ? { ...w, longrange: w.longrange * 3 } : w;
+  },
 );
 
 export const lmg = longGun(
@@ -435,7 +441,7 @@ export const lmg = longGun(
     if (kind === 'stock') return without(w, ['wire', 'sporter', 'military']) ?? w;
     return w;
   },
-  (s) => without(s.optics, ['scope']) ?? { irons: 1 },
+  (s) => without(s.optics, ['scope', 'longrange']) ?? { irons: 1 },
 );
 
 export { PRESETS as LONGGUN_PRESETS };

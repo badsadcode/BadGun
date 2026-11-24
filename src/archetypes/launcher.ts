@@ -100,6 +100,8 @@ export const launcher: ArchetypeDef = {
       rune: t(magic, 2, 0),
       lamp: t(diesel, 1, 0),
       smart: t(cyber, 1.5, 0),
+      prism: t(rails && !cyber, 0.8, 0),
+      thermal: t(cyber, 0.6, 0) + t(rails && !cyber, 0.3, 0),
     };
   },
 

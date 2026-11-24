@@ -135,7 +135,7 @@ test('archetypes pick variants that fit them', () => {
         assert.deepEqual([sh.parts.magazine, sh.parts.handguard], ['tube', 'pump'], 'pump action');
       }
       const sn = generate({ archetype: 'sniper', style, seed });
-      assert.ok(['scope', 'brass', 'rune'].includes(sn.parts.sight), `sniper sight ${sn.parts.sight}`);
+      assert.ok(['scope', 'brass', 'rune', 'eye', 'longrange', 'digital', 'thermal', 'nightvision', 'offset', 'periscope'].includes(sn.parts.sight), `sniper sight ${sn.parts.sight}`);
       assert.ok(component(sn, 'BoltHandle'), 'sniper bolt handle');
       assert.ok(component(generate({ archetype: 'lmg', style, seed }), 'Bipod'), 'lmg bipod');
       const ln = generate({ archetype: 'launcher', style, seed });

@@ -86,6 +86,6 @@ export const fantasy: StyleProfile = {
     magazine: { crystal: 1, orb: 0.8, canister: 0.15, pan: 0.1 },
     sight: { auto: 1 },
   },
-  optics: { none: 1, rune: 1.2, brass: 0.35 },
+  optics: { none: 1, rune: 1.2, brass: 0.35, eye: 1 },
   traits: { rivets: false, plumbing: false, glow: false, rails: false, roundness: 18, magic: true },
 };

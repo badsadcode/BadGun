@@ -72,6 +72,6 @@ export const scifi: StyleProfile = {
     magazine: { cell: 1 },
     sight: { auto: 1 },
   },
-  optics: { holo: 1, scope: 0.4, none: 0.2 },
+  optics: { holo: 1, scope: 0.4, none: 0.2, hud: 0.8, digital: 0.4, thermal: 0.3, minidot: 0.3 },
   traits: { rivets: false, plumbing: false, glow: true, rails: false, roundness: 18 },
 };

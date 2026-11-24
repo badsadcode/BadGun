@@ -840,7 +840,7 @@ const frameSight: OpticBuilder = (ctx, c, y, z) => {
 };
 
 export const LAUNCHER_OPTICS: Record<string, OpticBuilder> = { frame: frameSight };
-export const LAUNCHER_OPTIC_NAMES = ['frame', 'reddot', 'scope', 'holo', 'brass', 'tube', 'rune', 'lamp', 'smart'];
+export const LAUNCHER_OPTIC_NAMES = ['frame', 'reddot', 'scope', 'holo', 'brass', 'tube', 'rune', 'lamp', 'smart', 'prism', 'thermal'];
 
 /** Build the sight (or none) on a side bracket, with SOCKET_Optic and SOCKET_ADS. */
 export function launcherOptic(ctx: BuildContext, choice: string): void {

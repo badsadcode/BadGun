@@ -61,6 +61,6 @@ export const steampunk: StyleProfile = {
     magazine: { drum: 1, canister: 0.8, pan: 0.35 },
     sight: { auto: 1 },
   },
-  optics: { brass: 1, irons: 0.4 },
+  optics: { brass: 1, irons: 0.4, periscope: 0.7 },
   traits: { rivets: true, plumbing: true, glow: false, rails: false, roundness: 24 },
 };

@@ -34,7 +34,7 @@ export type AttachmentType = 'optic' | 'muzzle' | 'underbarrel' | 'side';
 export const ATTACHMENT_TYPES: AttachmentType[] = ['optic', 'muzzle', 'underbarrel', 'side'];
 
 /** Optics that are part of the gun itself (iron sights) can't be detached. */
-const FIXED_OPTICS = ['irons', 'leaf', 'none'];
+const FIXED_OPTICS = ['irons', 'leaf', 'ladder', 'none'];
 
 export interface AttachmentRecipe {
   type: AttachmentType;
