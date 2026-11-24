@@ -9,7 +9,7 @@ import { BuildContext, put, side } from './context.js';
 import { leafSight } from './era.js';
 
 /** Builds the optic; returns the sight-line height and the optic's rear z. */
-type OpticBuilder = (ctx: BuildContext, c: Component, y: number, z: number) => { eyeY: number; rearZ: number };
+export type OpticBuilder = (ctx: BuildContext, c: Component, y: number, z: number) => { eyeY: number; rearZ: number };
 
 /** Lathe profile for a scope-like tube with recessed lenses at both ends. */
 function scopeBody(stations: Vec2[], lensRecess = 0.006): Vec2[] {
@@ -183,7 +183,8 @@ const runeSight: OpticBuilder = (ctx, c, y, z) => {
 
 const leaf: OpticBuilder = (ctx, c, y) => leafSight(ctx, c, y);
 
-const OPTICS: Record<string, OpticBuilder> = { irons, reddot, scope, holo, brass, tube: tube_, rune: runeSight, leaf, lamp: lampOptic, smart: smartOptic };
+export const OPTIC_BUILDERS: Record<string, OpticBuilder> = { irons, reddot, scope, holo, brass, tube: tube_, rune: runeSight, leaf, lamp: lampOptic, smart: smartOptic };
+const OPTICS = OPTIC_BUILDERS;
 export const OPTIC_NAMES = Object.keys(OPTICS);
 
 export function buildOptic(ctx: BuildContext, choice: string): void {

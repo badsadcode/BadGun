@@ -194,7 +194,7 @@ export const HANDGUARDS: Record<string, PartBuilder> = { railed, forend, shell }
 // ---------------------------------------------------------------------------
 
 /** Each muzzle returns its length so the muzzle socket lands at the tip. */
-type MuzzleBuilder = (ctx: BuildContext, comp: ReturnType<typeof muzzleComponent>, a: number, rb: number) => number;
+export type MuzzleBuilder = (ctx: BuildContext, comp: ReturnType<typeof muzzleComponent>, a: number, rb: number) => number;
 
 function muzzleComponent(ctx: BuildContext, variant: string) {
   return ctx.b.component('Muzzle', { kind: 'muzzle', variant, parent: 'Barrel', pivot: [0, 0, ctx.L.barrel.z1] });
@@ -305,7 +305,7 @@ const heavybrake: MuzzleBuilder = (ctx, c, a, rb) => {
 /** No muzzle device: the barrel ends bare (the socket still marks the tip). */
 const none: MuzzleBuilder = () => 0;
 
-const MUZZLE_BUILDERS: Record<string, MuzzleBuilder> = { brake, flash, bell, crown, emitter, prongs, suppressor, compensator, heavybrake, none, can: canMuzzle, bottle: bottleMuzzle, crystal: crystalMuzzle, maw: mawMuzzle, exhaust: exhaustMuzzle, smart: smartMuzzle };
+export const MUZZLE_BUILDERS: Record<string, MuzzleBuilder> = { brake, flash, bell, crown, emitter, prongs, suppressor, compensator, heavybrake, none, can: canMuzzle, bottle: bottleMuzzle, crystal: crystalMuzzle, maw: mawMuzzle, exhaust: exhaustMuzzle, smart: smartMuzzle };
 
 export const MUZZLES: Record<string, PartBuilder> = Object.fromEntries(
   Object.entries(MUZZLE_BUILDERS).map(([name, fn]) => [

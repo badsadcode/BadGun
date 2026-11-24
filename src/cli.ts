@@ -7,6 +7,8 @@
  *   badgun --style modern --seed 1 --count 10          -> 10 variants, seeds 1..10
  *   badgun --style scifi --seed 7 --param bulk=0.9 --optic scope --color Body=#ff3366
  *   badgun --style diesel --seed 3 --maps 2048 --uv atlas  -> + texture maps, atlas UVs first
+ *   badgun --attachment optic --style steampunk --seed 2     -> one standalone attachment
+ *   badgun --kit --style cyber --seed 5                   -> every attachment that suits the world
  *   badgun --list
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -14,6 +16,8 @@ import { join } from 'node:path';
 import { generate } from './generate.js';
 import { toGLB } from './export/glb.js';
 import { factionToGLB, generateFaction, summary as factionSummary } from './faction.js';
+import { ATTACHMENT_TYPES, attachmentVariants, generateAttachment, generateAttachmentKit, kitToGLB } from './attachment.js';
+import type { AttachmentType } from './attachment.js';
 import { buildManifest, weaponName } from './export/manifest.js';
 import type { UvLayout } from './export/manifest.js';
 import { bakeTexture } from './texture/bake.js';
@@ -39,6 +43,10 @@ Options:
   --recipe <file>       load a recipe JSON (other flags override it)
   --out <dir>           output folder                          (default: out)
   --faction             generate a whole matching arsenal (uses --style and --seed)
+  --attachment <type>   a standalone attachment: ${ATTACHMENT_TYPES.join(' | ')}
+                        (pick one with --variant, otherwise the style decides)
+  --kit                 every attachment that suits the style, as separate files
+                        plus one *_kit.glb
   --uv <set>            tiling | atlas: which UV set is TEXCOORD_0 (default: tiling;
                         the other set is TEXCOORD_1)
   --texture [size]      embed a base color texture in the .glb (default size 1024)
@@ -71,6 +79,8 @@ function list(): void {
     for (const [kind, table] of Object.entries(a.parts)) console.log(`  ${kind.padEnd(10)} ${Object.keys(table).join(', ')}`);
     console.log(`  ${'sight'.padEnd(10)} ${a.optics.join(', ')}`);
   }
+  console.log('\nStandalone attachments (--attachment <type> --variant <name>):');
+  for (const t of ATTACHMENT_TYPES) console.log(`  ${t.padEnd(12)} ${Object.keys(attachmentVariants(t)).join(', ')}`);
 }
 
 function main(): void {
@@ -115,6 +125,27 @@ function main(): void {
   const outDir = o.out?.[0] ?? 'out';
   mkdirSync(outDir, { recursive: true });
 
+  if (o.attachment || o.kit) {
+    const save = (w: ReturnType<typeof generateAttachment>, dir: string) => {
+      writeFileSync(join(dir, `${weaponName(w)}.glb`), glb(w));
+      writeFileSync(join(dir, `${weaponName(w)}.json`), JSON.stringify(buildManifest(w, uv), null, 2));
+      maps(w, dir);
+      console.log(`${weaponName(w)}.glb  ${buildManifest(w).stats.triangles} tris  [${w.attachment!.type}: ${w.attachment!.variant}]`);
+    };
+    if (o.kit) {
+      const kit = generateAttachmentKit({ style: recipe.style, seed: recipe.seed, paletteVariant: recipe.paletteVariant, params: recipe.params });
+      const dir = join(outDir, `BadGun_kit_${recipe.style}_${recipe.seed}`);
+      mkdirSync(dir, { recursive: true });
+      for (const w of kit.items) save(w, dir);
+      writeFileSync(join(dir, `BadGun_kit_${recipe.style}_${recipe.seed}.glb`), kitToGLB(kit));
+      console.log(`-> ${dir}/`);
+      return;
+    }
+    const type = o.attachment[0] as AttachmentType;
+    if (!ATTACHMENT_TYPES.includes(type)) throw new Error(`--attachment must be one of ${ATTACHMENT_TYPES.join(', ')}`);
+    save(generateAttachment({ type, variant: o.variant?.[0], style: recipe.style, seed: recipe.seed, params: recipe.params, paletteVariant: recipe.paletteVariant, palette: recipe.palette, host: o.archetype ? recipe.archetype : undefined }), outDir);
+    return;
+  }
   if (o.faction) {
     const { length: _l, ...shared } = recipe.params ?? {};
     void _l;

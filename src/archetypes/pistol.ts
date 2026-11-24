@@ -15,6 +15,7 @@ import { pipePistol, tapedPistolGrip } from '../parts/scrap.js';
 import { flintlock, scrollGrip } from '../parts/fantasy.js';
 import { broomGrip, broomhandle, toggle } from '../parts/era.js';
 import { buildOptic } from '../parts/sight.js';
+import { PISTOL_RAIL_FRAMES, PISTOL_UNDERBARREL_PARTS, pistolAttachmentWeights, pistolMount } from '../parts/attach.js';
 
 const t = (on: boolean, yes: number, no: number) => (on ? yes : no);
 
@@ -22,10 +23,11 @@ export const pistol: ArchetypeDef = {
   id: 'pistol',
   name: 'Pistol',
   description: 'Handguns: slide pistols, revolvers and blasters.',
-  parts: { frame: { ...PISTOL_FRAMES, deco: decoPistol, smartgun, pipe: pipePistol, flintlock, broomhandle, toggle }, grip: { ...PISTOL_GRIPS, taped: tapedPistolGrip, scroll: scrollGrip, broom: broomGrip }, muzzle: MUZZLES },
+  parts: { frame: { ...PISTOL_FRAMES, deco: decoPistol, smartgun, pipe: pipePistol, flintlock, broomhandle, toggle }, grip: { ...PISTOL_GRIPS, taped: tapedPistolGrip, scroll: scrollGrip, broom: broomGrip }, muzzle: MUZZLES, underbarrel: PISTOL_UNDERBARREL_PARTS },
   optics: ['none', 'reddot', 'holo', 'rune'],
 
   weights(style, kind): Weights | undefined {
+    if (kind === 'underbarrel') return pistolAttachmentWeights(style);
     const { rails, plumbing, glow } = style.traits;
     const era = style.traits.era;
     if (era) {
@@ -84,7 +86,7 @@ export const pistol: ArchetypeDef = {
   },
 
   build(ctx: BuildContext, chosen) {
-    const order = ['frame', 'grip', 'muzzle'];
+    const order = ['frame', 'grip', 'muzzle', 'underbarrel'];
     for (const kind of order) {
       const fn = pistol.parts[kind][chosen[kind]];
       if (!fn) throw new Error(`Unknown ${kind} variant "${chosen[kind]}". Available: ${Object.keys(pistol.parts[kind]).join(', ')}`);
@@ -102,6 +104,9 @@ export const pistol: ArchetypeDef = {
     b.socket({ name: 'SOCKET_Hand_Support', parent: 'Grip', position: [0.02, hand[1] - 0.01, hand[2] + 0.005], forward: [0, 0, 1], description: 'Support hand wrapped around the shooting hand (left side).' });
     const base: Vec3 = [0, L.grip.y - (L.grip.length + 0.008) * Math.cos(a), L.grip.z - D / 2 - (L.grip.length + 0.008) * Math.sin(a)];
     b.socket({ name: 'SOCKET_Magazine', parent: 'Frame', position: base, forward: [0, -Math.cos(a), -Math.sin(a)], description: L.extra.revolver ? 'Bottom of the grip (revolvers load through the cylinder).' : 'Magazine well at the bottom of the grip.' });
+    if (PISTOL_RAIL_FRAMES.includes(chosen.frame)) {
+      b.socket({ name: 'SOCKET_Underbarrel', parent: 'Frame', position: pistolMount(ctx).at, forward: [0, 0, 1], description: 'Under-frame mount for a light or laser. Attachments hang down from here.' });
+    }
     b.socket({
       name: 'SOCKET_Eject', parent: b.has('Slide') ? 'Slide' : 'Frame',
       position: [-L.rec.width / 2 - 0.004, L.rec.top - 0.002, L.rec.z0 + (L.rec.z1 - L.rec.z0) * 0.55], forward: [-1, 0.6, -0.1],
@@ -109,5 +114,9 @@ export const pistol: ArchetypeDef = {
     });
   },
 
+  // Lights and lasers need a rail-like frame (no revolvers, flintlocks or zip guns).
+  fixup: (chosen, forced) => {
+    if (!forced.has('underbarrel') && !PISTOL_RAIL_FRAMES.includes(chosen.frame)) chosen.underbarrel = 'none';
+  },
   origin: (ctx) => ctx.b.sockets.find((s) => s.name === 'SOCKET_Hand_Grip')?.position ?? [0, 0, 0],
 };

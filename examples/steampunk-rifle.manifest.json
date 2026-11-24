@@ -25,6 +25,8 @@
       "stock": "sporter",
       "grip": "integral",
       "magazine": "drum",
+      "underbarrel": "none",
+      "side": "none",
       "sight": "irons"
     },
     "palette": "Copper & Ebony"
@@ -419,6 +421,51 @@
         1
       ],
       "description": "Support hand under the handguard."
+    },
+    {
+      "name": "SOCKET_Underbarrel",
+      "parent": "Receiver",
+      "position": [
+        0,
+        0.049,
+        0.3429
+      ],
+      "forward": [
+        0,
+        0,
+        1
+      ],
+      "description": "Underbarrel attachment mount (grip, launcher). Attachments hang down from here."
+    },
+    {
+      "name": "SOCKET_Side",
+      "parent": "Receiver",
+      "position": [
+        -0.0251,
+        0.0741,
+        0.3787
+      ],
+      "forward": [
+        0,
+        0,
+        1
+      ],
+      "description": "Right-side rail mount (light, laser). Side attachments are built already turned to this side."
+    },
+    {
+      "name": "SOCKET_Barrel_End",
+      "parent": "Barrel",
+      "position": [
+        0,
+        0.0741,
+        0.6154
+      ],
+      "forward": [
+        0,
+        0,
+        1
+      ],
+      "description": "Bare barrel tip: muzzle devices screw on here."
     },
     {
       "name": "SOCKET_Magazine",

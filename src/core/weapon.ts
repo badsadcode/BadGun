@@ -60,6 +60,8 @@ export interface Weapon {
   sockets: Socket[];
   /** True once geometry is in node-local space. */
   finalized: boolean;
+  /** Set when this asset is a standalone attachment rather than a weapon. */
+  attachment?: { type: string; variant: string };
 }
 
 export class WeaponBuilder {

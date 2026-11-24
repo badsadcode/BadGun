@@ -31,6 +31,8 @@
       "stock": "deco",
       "grip": "polymer",
       "magazine": "curved",
+      "underbarrel": "launcher",
+      "side": "none",
       "sight": "lamp"
     },
     "palette": "Oxide Olive"
@@ -307,6 +309,24 @@
       "triangles": 372
     },
     {
+      "name": "Underbarrel",
+      "kind": "underbarrel",
+      "variant": "launcher",
+      "parent": "Handguard",
+      "pivot": [
+        0,
+        0.034,
+        0.4663
+      ],
+      "materials": [
+        "MAT_Detail",
+        "MAT_Barrel",
+        "MAT_Trim",
+        "MAT_Body"
+      ],
+      "triangles": 552
+    },
+    {
       "name": "Optic",
       "kind": "optic",
       "variant": "lamp",
@@ -358,6 +378,21 @@
       "description": "Butt of the stock."
     },
     {
+      "name": "SOCKET_Launcher_Muzzle",
+      "parent": "Underbarrel",
+      "position": [
+        0,
+        -0.0006,
+        0.615
+      ],
+      "forward": [
+        0,
+        0,
+        1
+      ],
+      "description": "Grenade launcher muzzle: projectile spawn."
+    },
+    {
       "name": "SOCKET_Optic",
       "parent": "Receiver",
       "position": [
@@ -407,15 +442,60 @@
       "parent": "Handguard",
       "position": [
         0,
-        0.022,
-        0.4807
+        -0.0006,
+        0.5195
       ],
       "forward": [
         0,
         0,
         1
       ],
-      "description": "Support hand under the handguard."
+      "description": "Support hand on the underbarrel attachment."
+    },
+    {
+      "name": "SOCKET_Underbarrel",
+      "parent": "Handguard",
+      "position": [
+        0,
+        0.034,
+        0.4663
+      ],
+      "forward": [
+        0,
+        0,
+        1
+      ],
+      "description": "Underbarrel attachment mount (grip, launcher). Attachments hang down from here."
+    },
+    {
+      "name": "SOCKET_Side",
+      "parent": "Handguard",
+      "position": [
+        -0.0232,
+        0.0572,
+        0.5549
+      ],
+      "forward": [
+        0,
+        0,
+        1
+      ],
+      "description": "Right-side rail mount (light, laser). Side attachments are built already turned to this side."
+    },
+    {
+      "name": "SOCKET_Barrel_End",
+      "parent": "Barrel",
+      "position": [
+        0,
+        0.0572,
+        0.7561
+      ],
+      "forward": [
+        0,
+        0,
+        1
+      ],
+      "description": "Bare barrel tip: muzzle devices screw on here."
     },
     {
       "name": "SOCKET_Magazine",
@@ -481,11 +561,11 @@
   "uv": {
     "tiling": "TEXCOORD_0",
     "atlas": "TEXCOORD_1",
-    "charts": 1634,
-    "coverage": 0.674,
+    "charts": 1709,
+    "coverage": 0.664,
     "texelsPerMeter": {
-      "1024": 1127,
-      "2048": 2255
+      "1024": 1056,
+      "2048": 2111
     },
     "padding": 4
   },
@@ -515,10 +595,10 @@
     }
   ],
   "stats": {
-    "triangles": 5824,
-    "vertices": 9092,
-    "meshes": 9,
-    "primitives": 22,
+    "triangles": 6376,
+    "vertices": 9794,
+    "meshes": 10,
+    "primitives": 26,
     "materials": 10
   }
 }

@@ -34,6 +34,7 @@ Recipe ──► resolveParams / resolveParts ──► layout ──► part bu
 | `src/materials/palette.ts` | Color utils, wear, overrides |
 | `src/export/glb.ts` | Dependency-free GLB writer |
 | `src/export/manifest.ts` | Manifest (recipe, parts, sockets, bounds, stats, conventions, UV info) |
+| `src/parts/attach.ts`, `src/attachment.ts` | Attachments: underbarrel/side builders in their own mount frame, weapon mount points, style odds; standalone attachments and kits |
 | `src/anim/clips.ts` | Animation clips (Fire, Reload, Cycle…) built from component motion metadata; sampled into glTF animations by `glb.ts` |
 | `src/texture/atlas.ts` | Atlas UVs: charts from shared vertices, skyline packing into one square, uniform texel density |
 | `src/texture/bake.ts` | Rasterizer: base color, ID map and UV template images in atlas space |
@@ -67,6 +68,8 @@ Recipe ──► resolveParams / resolveParts ──► layout ──► part bu
 **UVs are physical.** Builders emit UVs in meters (perimeter × depth for extrusions, arc × length for lathes; flat lathe caps project as a disc); the exporter scales by `UV_UNITS_PER_METER = 4`. These "tiling" UVs can overlap.
 
 **The atlas is derived, not authored.** `buildAtlas` runs after finalize and never touches builders. It treats every group of triangles connected through shared vertices as one chart (builders already cut seams by duplicating vertices, and every chart's physical UVs are flat and fold-free), measures charts in meters, and skyline-packs them into one square with padding in pixels. Because the source UVs are physical, texel density is uniform everywhere. The export writes both sets: tiling in `TEXCOORD_0` and atlas in `TEXCOORD_1` by default, or swapped with `{ uv: 'atlas' }`. The atlas is cached per weapon (`weaponAtlas`) so the GLB, manifest and bakes all agree. If a new builder ever makes a chart that overlaps itself in UV, the atlas test will catch it.
+
+**Attachments live in a mount frame.** Underbarrel and side builders draw in their own frame (mount at the origin, hanging down, front at +Z), and a `Mount` (position, rotation, parent) places it: under the handguard, on the right rail turned a quarter, under a pistol frame (whose height is *measured* from the built frame, since frames differ), or at the origin for a standalone asset. `generateAttachment` builds a host rifle's layout for sizing, builds the one attachment, then finalizes with the mount point as origin. Optics and muzzles reuse `OPTIC_BUILDERS` / `MUZZLE_BUILDERS` the same way. Because the code path is shared, standalone and mounted geometry are identical, and a test holds it to that.
 
 **Animations come from motion metadata.** Builders only declare how a part *can* move (`motion: { type, axis, range, purpose }`); `weaponClips` decides *when*, by looking for well-known component names (`Trigger`, `Hammer`, `Magazine`, `ChargingHandle`, `BoltHandle`, `Lever`, `Slide`, pump `Handguard`, break-open `Barrel`, `String`, …). Tracks hold the motion parameter over time (eased keys); the exporter samples them at 60 fps into translation/rotation channels on the existing nodes. A new moving part becomes animated by giving it a motion and, if it's a new kind of part, a line in `clips.ts`.
 

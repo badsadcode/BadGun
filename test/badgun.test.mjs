@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { validateBytes } from 'gltf-validator';
 import { inflateSync } from 'node:zlib';
-import { generate, toGLB, buildManifest, STYLES, ARCHETYPES, generateFaction, factionToGLB, buildAtlas, bakeTexture, encodePNG, ID_COLORS, weaponClips } from '../dist/index.js';
+import { generate, toGLB, buildManifest, STYLES, ARCHETYPES, generateFaction, factionToGLB, buildAtlas, bakeTexture, encodePNG, ID_COLORS, weaponClips, generateAttachment, generateAttachmentKit, kitToGLB, attachmentVariants, ATTACHMENT_TYPES } from '../dist/index.js';
 
 const base = { archetype: 'rifle', style: 'steampunk', seed: 42 };
 const component = (w, name) => w.components.find((c) => c.name === name);
@@ -296,6 +296,52 @@ test('animation clips: every weapon can fire, magazines reload, and the .glb car
         assert.deepEqual(buildManifest(w).animations.map((a) => a.name), names);
         assert.equal(glbJson(toGLB(w, { animations: false })).animations, undefined);
       }
+    }
+  }
+});
+
+test('attachments: standalone pieces are exactly the ones on the gun, and every variant exports', async () => {
+  const geo = (c) => [...c.geometry.entries()].map(([slot, g]) => slot + ':' + g.positions.map((v) => (Math.round(v * 1e5) / 1e5 + 0).toFixed(5)).join(',')).join('|');
+  // Same style and seed: the standalone attachment, measured from SOCKET_Mount, matches the
+  // one built on the gun, measured from its mount socket. So snapping it on is a translation.
+  for (const [type, variant, comp, socket] of [
+    ['side', 'flashlight', 'SideAttachment', 'SOCKET_Side'],
+    ['underbarrel', 'launcher', 'Underbarrel', 'SOCKET_Underbarrel'],
+    ['optic', 'scope', 'Optic', 'SOCKET_Optic'],
+    ['muzzle', 'suppressor', 'Muzzle', 'SOCKET_Barrel_End'],
+  ]) {
+    const kind = type === 'optic' ? 'sight' : type;
+    const gun = generate({ archetype: 'rifle', style: 'modern', seed: 8, parts: { config: 'standard', handguard: 'railed', [kind]: variant } });
+    const part = gun.components.find((c) => c.name === comp);
+    assert.ok(part, `${type}: on the gun`);
+    const s = gun.sockets.find((x) => x.name === socket);
+    assert.ok(s, `${socket} exists`);
+    assert.deepEqual(part.pivot.map((v) => +v.toFixed(5)), s.position.map((v) => +v.toFixed(5)), `${type}: the part sits on its socket`);
+    const alone = generateAttachment({ type, variant, style: 'modern', seed: 8 });
+    assert.equal(geo(alone.components[0]), geo(part), `${type}/${variant}: standalone == mounted`);
+    assert.deepEqual(alone.sockets.find((x) => x.name === 'SOCKET_Mount').position, [0, 0, 0]);
+  }
+  // Every variant of every type, in every world, is valid glTF.
+  for (const style of Object.keys(STYLES)) {
+    for (const type of ATTACHMENT_TYPES) {
+      for (const variant of Object.keys(attachmentVariants(type))) {
+        const w = generateAttachment({ type, variant, style, seed: 2 });
+        const report = await validateBytes(toGLB(w));
+        assert.equal(report.issues.numErrors, 0, `${style}/${type}/${variant}`);
+      }
+    }
+    const kit = generateAttachmentKit({ style, seed: 4 });
+    assert.ok(kit.items.length >= 4, `${style}: kit has something of every type`);
+    assert.deepEqual([...new Set(kit.items.map((w) => w.attachment.type))], ATTACHMENT_TYPES);
+    assert.equal((await validateBytes(kitToGLB(kit))).issues.numErrors, 0, `${style}: kit glTF`);
+  }
+  assert.throws(() => generateAttachment({ type: 'side', variant: 'bee-launcher', style: 'modern', seed: 1 }), /Available: /);
+  // Attachments stay off crowded or moving fronts.
+  for (const style of Object.keys(STYLES)) {
+    for (let seed = 1; seed <= 6; seed++) {
+      for (const a of ['lmg', 'sniper']) assert.equal(generate({ archetype: a, style, seed }).parts.underbarrel, 'none', `${a} keeps its bipod spot`);
+      const sh = generate({ archetype: 'shotgun', style, seed });
+      if (sh.parts.handguard === 'pump') assert.deepEqual([sh.parts.underbarrel, sh.parts.side], ['none', 'none'], 'nothing on a moving pump');
     }
   }
 });

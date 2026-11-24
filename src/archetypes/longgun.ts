@@ -17,13 +17,14 @@ import { GRIPS, MAGAZINES } from '../parts/lower.js';
 import { BARRELS, HANDGUARDS, MUZZLES } from '../parts/front.js';
 import { STOCKS } from '../parts/stock.js';
 import { EXTRA_BARRELS, EXTRA_GRIPS, EXTRA_HANDGUARDS, EXTRA_MAGAZINES, EXTRA_RECEIVERS, EXTRA_STOCKS } from '../parts/extra.js';
-import { bipod, boltHandle, carryHandle, foregrip, sideSaddle } from '../parts/accessory.js';
+import { bipod, boltHandle, carryHandle, sideSaddle } from '../parts/accessory.js';
 import { PLATED_GRIPS, PLATED_RECEIVERS } from '../parts/plated.js';
 import { ERA_HANDGUARDS, ERA_MAGAZINES, ERA_RECEIVERS, ERA_STOCKS, bayonet, heatShield } from '../parts/era.js';
 import { OPTIC_NAMES, buildOptic } from '../parts/sight.js';
 import { VARIETY_BARRELS, VARIETY_GRIPS, VARIETY_HANDGUARDS, VARIETY_MAGAZINES, VARIETY_STOCKS } from '../parts/variety.js';
 import { FANTASY_BARRELS, FANTASY_GRIPS, FANTASY_HANDGUARDS, FANTASY_MAGAZINES, FANTASY_RECEIVERS, FANTASY_STOCKS } from '../parts/fantasy.js';
 import { CYBER_GRIPS, CYBER_HANDGUARDS, CYBER_MAGAZINES, CYBER_RECEIVERS, CYBER_STOCKS, DIESEL_HANDGUARDS, DIESEL_MAGAZINES, DIESEL_RECEIVERS, DIESEL_STOCKS } from '../parts/punk.js';
+import { SIDE_PARTS, UNDERBARREL_PARTS, attachmentWeights, longGunMounts } from '../parts/attach.js';
 import { SCRAP_BARRELS, SCRAP_GRIPS, SCRAP_HANDGUARDS, SCRAP_MAGAZINES, SCRAP_RECEIVERS, SCRAP_STOCKS } from '../parts/scrap.js';
 
 /** "config" is the overall layout: standard, or bullpup (magazine behind the grip). */
@@ -38,6 +39,8 @@ export const LONGGUN_PARTS: Record<string, Record<string, PartBuilder>> = {
   stock: { ...STOCKS, ...EXTRA_STOCKS, ...VARIETY_STOCKS, ...SCRAP_STOCKS, ...FANTASY_STOCKS, ...ERA_STOCKS, ...DIESEL_STOCKS, ...CYBER_STOCKS },
   grip: { ...GRIPS, ...EXTRA_GRIPS, ...SCRAP_GRIPS, ...FANTASY_GRIPS, ...VARIETY_GRIPS, ...PLATED_GRIPS, ...CYBER_GRIPS },
   magazine: { ...MAGAZINES, ...EXTRA_MAGAZINES, ...VARIETY_MAGAZINES, ...SCRAP_MAGAZINES, ...FANTASY_MAGAZINES, ...ERA_MAGAZINES, ...DIESEL_MAGAZINES, ...CYBER_MAGAZINES },
+  underbarrel: UNDERBARREL_PARTS,
+  side: SIDE_PARTS,
 };
 
 /** Proportions per archetype. Values are meters; `L` = length param, `B` = bulk param. */
@@ -233,6 +236,11 @@ function longGunFixup(id: string, chosen: Record<string, string>, forced: Set<st
     if (chosen.magazine === 'pan' || chosen.magazine === 'top') set('magazine', 'straight');
   } else if (chosen.stock === 'butt') set('stock', 'fixed');
   if (chosen.magazine === 'pan' || chosen.magazine === 'top') set('sight', 'none');
+  // Attachments clamp onto a handguard, and stay clear of moving or crowded
+  // parts: pumps, break actions, LMG and sniper bipods.
+  const bareFront = ['pump', 'bare', 'splinter'].includes(chosen.handguard) || chosen.barrel === 'double' || chosen.barrel === 'overunder';
+  if (bareFront || id === 'lmg' || id === 'sniper') set('underbarrel', 'none');
+  if (bareFront) set('side', 'none');
 }
 
 function buildLongGun(id: ArchetypeId, ctx: BuildContext, chosen: Record<string, string>): void {
@@ -264,13 +272,9 @@ function buildLongGun(id: ArchetypeId, ctx: BuildContext, chosen: Record<string,
   }
   if (id === 'shotgun' && chosen.handguard === 'pump' && (st.era ?? 2000) < 1975 && ctx.rng('heatshield').chance(0.5)) heatShield(ctx);
 
-  // Vertical foregrip on suitable handguards.
-  let support: Vec3 | null = null;
-  const fgOk = ['railed', 'quad', 'slim', 'shell', 'jacket', 'taped'].includes(chosen.handguard) && id !== 'lmg' && !(id === 'shotgun' && chosen.config !== 'boxfed');
-  const t = ctx.style.traits;
-  const fgChance = (t.rails ? 0.45 : t.glow ? 0.3 : t.scrap ? 0.2 : 0.05) * (id === 'smg' ? 1.4 : 1);
-  if (fgOk && rng.next() < fgChance) support = foregrip(ctx);
-
+  // A grip attachment (underbarrel kind) is where the support hand goes.
+  const ex = ctx.L.extra;
+  const support: Vec3 | null = ex.supportY !== undefined ? [ex.supportX, ex.supportY, ex.supportZ] : null;
   const { L, b } = ctx;
   const gripPoint: Vec3 = [0, L.grip.y - 0.03 * Math.cos(L.grip.angle), L.grip.z - 0.03 * Math.sin(L.grip.angle) - 0.016];
   b.socket({ name: 'SOCKET_Hand_Grip', parent: 'Grip', position: gripPoint, forward: [0, 0, 1], description: 'Trigger hand on the pistol grip.' });
@@ -279,8 +283,14 @@ function buildLongGun(id: ArchetypeId, ctx: BuildContext, chosen: Record<string,
     parent: 'Handguard',
     position: support ?? [0, -L.handguard.radius - 0.012, L.handguard.z0 + (L.handguard.z1 - L.handguard.z0) * 0.55],
     forward: [0, 0, 1],
-    description: support ? 'Support hand on the vertical foregrip.' : id === 'shotgun' ? 'Support hand on the pump.' : 'Support hand under the handguard.',
+    description: support ? 'Support hand on the underbarrel attachment.' : id === 'shotgun' ? 'Support hand on the pump.' : 'Support hand under the handguard.',
   });
+  // Mounting points for swappable attachments (see generateAttachment).
+  const mounts = longGunMounts(ctx);
+  const hgParent = b.has('Handguard') ? 'Handguard' : b.rootName;
+  b.socket({ name: 'SOCKET_Underbarrel', parent: hgParent, position: mounts.underbarrel.at, forward: [0, 0, 1], description: 'Underbarrel attachment mount (grip, launcher). Attachments hang down from here.' });
+  b.socket({ name: 'SOCKET_Side', parent: hgParent, position: mounts.side.at, forward: [0, 0, 1], description: 'Right-side rail mount (light, laser). Side attachments are built already turned to this side.' });
+  b.socket({ name: 'SOCKET_Barrel_End', parent: b.has('Barrel') ? 'Barrel' : b.rootName, position: mounts.barrelEnd, forward: [0, 0, 1], description: 'Bare barrel tip: muzzle devices screw on here.' });
   b.socket({
     name: 'SOCKET_Magazine',
     parent: 'Receiver',
@@ -346,6 +356,7 @@ function longGun(
           boxfed: id === 'shotgun' ? box : 0,
         };
       }
+      if (kind === 'underbarrel' || kind === 'side') return attachmentWeights(style, kind, id);
       const banned = [...(SPECIALISTS[kind] ?? []), ...(kind === 'receiver' && !['rifle', 'sniper'].includes(id) ? ['boltaction'] : [])];
       return tweak(style, kind, without(style.parts[kind], banned));
     },

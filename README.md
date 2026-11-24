@@ -35,6 +35,7 @@
 - **Two UV sets, ready to texture.** A *tiling* unwrap (1 UV unit = 0.25 m, same density everywhere) for repeating materials and trim sheets, and a non-overlapping *atlas* with uniform texel density for hand painting, baking and unique texture sets.
 - **Texture maps on demand.** Bake a base color map, an ID map (one flat color per material slot, for masking in Substance Painter and friends) and a UV template as PNG, or embed the base color texture straight into the `.glb`.
 - **Game-ready hierarchy.** Named components on correct pivots, moving parts with motion metadata (magazine → reload, trigger → fire, stock → adjust, hammer → cock), and sockets for hands, optics, muzzle FX, ejection and the ADS camera.
+- **Swappable attachments.** Optics, muzzle devices, underbarrel grips and grenade launchers, lights and lasers: on the gun as separate nodes, or as standalone `.glb` assets that snap onto the gun's mount sockets, alone or as a whole kit per world.
 - **Animation clips included.** *Fire*, *Reload*, *Cycle* (pump, lever, bolt, rack), *Cock*, *Spin*, *Draw* and accessory clips, built from the weapon's own moving parts, as standard glTF animations. Each comes with timed events (`shot`, `magOut`, `magIn`, …) for syncing sounds and effects.
 - **Engine-agnostic.** Plain glTF 2.0 binary with zero runtime dependencies. A sidecar manifest JSON (also embedded in the `.glb` extras) carries the recipe, parts, sockets, bounds, collision box and stats.
 
@@ -125,6 +126,39 @@ const id = bakeTexture(weapon, 'id', { size: 2048 });        // { width, height,
 const png = encodePNG(id.data, id.width, id.height);         // Uint8Array, write it anywhere
 ```
 
+## Attachments
+
+Attachments come two ways.
+
+**On the gun.** Long guns have two more part kinds, `underbarrel` (`vgrip`, `angled`, `stubby`, `launcher`) and `side` (`flashlight`, `laser`, `combo`, `lantern`, `crystal`, `taped`). Pistols with a rail-like frame get `underbarrel` lights and lasers. Each world picks what suits it, mostly picking *none*: lanterns for steampunk, glowing crystals for fantasy, duct-taped flashlights for survivors, no lasers in WW2. Each attachment is its own node (`Underbarrel`, `SideAttachment`, `Optic`, `Muzzle`), so a game can hide or swap it.
+
+```bash
+node dist/cli.js --style modern --seed 2 --part underbarrel=launcher --part side=flashlight
+```
+
+**Standalone, to swap at runtime.** Every weapon has mount sockets: `SOCKET_Optic`, `SOCKET_Barrel_End`, `SOCKET_Underbarrel` and `SOCKET_Side`. A standalone attachment's origin is its own `SOCKET_Mount`, so snapping it on is a plain translation (everything keeps +Y up and +Z forward). A standalone attachment is built exactly like the mounted one (the tests check that the geometry matches), sized for a rifle by default (`host` picks another weapon type).
+
+```bash
+node dist/cli.js --attachment underbarrel --variant launcher --style cyber --seed 2
+node dist/cli.js --kit --style steampunk --seed 4      # every attachment that suits the world + one *_kit.glb
+```
+
+```js
+import { generateAttachment, generateAttachmentKit, kitToGLB, attachmentVariants } from 'badgun';
+const scope = generateAttachment({ type: 'optic', variant: 'scope', style: 'modern', seed: 8 });
+const kit = generateAttachmentKit({ style: 'scrap', seed: 3 });   // kit.items: Weapon[]
+attachmentVariants('side', 'steampunk');                            // { lantern: 1 }
+```
+
+| Type | Snaps onto | Variants |
+|---|---|---|
+| `optic` | `SOCKET_Optic` | reddot, scope, holo, brass, tube, rune, lamp, smart |
+| `muzzle` | `SOCKET_Barrel_End` | 15 devices, from suppressors and brakes to soda cans and crystals |
+| `underbarrel` | `SOCKET_Underbarrel` | vgrip, angled, stubby, launcher |
+| `side` | `SOCKET_Side` (pistols: `SOCKET_Underbarrel`, turned to hang down) | flashlight, laser, combo, lantern, crystal, taped |
+
+Attachments carry their own sockets too: `SOCKET_Light`, `SOCKET_Laser`, `SOCKET_Launcher_Muzzle`, and `SOCKET_Hand_Support` on grips.
+
 ## Animation clips
 
 Every single-weapon `.glb` carries the clips that fit its parts (a pump shotgun gets *Cycle* as a pump, a bolt-action gets a bolt, a revolver gets *Spin*):
@@ -205,16 +239,16 @@ A recipe is the whole description of a weapon. Save it, share it, batch it. A re
 | Moving parts | node `extras.badgun.motion` = `{ type, axis, range, purpose }` |
 | Manifest | `<name>.json` sidecar + root node `extras.badgun` |
 
-## What's in v0.9
+## What's in v0.10
 
 | Archetype | Part kinds |
 |---|---|
-| rifle · smg · shotgun · sniper · lmg | 5 layouts · 16 receivers · 14 barrels (incl. doubles) · 16 handguards · 16 muzzles (incl. soda-can, bottle, crystal, exhaust stacks and smart brake) · 17 stocks (incl. one-piece, military and folding frame) · 12 grips (incl. loop and neon) · 18 magazines (incl. internal, stick, top-fed, crystal, orb, jerrycan and smart mag), plus accessories (bipod, bolt handle, carry handle, foregrip, shell holder, lever, bayonet, heat shield) |
-| pistol | 12 frames (slide, revolver, blaster, pipe zip gun, flintlock, loop blaster, hand cannon, flare gun, broomhandle, toggle-lock, deco streamliner, smartgun) · 6 grips · muzzles |
+| rifle · smg · shotgun · sniper · lmg | 5 layouts · 16 receivers · 14 barrels (incl. doubles) · 16 handguards · 16 muzzles (incl. soda-can, bottle, crystal, exhaust stacks and smart brake) · 17 stocks (incl. one-piece, military and folding frame) · 12 grips (incl. loop and neon) · 18 magazines (incl. internal, stick, top-fed, crystal, orb, jerrycan and smart mag), plus attachments (4 underbarrel: grips, grenade launcher · 6 side rail: lights, lasers, lantern, crystal, taped flashlight) and accessories (bipod, bolt handle, carry handle, shell holder, lever, bayonet, heat shield) |
+| pistol | 12 frames (slide, revolver, blaster, pipe zip gun, flintlock, loop blaster, hand cannon, flare gun, broomhandle, toggle-lock, deco streamliner, smartgun) · 6 grips · muzzles · under-frame lights and lasers |
 | crossbow | 4 tillers · 5 prods (recurve, compound, energy, leaf spring, arcane) · stocks · grips; drawn string + loaded bolt |
 | bow | 6 bows (longbow, recurve, compound, energy, pipe, elven) · 6 arrows; string with draw motion |
 
-147 part variants and 10 optics in total. The historical styles (WW1, WW2, Vietnam) add bolt-action and tubular receivers, full-length military stocks, internal/stick/top-fed magazines, leaf sights, bayonets and period pistols: generic period shapes, not replicas of particular models. Dieselpunk brings art-deco streamliners, riveted armor, radiator handguards, exhaust stacks, jerrycan magazines and searchlight sights; cyberpunk brings screen-equipped chassis, street-built rifles covered in cables and stickers, smart magazines with LED ammo counters, neon grips, blade stocks and smart-link sights. Archetypes enforce what they need (shotguns get a pump and tube magazine, or break open if double-barreled; snipers get a scope and bolt handle; bullpups get a butt stock). Otherwise any part works with any style, and the style's palette repaints it, so the Frankengun is a supported feature.
+164 part variants and 10 optics in total. The historical styles (WW1, WW2, Vietnam) add bolt-action and tubular receivers, full-length military stocks, internal/stick/top-fed magazines, leaf sights, bayonets and period pistols: generic period shapes, not replicas of particular models. Dieselpunk brings art-deco streamliners, riveted armor, radiator handguards, exhaust stacks, jerrycan magazines and searchlight sights; cyberpunk brings screen-equipped chassis, street-built rifles covered in cables and stickers, smart magazines with LED ammo counters, neon grips, blade stocks and smart-link sights. Archetypes enforce what they need (shotguns get a pump and tube magazine, or break open if double-barreled; snipers get a scope and bolt handle; bullpups get a butt stock). Otherwise any part works with any style, and the style's palette repaints it, so the Frankengun is a supported feature.
 
 **Known limitations:** The atlas packs islands by their bounding boxes, so only about half of the square ends up covered by actual surfaces, and every surface gets the same pixel density (hidden faces included). Islands are split at every hard edge, so there are many small ones. Embedded textures are only for single weapons, not faction arsenals. Animations move parts only (no hands, no recoil of the whole gun, no ejected casings), projectiles in *Fire* simply fly off and stay there until the clip restarts, and tube-fed guns (pump shotguns, lever actions) have no *Reload* because shells aren't modeled. There are no LODs yet. The roadmap lives in the [brief](docs/PROJECT_BRIEF.md#8-practical-milestones-suggested-not-prescribed).
 

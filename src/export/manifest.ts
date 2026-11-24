@@ -58,6 +58,7 @@ export interface Manifest {
 
 export function weaponName(w: Weapon): string {
   const seed = String(w.recipe.seed).replace(/[^A-Za-z0-9_-]/g, '_');
+  if (w.attachment) return `BadGun_${w.attachment.type}_${w.attachment.variant}_${w.recipe.style}_${seed}`;
   return `BadGun_${w.recipe.archetype}_${w.recipe.style}_${seed}`;
 }
 

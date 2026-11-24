@@ -17,6 +17,8 @@ export type { BakeMode, BakeOptions, Image } from './texture/bake.js';
 export { encodePNG } from './texture/png.js';
 export { weaponClips, sampleKeys } from './anim/clips.js';
 export type { Clip, Track, Key } from './anim/clips.js';
+export { generateAttachment, generateAttachmentKit, kitToGLB, attachmentVariants, ATTACHMENT_TYPES } from './attachment.js';
+export type { AttachmentRecipe, AttachmentType, AttachmentKit } from './attachment.js';
 export { generateFaction, factionToGLB, factionName, summary as factionSummary } from './faction.js';
 export type { Faction, FactionRecipe, Livery } from './faction.js';
 export { buildManifest, weaponName, UV_UNITS_PER_METER, VERSION } from './export/manifest.js';
