@@ -132,11 +132,13 @@ Attachments come two ways.
 
 **On the gun.** Long guns have two more part kinds, `underbarrel` (`vgrip`, `angled`, `stubby`, `launcher`) and `side` (`flashlight`, `laser`, `combo`, `lantern`, `crystal`, `taped`). Pistols with a rail-like frame get `underbarrel` lights and lasers. Each world picks what suits it, mostly picking *none*: lanterns for steampunk, glowing crystals for fantasy, duct-taped flashlights for survivors, no lasers in WW2. Each attachment is its own node (`Underbarrel`, `SideAttachment`, `Optic`, `Muzzle`), so a game can hide or swap it.
 
+Rifles and shotguns also take a `bayonet` (node `Bayonet`, on the lug at `SOCKET_Bayonet`, tip at `SOCKET_Bayonet_Tip`): `knife` (modern, saw-back), `spike` (WW socket bayonet), `sword` (WW1, hooked quillon), `blade` (WW2/Vietnam), `energy` (sci-fi), `rune` (fantasy), `kitchen` (a kitchen knife taped on), `saw` (cyberpunk, neon edge) and `cleaver` (dieselpunk). The historical styles fix one on about as often as their soldiers did; elsewhere it's rare. And the magazine is an attachment too: 8 newer box magazines (`extended` with a +2 baseplate, `casket` quad-stack, `coupled` pair, `windowed` with rounds showing, `pullloop` with a fabric tab, `helical` spiral drum, `banana`, steel `ribbed`) join the 18 older ones, and every box magazine rolls its own baseplate, ribs, witness holes and window.
+
 ```bash
 node dist/cli.js --style modern --seed 2 --part underbarrel=launcher --part side=flashlight
 ```
 
-**Standalone, to swap at runtime.** Every weapon has mount sockets: `SOCKET_Optic`, `SOCKET_Barrel_End`, `SOCKET_Underbarrel` and `SOCKET_Side`. A standalone attachment's origin is its own `SOCKET_Mount`, so snapping it on is a plain translation (everything keeps +Y up and +Z forward). A standalone attachment is built exactly like the mounted one (the tests check that the geometry matches), sized for a rifle by default (`host` picks another weapon type).
+**Standalone, to swap at runtime.** Every weapon has mount sockets: `SOCKET_Optic`, `SOCKET_Barrel_End`, `SOCKET_Underbarrel` and `SOCKET_Side`, and long guns `SOCKET_Bayonet` and `SOCKET_Magazine`. A standalone attachment's origin is its own `SOCKET_Mount`, so snapping it on is a plain translation (everything keeps +Y up and +Z forward). A standalone attachment is built exactly like the mounted one (the tests check that the geometry matches), sized for a rifle by default (`host` picks another weapon type).
 
 ```bash
 node dist/cli.js --attachment underbarrel --variant launcher --style cyber --seed 2
@@ -156,8 +158,31 @@ attachmentVariants('side', 'steampunk');                            // { lantern
 | `muzzle` | `SOCKET_Barrel_End` | 15 devices, from suppressors and brakes to soda cans and crystals |
 | `underbarrel` | `SOCKET_Underbarrel` | vgrip, angled, stubby, launcher |
 | `side` | `SOCKET_Side` (pistols: `SOCKET_Underbarrel`, turned to hang down) | flashlight, laser, combo, lantern, crystal, taped |
+| `bayonet` | `SOCKET_Bayonet` | knife, spike, sword, blade, energy, rune, kitchen, saw, cleaver |
+| `magazine` | `SOCKET_Magazine` (pan/top: `SOCKET_Magazine_Top`) | 23 detachable magazines, from curved and drum to casket, helical and coupled; built for the `host` magwell (rifle, smg, lmg...) |
 
-Attachments carry their own sockets too: `SOCKET_Light`, `SOCKET_Laser`, `SOCKET_Launcher_Muzzle`, and `SOCKET_Hand_Support` on grips.
+Attachments carry their own sockets too: `SOCKET_Light`, `SOCKET_Laser`, `SOCKET_Launcher_Muzzle`, `SOCKET_Bayonet_Tip`, and `SOCKET_Hand_Support` on grips.
+
+### Loadout stats
+
+Every attachment comes with **suggested** gameplay stats for a customization screen: a starting point to tune, not a balance pass. Multipliers are relative to the bare weapon (1 = unchanged), times are seconds, reach is meters, damage is on a 100 hp scale.
+
+| Type | Stats |
+|---|---|
+| `optic` | `magnification`, `adsTime`, `sway` |
+| `muzzle` | `suppressed`, `recoil`, `flash` |
+| `underbarrel` | `recoil`, `adsTime` (launcher adds `secondary: 'grenade'`, `capacity: 1`) |
+| `side` | `light`, `laser`, `hipSpread` |
+| `bayonet` | `reach`, `damage`, `mobility` |
+| `magazine` | `capacity` (depends on the host: a curved mag holds 30 on a rifle, 35 on an SMG; drums 75-100, ammo boxes 150-200, internal 5, tubes 7-8), `reloadTime`, `mobility`, `reload` |
+
+A weapon's manifest has a `loadout` section: its `capacity` (magazine, cylinder chambers, tube; 1 for bows, crossbows and launchers) and every slot (`optic`, `muzzle`, `underbarrel`, `side`, `bayonet`, `magazine`) with its variant, the socket it sits on and its stats. A standalone attachment's manifest has `attachment: { type, variant, mountsOn, stats }`. In code: `attachmentStats(type, variant, { host })` (unknown variants get sensible per-type defaults; it never throws) and `weaponLoadout(weapon)`.
+
+```js
+import { attachmentStats } from 'badgun';
+attachmentStats('magazine', 'drum', { host: 'lmg' });   // { capacity: 100, reloadTime: 3.2, mobility: 0.88, reload: 'magazine' }
+attachmentStats('optic', 'scope');                       // { magnification: 4, adsTime: 1.35, sway: 1.3 }
+```
 
 ## Animation clips
 
@@ -235,7 +260,7 @@ A recipe is the whole description of a weapon. Save it, share it, batch it. A re
 | Axes | +Y up, +Z forward (muzzle), +X is the weapon's left |
 | Origin | trigger hand on the pistol grip (`SOCKET_Hand_Grip`) |
 | Materials | one shared `MAT_<Slot>` per semantic slot → at most one draw call per part per slot |
-| Sockets | empty nodes `SOCKET_*`, whose +Z axis is the socket direction: `Muzzle`, `Optic`, `ADS`, `Hand_Grip`, `Hand_Support`, `Magazine`, `Eject`, `Shoulder` |
+| Sockets | empty nodes `SOCKET_*`, whose +Z axis is the socket direction: `Muzzle`, `Optic`, `ADS`, `Hand_Grip`, `Hand_Support`, `Magazine`, `Eject`, `Shoulder`, `Bayonet` |
 | Moving parts | node `extras.badgun.motion` = `{ type, axis, range, purpose }` |
 | Manifest | `<name>.json` sidecar + root node `extras.badgun` |
 
@@ -243,14 +268,14 @@ A recipe is the whole description of a weapon. Save it, share it, batch it. A re
 
 | Archetype | Part kinds |
 |---|---|
-| rifle · smg · shotgun · sniper · lmg | 5 layouts · 26 receivers (incl. battle slab, see-through truss, welded box, sci-fi capsule, MG feed-cover brick, sporting hunter, revolving drum, carved wood, hydraulic industrial, ribbed organic) · 14 barrels (incl. doubles) · 16 handguards · 16 muzzles (incl. soda-can, bottle, crystal, exhaust stacks and smart brake) · 17 stocks (incl. one-piece, military and folding frame) · 12 grips (incl. loop and neon) · 18 magazines (incl. internal, stick, top-fed, crystal, orb, jerrycan and smart mag), plus attachments (4 underbarrel: grips, grenade launcher · 6 side rail: lights, lasers, lantern, crystal, taped flashlight) and accessories (bipod, bolt handle, carry handle, shell holder, lever, bayonet, heat shield) |
+| rifle · smg · shotgun · sniper · lmg | 5 layouts · 26 receivers (incl. battle slab, see-through truss, welded box, sci-fi capsule, MG feed-cover brick, sporting hunter, revolving drum, carved wood, hydraulic industrial, ribbed organic) · 14 barrels (incl. doubles) · 16 handguards · 16 muzzles (incl. soda-can, bottle, crystal, exhaust stacks and smart brake) · 17 stocks (incl. one-piece, military and folding frame) · 12 grips (incl. loop and neon) · 26 magazines (incl. internal, stick, top-fed, crystal, orb, jerrycan, smart mag, casket, coupled, helical and banana) · 9 bayonets, plus attachments (4 underbarrel: grips, grenade launcher · 6 side rail: lights, lasers, lantern, crystal, taped flashlight) and accessories (bipod, bolt handle, carry handle, shell holder, lever, heat shield) |
 | pistol | 27 frames (slide, revolver, blaster, pipe zip gun, flintlock, loop blaster, hand cannon, flare gun, broomhandle, toggle-lock, deco streamliner, smartgun, compact, long target slide, polymer striker, magnum, machine pistol, bullpup, holdout, taser, coil gun, needler, derringer, wand, service pistol, rocket gyro, nail gun) · 6 grips · muzzles · under-frame lights and lasers |
 | revolver | 12 frames (classic single-action, service, magnum, snub, top-break, pepperbox, sci-fi heavy and coil, junk, ornate, deco, smart) · 5 cylinders (6-shot fluted, 5-shot, 8-shot, engraved, energy) · 8 barrels · 5 grips · 4 hammers; swing-out cranes and top-breaks animate a Reload |
 | crossbow | 7 tillers (incl. one-hand pistol, bolt-magazine repeater, siege beam with windlass) · 5 prods (recurve, compound, energy, leaf spring, arcane) · stocks · grips; drawn string + loaded bolt |
 | bow | 6 bows (longbow, recurve, compound, energy, pipe, elven) · 6 arrows; string with draw motion |
 | launcher | 13 tubes (bazooka, front-loaded rocket tube, disposable, recoilless, multi-tube pod, energy, pipe, brass, arcane, deco, smart, harpoon, mega energy cannon) · 8 projectiles (HEAT, slim missile, bulb, plasma, firework, barbed spear, orb, crystal bolt) · 3 grip sets · 3 shoulder rests · side-mounted sights; `Rocket` fires and reloads, `SOCKET_Backblast` at the rear |
 
-253 part variants and 10 optics in total. The historical styles (WW1, WW2, Vietnam) add bolt-action and tubular receivers, full-length military stocks, internal/stick/top-fed magazines, leaf sights, bayonets and period pistols: generic period shapes, not replicas of particular models. Dieselpunk brings art-deco streamliners, riveted armor, radiator handguards, exhaust stacks, jerrycan magazines and searchlight sights; cyberpunk brings screen-equipped chassis, street-built rifles covered in cables and stickers, smart magazines with LED ammo counters, neon grips, blade stocks and smart-link sights. Archetypes enforce what they need (shotguns get a pump and tube magazine, or break open if double-barreled; snipers get a scope and bolt handle; bullpups get a butt stock). Otherwise any part works with any style, and the style's palette repaints it, so the Frankengun is a supported feature.
+270 part variants and 10 optics in total. The historical styles (WW1, WW2, Vietnam) add bolt-action and tubular receivers, full-length military stocks, internal/stick/top-fed magazines, leaf sights, bayonets and period pistols: generic period shapes, not replicas of particular models. Dieselpunk brings art-deco streamliners, riveted armor, radiator handguards, exhaust stacks, jerrycan magazines and searchlight sights; cyberpunk brings screen-equipped chassis, street-built rifles covered in cables and stickers, smart magazines with LED ammo counters, neon grips, blade stocks and smart-link sights. Archetypes enforce what they need (shotguns get a pump and tube magazine, or break open if double-barreled; snipers get a scope and bolt handle; bullpups get a butt stock). Otherwise any part works with any style, and the style's palette repaints it, so the Frankengun is a supported feature.
 
 **Known limitations:** The atlas packs islands by their bounding boxes, so only about half of the square ends up covered by actual surfaces, and every surface gets the same pixel density (hidden faces included). Islands are split at every hard edge, so there are many small ones. Embedded textures are only for single weapons, not faction arsenals. Animations move parts only (no hands, no recoil of the whole gun, no ejected casings), projectiles in *Fire* simply fly off and stay there until the clip restarts, and tube-fed guns (pump shotguns, lever actions) have no *Reload* because shells aren't modeled. There are no LODs yet. The roadmap lives in the [brief](docs/PROJECT_BRIEF.md#8-practical-milestones-suggested-not-prescribed).
 

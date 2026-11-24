@@ -378,7 +378,7 @@ function buildStaticUI() {
   $('types').append(fb);
   const kb = document.createElement('button');
   kb.textContent = '🔧 Kit';
-  kb.title = 'Attachment kit: every scope, muzzle device, grip and light that suits this world, as separate pieces';
+  kb.title = 'Attachment kit: every scope, muzzle device, grip, light, bayonet and magazine that suits this world, as separate pieces';
   kb.dataset.arch = 'kit';
   kb.onclick = () => { recipe.archetype = 'kit'; recipe.parts = {}; recipe.optic = 'auto'; isolated = null; regenerate(false); };
   $('types').append(kb);
@@ -479,7 +479,7 @@ function refreshUI(weapon) {
   if (currentKit) {
     const tris = currentKit.items.reduce((n, w) => n + BadGun.buildManifest(w).stats.triangles, 0);
     const count = (t) => currentKit.items.filter((w) => w.attachment.type === t).length;
-    $('hud').innerHTML = `🔧 <b>${BadGun.getStyle(recipe.style).name} attachment kit</b> · ${currentKit.items.length} attachments: ${count('optic')} optics, ${count('muzzle')} muzzle devices, ${count('underbarrel')} underbarrel, ${count('side')} side rail<br>palette <b>${weapon.paletteName}</b> · ${tris.toLocaleString()} tris in total`;
+    $('hud').innerHTML = `🔧 <b>${BadGun.getStyle(recipe.style).name} attachment kit</b> · ${currentKit.items.length} attachments: ${count('optic')} optics, ${count('muzzle')} muzzle devices, ${count('underbarrel')} underbarrel, ${count('side')} side rail, ${count('bayonet')} bayonets, ${count('magazine')} magazines<br>palette <b>${weapon.paletteName}</b> · ${tris.toLocaleString()} tris in total`;
   } else if (currentFaction) {
     const f = currentFaction;
     const tris = f.members.reduce((n, m) => n + BadGun.buildManifest(m.weapon).stats.triangles, 0);

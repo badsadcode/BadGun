@@ -73,7 +73,7 @@ export const cyber: StyleProfile = {
     handguard: { cabled: 1.2, quad: 0.6, slim: 0.5, shell: 0.3 },
     stock: { blade: 1.2, collapsible: 0.6, frame: 0.6, skeletal: 0.4, thumbhole: 0.3 },
     grip: { neon: 1.2, ergo: 0.6, loop: 0.4, skeleton: 0.4 },
-    magazine: { smartmag: 1.2, straight: 0.5, curved: 0.4, cell: 0.3, twin: 0.2 },
+    magazine: { smartmag: 1.2, straight: 0.5, curved: 0.4, cell: 0.3, twin: 0.2, helical: 0.3, casket: 0.25, windowed: 0.3, pullloop: 0.2 },
     sight: { auto: 1 },
   },
   byArchetype: {

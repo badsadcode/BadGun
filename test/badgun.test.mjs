@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { validateBytes } from 'gltf-validator';
 import { inflateSync } from 'node:zlib';
-import { generate, toGLB, buildManifest, STYLES, ARCHETYPES, generateFaction, factionToGLB, buildAtlas, bakeTexture, encodePNG, ID_COLORS, weaponClips, generateAttachment, generateAttachmentKit, kitToGLB, attachmentVariants, ATTACHMENT_TYPES } from '../dist/index.js';
+import { generate, toGLB, buildManifest, STYLES, ARCHETYPES, generateFaction, factionToGLB, buildAtlas, bakeTexture, encodePNG, ID_COLORS, weaponClips, generateAttachment, generateAttachmentKit, kitToGLB, attachmentVariants, ATTACHMENT_TYPES, attachmentStats, weaponLoadout } from '../dist/index.js';
 
 const base = { archetype: 'rifle', style: 'steampunk', seed: 42 };
 const component = (w, name) => w.components.find((c) => c.name === name);
@@ -146,7 +146,7 @@ test('archetypes pick variants that fit them', () => {
         assert.ok(!['ammobox'].includes(w.parts.magazine) && (w.parts.magazine !== 'tube' || w.parts.config === 'lever'), `${a}: ${w.parts.magazine}`);
         assert.equal(w.parts.stock === 'butt', w.parts.config === 'bullpup', 'bullpups (and only bullpups) get a butt stock');
         assert.equal(['sporter', 'military'].includes(w.parts.stock), w.parts.grip === 'integral', 'one-piece stocks carry their own grip');
-        if (w.parts.config === 'machinepistol') assert.ok(['straight', 'stick'].includes(w.parts.magazine), 'machine pistols feed through the grip');
+        if (w.parts.config === 'machinepistol') assert.ok(['straight', 'stick', 'extended', 'pullloop', 'windowed', 'ribbed'].includes(w.parts.magazine), 'machine pistols feed through the grip');
       }
     }
   }
@@ -335,9 +335,14 @@ test('attachments: standalone pieces are exactly the ones on the gun, and every 
     ['underbarrel', 'launcher', 'Underbarrel', 'SOCKET_Underbarrel'],
     ['optic', 'scope', 'Optic', 'SOCKET_Optic'],
     ['muzzle', 'suppressor', 'Muzzle', 'SOCKET_Barrel_End'],
+    ['bayonet', 'knife', 'Bayonet', 'SOCKET_Bayonet'],
+    ['bayonet', 'sword', 'Bayonet', 'SOCKET_Bayonet'],
+    ['magazine', 'curved', 'Magazine', 'SOCKET_Magazine'],
+    ['magazine', 'casket', 'Magazine', 'SOCKET_Magazine'],
+    ['magazine', 'pan', 'Magazine', 'SOCKET_Magazine_Top'],
   ]) {
     const kind = type === 'optic' ? 'sight' : type;
-    const gun = generate({ archetype: 'rifle', style: 'modern', seed: 8, parts: { config: 'standard', handguard: 'railed', [kind]: variant } });
+    const gun = generate({ archetype: 'rifle', style: 'modern', seed: 8, parts: { config: 'standard', handguard: 'railed', [kind]: variant, ...(type === 'bayonet' ? { muzzle: 'suppressor' } : {}) } });
     const part = gun.components.find((c) => c.name === comp);
     assert.ok(part, `${type}: on the gun`);
     const s = gun.sockets.find((x) => x.name === socket);
@@ -346,7 +351,16 @@ test('attachments: standalone pieces are exactly the ones on the gun, and every 
     const alone = generateAttachment({ type, variant, style: 'modern', seed: 8 });
     assert.equal(geo(alone.components[0]), geo(part), `${type}/${variant}: standalone == mounted`);
     assert.deepEqual(alone.sockets.find((x) => x.name === 'SOCKET_Mount').position, [0, 0, 0]);
+    assert.equal(buildManifest(alone).attachment.mountsOn, socket, `${type}/${variant}: manifest says where it snaps`);
   }
+  // Magazines fit the host's magwell: an SMG magazine matches the one on an SMG.
+  {
+    const gun = generate({ archetype: 'smg', style: 'cyber', seed: 5, parts: { config: 'standard', magazine: 'helical' } });
+    const alone = generateAttachment({ type: 'magazine', variant: 'helical', style: 'cyber', seed: 5, host: 'smg' });
+    assert.equal(geo(alone.components[0]), geo(gun.components.find((c) => c.name === 'Magazine')), 'smg magazine standalone == mounted');
+    assert.equal(alone.components[0].motion, undefined, 'a lone magazine does not animate');
+  }
+  assert.throws(() => generateAttachment({ type: 'magazine', variant: 'curved', style: 'modern', seed: 1, host: 'pistol' }), /long guns/);
   // Every variant of every type, in every world, is valid glTF.
   for (const style of Object.keys(STYLES)) {
     for (const type of ATTACHMENT_TYPES) {
@@ -357,7 +371,7 @@ test('attachments: standalone pieces are exactly the ones on the gun, and every 
       }
     }
     const kit = generateAttachmentKit({ style, seed: 4 });
-    assert.ok(kit.items.length >= 4, `${style}: kit has something of every type`);
+    assert.ok(kit.items.length >= ATTACHMENT_TYPES.length, `${style}: kit has something of every type`);
     assert.deepEqual([...new Set(kit.items.map((w) => w.attachment.type))], ATTACHMENT_TYPES);
     assert.equal((await validateBytes(kitToGLB(kit))).issues.numErrors, 0, `${style}: kit glTF`);
   }
@@ -370,4 +384,80 @@ test('attachments: standalone pieces are exactly the ones on the gun, and every 
       if (sh.parts.handguard === 'pump') assert.deepEqual([sh.parts.underbarrel, sh.parts.side], ['none', 'none'], 'nothing on a moving pump');
     }
   }
+});
+
+test('bayonets and magazines: period odds, fit, and every variant builds on every layout', () => {
+  // Bayonets only where they make sense, never under a fat muzzle can, and the barrel leaves room for the handle.
+  let ww1 = 0;
+  for (const style of Object.keys(STYLES)) {
+    for (let seed = 1; seed <= 8; seed++) {
+      for (const archetype of ['rifle', 'smg', 'shotgun', 'sniper', 'lmg']) {
+        const w = generate({ archetype, style, seed });
+        const b = w.parts.bayonet;
+        if (!['rifle', 'shotgun'].includes(archetype) || w.parts.config === 'bullpup') assert.equal(b, 'none', `${style}/${archetype}/${seed}: no bayonet`);
+        if (b !== 'none') {
+          assert.ok(!['bell', 'can', 'bottle', 'maw'].includes(w.parts.muzzle), 'no blade under a fat muzzle');
+          const bay = component(w, 'Bayonet');
+          const s = w.sockets.find((x) => x.name === 'SOCKET_Bayonet');
+          assert.deepEqual(bay.pivot.map((v) => +v.toFixed(5)), s.position.map((v) => +v.toFixed(5)), 'bayonet sits on its lug');
+          assert.ok(w.sockets.find((x) => x.name === 'SOCKET_Bayonet_Tip').position[2] > w.sockets.find((x) => x.name === 'SOCKET_Muzzle').position[2], 'the point is past the muzzle');
+          if (style === 'ww1' && archetype === 'rifle') ww1++;
+        }
+      }
+    }
+  }
+  assert.ok(ww1 >= 2, 'WW1 rifles often carry bayonets');
+  // Every new magazine and bayonet builds on every long-gun layout it can be forced onto.
+  const mags = ['extended', 'casket', 'coupled', 'windowed', 'pullloop', 'helical', 'banana', 'ribbed', 'straight', 'curved'];
+  for (const [archetype, config] of [['rifle', 'standard'], ['rifle', 'bullpup'], ['smg', 'standard'], ['smg', 'machinepistol'], ['lmg', 'standard'], ['sniper', 'standard']]) {
+    for (const magazine of mags) {
+      const w = generate({ archetype, style: 'modern', seed: 3, parts: { config, magazine } });
+      const m = component(w, 'Magazine');
+      assert.ok(m && m.geometry.size > 0, `${archetype}/${config}/${magazine}: magazine built`);
+      // The magazine reaches up into the well.
+      const top = Math.max(...[...m.geometry.values()].map((g) => g.bounds().max[1]));
+      assert.ok(top > -0.001, `${archetype}/${config}/${magazine}: meets the magwell (${top})`);
+    }
+  }
+  for (const bayonet of Object.keys(attachmentVariants('bayonet'))) {
+    for (const archetype of ['rifle', 'shotgun']) {
+      const w = generate({ archetype, style: 'modern', seed: 4, parts: { bayonet } });
+      assert.equal(component(w, 'Bayonet').variant, bayonet);
+    }
+  }
+});
+
+test('loadout: suggested stats for every attachment, capacity for every weapon', () => {
+  for (const type of ATTACHMENT_TYPES) {
+    for (const variant of [...Object.keys(attachmentVariants(type)), 'none', 'mystery-gizmo-9000']) {
+      for (const host of ['rifle', 'smg', 'lmg', 'sniper', 'shotgun', 'pistol']) {
+        const stats = attachmentStats(type, variant, { host });
+        assert.ok(Object.keys(stats).length >= 2, `${type}/${variant}: has stats`);
+        for (const [k, v] of Object.entries(stats)) assert.ok((typeof v === 'number' && Number.isFinite(v)) || typeof v === 'boolean' || typeof v === 'string', `${type}/${variant}.${k}`);
+      }
+    }
+  }
+  assert.doesNotThrow(() => attachmentStats('jetpack', 'whatever'));
+  assert.equal(attachmentStats('magazine', 'internal').capacity, 5);
+  assert.ok(attachmentStats('magazine', 'drum', { host: 'lmg' }).capacity >= 75);
+  assert.ok(attachmentStats('optic', 'scope').magnification > attachmentStats('optic', 'reddot').magnification);
+  assert.equal(attachmentStats('muzzle', 'suppressor').suppressed, true);
+  assert.equal(attachmentStats('underbarrel', 'launcher').secondary, 'grenade');
+  for (const archetype of Object.keys(ARCHETYPES)) {
+    const w = generate({ archetype, style: 'modern', seed: 2 });
+    const m = buildManifest(w);
+    assert.ok(m.loadout && Number.isInteger(m.loadout.capacity) && m.loadout.capacity >= 1, `${archetype}: capacity`);
+    assert.equal(m.attachment, undefined);
+    for (const e of m.loadout.slots) if (e.socket) assert.ok(w.sockets.find((s) => s.name === e.socket), `${archetype}: ${e.slot} socket exists`);
+  }
+  const rifle = weaponLoadout(generate({ archetype: 'rifle', style: 'ww1', seed: 1, parts: { bayonet: 'sword' } }));
+  assert.deepEqual(rifle.slots.map((s) => s.slot), ['optic', 'muzzle', 'underbarrel', 'side', 'bayonet', 'magazine']);
+  assert.equal(rifle.slots.find((s) => s.slot === 'bayonet').socket, 'SOCKET_Bayonet');
+  assert.equal(weaponLoadout(generate({ archetype: 'bow', style: 'fantasy', seed: 1 })).capacity, 1);
+  const rev = generate({ archetype: 'revolver', style: 'modern', seed: 1, parts: { cylinder: 'eight' } });
+  assert.equal(weaponLoadout(rev).capacity, 8);
+  const lone = buildManifest(generateAttachment({ type: 'optic', variant: 'scope', style: 'modern', seed: 1 }));
+  assert.equal(lone.attachment.mountsOn, 'SOCKET_Optic');
+  assert.equal(lone.attachment.stats.magnification, 4);
+  assert.equal(lone.loadout, undefined);
 });

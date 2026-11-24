@@ -58,7 +58,7 @@ export const steampunk: StyleProfile = {
     handguard: { forend: 1, cage: 0.8, slim: 0.3, jacket: 0.4 },
     stock: { classic: 1, wire: 0.25, thumbhole: 0.3, sporter: 0.6 },
     grip: { wood: 1, wrapped: 0.8 },
-    magazine: { drum: 1, canister: 0.8, pan: 0.35 },
+    magazine: { drum: 1, canister: 0.8, pan: 0.35, ribbed: 0.25 },
     sight: { auto: 1 },
   },
   optics: { brass: 1, irons: 0.4 },

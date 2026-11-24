@@ -61,7 +61,7 @@ export interface Weapon {
   /** True once geometry is in node-local space. */
   finalized: boolean;
   /** Set when this asset is a standalone attachment rather than a weapon. */
-  attachment?: { type: string; variant: string };
+  attachment?: { type: string; variant: string; mountsOn?: string; stats?: Record<string, number | boolean | string> };
 }
 
 export class WeaponBuilder {

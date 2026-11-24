@@ -68,7 +68,7 @@ export const modern: StyleProfile = {
     handguard: { railed: 1, quad: 0.6, slim: 0.5 },
     stock: { collapsible: 1, fixed: 0.5, wire: 0.2, thumbhole: 0.4, none: 0.1, sporter: 0.25, frame: 0.45 },
     grip: { polymer: 1, ergo: 0.8, loop: 0.1 },
-    magazine: { curved: 1, straight: 0.4, twin: 0.15 },
+    magazine: { curved: 1, straight: 0.4, twin: 0.15, windowed: 0.3, extended: 0.25, pullloop: 0.15, coupled: 0.1, casket: 0.06, ribbed: 0.1 },
     sight: { auto: 1 },
   },
   optics: { reddot: 1, scope: 0.6, holo: 0.4, irons: 0.3 },

@@ -2,7 +2,7 @@
  * Historical parts (WW1 / WW2 / Vietnam era). Generic period shapes, not
  * replicas of particular models: bolt-action receivers, full-length military
  * stocks, internal and stick magazines, top-fed machine-gun magazines, leaf
- * sights, bayonets, a ribbed triangular handguard, and two early pistols.
+ * sights, a ribbed triangular handguard, and two early pistols.
  */
 import { AXIS_X, AXIS_Y, Vec2, bezier, box, cylinder, extrudeFront, lathe, ring, smoothPolygon } from '../core/geometry.js';
 import type { PartBuilder } from '../archetypes/archetype.js';
@@ -166,18 +166,6 @@ export const ERA_MAGAZINES: Record<string, PartBuilder> = { internal, stick, top
 // ---------------------------------------------------------------------------
 // Accessories
 // ---------------------------------------------------------------------------
-
-/** Bayonet under the muzzle: a ring around the barrel, a handle and a blade. */
-export function bayonet(ctx: BuildContext, length: number): void {
-  const { L } = ctx;
-  const rb = L.barrel.radius, z = L.barrel.z1 - 0.012;
-  const c = ctx.b.component('Bayonet', { kind: 'bayonet', variant: 'blade', parent: 'Barrel', pivot: [0, -rb, z] });
-  const yb = -rb - 0.009;
-  put(ctx, c, 'Detail', lathe([[rb, z - 0.006], [rb + 0.003, z - 0.005], [rb + 0.003, z + 0.005], [rb, z + 0.006]], ctx.seg(0.8)));
-  side(ctx, c, 'Stock', [[z - 0.1, yb + 0.005], [z - 0.004, yb + 0.005], [z - 0.004, yb - 0.006], [z - 0.1, yb - 0.005]], 0.012, 0.002);
-  side(ctx, c, 'Barrel', [[z, yb + 0.006], [z + length * 0.9, yb + 0.004], [z + length, yb - 0.001], [z + length * 0.9, yb - 0.006], [z, yb - 0.005]], 0.0035, 0.0006);
-  ctx.b.socket({ name: 'SOCKET_Bayonet', parent: 'Bayonet', position: [0, yb, z + length], forward: [0, 0, 1], description: 'Bayonet tip.' });
-}
 
 /** Perforated heat shield over a shotgun barrel. */
 export function heatShield(ctx: BuildContext): void {

@@ -71,7 +71,7 @@ export const diesel: StyleProfile = {
     handguard: { radiator: 1.2, jacket: 0.8, slim: 0.3 },
     stock: { deco: 1.2, fixed: 0.5, wire: 0.4, thumbhole: 0.3 },
     grip: { wood: 0.8, polymer: 0.6, ergo: 0.4 },
-    magazine: { drum: 1, jerrycan: 0.8, curved: 0.5, straight: 0.4, pan: 0.2 },
+    magazine: { drum: 1, jerrycan: 0.8, curved: 0.5, straight: 0.4, pan: 0.2, ribbed: 0.5, casket: 0.3 },
     sight: { auto: 1 },
   },
   byArchetype: {

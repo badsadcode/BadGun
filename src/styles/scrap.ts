@@ -69,7 +69,7 @@ export const scrap: StyleProfile = {
     handguard: { plank: 1, taped: 1, slim: 0.2 },
     stock: { plank: 1, pipe: 0.8, none: 0.35, wire: 0.3, sporter: 0.2 },
     grip: { taped: 1, plank: 0.8, polymer: 0.15 },
-    magazine: { straight: 0.6, twin: 0.5, can: 0.8, curved: 0.3, pan: 0.15 },
+    magazine: { straight: 0.6, twin: 0.5, can: 0.8, curved: 0.3, pan: 0.15, banana: 0.3, coupled: 0.25, pullloop: 0.2 },
     sight: { auto: 1 },
   },
   optics: { none: 1, irons: 1, tube: 0.8, reddot: 0.15 },

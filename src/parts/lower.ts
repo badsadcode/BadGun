@@ -1,9 +1,10 @@
 /**
  * Grips and magazines: the parts that hang under the receiver.
  */
-import { AXIS_X, AXIS_Y, Vec2, Vec3, bezier, box, cylinder, dome, lathe, ring, roundedRect, smoothPolygon } from '../core/geometry.js';
+import { AXIS_X, AXIS_Y, Vec2, Vec3, box, cylinder, dome, lathe, ring, roundedRect, smoothPolygon } from '../core/geometry.js';
 import { BuildContext, put, raked, side } from './context.js';
 import type { PartBuilder } from './receiver.js';
+import { magBody, magLook } from './mags2.js';
 
 // ---------------------------------------------------------------------------
 // Grips
@@ -82,32 +83,10 @@ function magComponent(ctx: BuildContext, variant: string, axis: Vec3 = [0, -1, 0
   });
 }
 
+/** Box magazine body plus its seeded look (baseplate, ribs, witness holes, window); see mags2.ts. */
 function boxMag(ctx: BuildContext, variant: string, curve: number): void {
-  const { L, p } = ctx;
   const m = magComponent(ctx, variant);
-  const { z0: m0, z1: m1 } = L.magwell;
-  const Lm = L.magLength;
-  const yT = L.rec.bottom + 0.008, yE = L.rec.bottom - Lm;
-  const bz = m0 + 0.003, fz = m1 - 0.003;
-  const front = bezier([fz, yT], [fz, yT - Lm * 0.45], [fz + curve * 0.7 + 0.006, yE + Lm * 0.15], [fz + curve + 0.006, yE + 0.006], 8);
-  const back = bezier([bz, yT], [bz, yT - Lm * 0.45], [bz + curve * 0.7, yE + Lm * 0.15], [bz + curve, yE], 8);
-  const width = 0.023 + p.bulk * 0.004;
-  side(ctx, m, 'Magazine', [[bz, yT], [fz, yT], ...front, ...back.slice(0, -1).reverse()], width, 0.002);
-
-  // Floorplate, tilted to follow the bottom edge.
-  const len = fz + curve + 0.006 - (bz + curve);
-  const tilt = Math.atan2(0.006, len);
-  put(ctx, m, 'Detail', box([0, 0, 0], [width + 0.003, 0.008, len + 0.01], ctx.bevel(0.002)), [0, yE - 0.001 + 0.003, (bz + fz) / 2 + curve + 0.003], [-tilt, 0, 0]);
-
-  // Side ribs (grip texture).
-  if (p.detail > 0.5) {
-    for (let i = 1; i <= 3; i++) {
-      const t = 0.2 + i * 0.12;
-      const y = yT - Lm * t;
-      const zc = bz + (fz - bz) / 2 + curve * t * t;
-      put(ctx, m, 'Magazine', box([0, 0, 0], [width + 0.002, 0.003, (fz - bz) * 0.7], ctx.bevel(0.001)), [0, y, zc + 0.002]);
-    }
-  }
+  magLook(ctx, magBody(ctx, m, { curve }), variant);
 }
 
 const curved: PartBuilder = (ctx) => boxMag(ctx, 'curved', 0.022 + ctx.rng('magazine').range(0, 0.02));

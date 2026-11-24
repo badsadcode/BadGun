@@ -69,7 +69,7 @@ export const scifi: StyleProfile = {
     handguard: { shell: 1, slim: 0.4, jacket: 0.3 },
     stock: { skeletal: 1, solid: 0.8, thumbhole: 0.5, frame: 0.4 },
     grip: { sleek: 1, skeleton: 0.8, loop: 0.9 },
-    magazine: { cell: 1 },
+    magazine: { cell: 1, helical: 0.4 },
     sight: { auto: 1 },
   },
   optics: { holo: 1, scope: 0.4, none: 0.2 },
