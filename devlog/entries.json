@@ -86,5 +86,13 @@
     "date": "2026-11-24",
     "summary": "Revolvers and rocket launchers join the factory, plus harpoons, tasers, a nail gun, a megacannon and dozens of new bodies, built by four robot helpers at once.",
     "cover": "assets/011/banner.webp"
+  },
+  {
+    "slug": "012-make-it-yours",
+    "number": "012",
+    "title": "Make It Yours",
+    "date": "2026-11-24",
+    "summary": "Real shapes for scopes and attachments, bayonets, swappable magazines, and suggested gameplay stats for every piece.",
+    "cover": "assets/012/banner.webp"
   }
 ]

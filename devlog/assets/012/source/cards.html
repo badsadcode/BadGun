@@ -1,0 +1,220 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@500;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#121419; --ink:#f1eee8; --dim:#9aa0aa; --orange:#ff6b3d; --yellow:#ffd23d; --cyan:#42e2ff; --brass:#e0b25a; --pink:#ff5fc0; }
+* { box-sizing: border-box; margin: 0; }
+body { background: #333; font-family: 'Space Grotesk', sans-serif; color: var(--ink); padding: 20px; display: grid; gap: 20px; justify-content: start; }
+.card { width: 1200px; position: relative; overflow: hidden; border-radius: 28px; padding: 48px 56px;
+  background:
+    radial-gradient(900px 500px at 80% 30%, rgba(255,107,61,.13), transparent 60%),
+    radial-gradient(700px 400px at 10% 100%, rgba(66,226,255,.08), transparent 60%),
+    linear-gradient(160deg, #181b22, #101216);
+}
+.card::before { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+  background-size: 32px 32px; mask-image: radial-gradient(circle at 60% 40%, #000 30%, transparent 85%); }
+.kicker { font: 700 14px 'JetBrains Mono', monospace; letter-spacing: 3px; color: var(--orange); text-transform: uppercase; }
+h1 { font-size: 76px; line-height: .95; letter-spacing: -3px; font-weight: 700; margin: 18px 0 18px; }
+h1 em { font-style: normal; color: var(--orange); }
+h2 { font-size: 44px; letter-spacing: -1.5px; line-height: 1; margin: 10px 0 8px; }
+.sub { font-size: 22px; color: var(--dim); max-width: 520px; line-height: 1.35; }
+.chip { display: inline-block; font: 700 13px 'JetBrains Mono', monospace; letter-spacing: 2px; padding: 6px 12px; border-radius: 999px; border: 1.5px solid currentColor; }
+.note { font-family: 'Caveat', cursive; font-weight: 700; color: var(--yellow); }
+img { display: block; }
+.logo { position: absolute; right: 40px; bottom: 30px; font: 700 15px 'JetBrains Mono', monospace; color: #5b616c; letter-spacing: 2px; }
+.logo b { color: var(--orange); }
+
+/* banner */
+#banner { height: 560px; }
+#banner .guns { position: absolute; right: -40px; top: 40px; width: 760px; height: 500px; }
+#banner .guns img { position: absolute; filter: drop-shadow(0 30px 30px rgba(0,0,0,.45)); }
+#banner .g1 { width: 600px; right: 110px; top: 10px; opacity: .97; }
+#banner .g2 { width: 700px; right: 40px; top: 150px; }
+#banner .g3 { width: 600px; right: 130px; top: 320px; }
+#banner .stamp { position: absolute; left: 56px; bottom: 48px; display: flex; gap: 10px; }
+#banner .scribble { position: absolute; left: 58px; top: 405px; transform: rotate(-3deg); font-size: 28px; }
+
+/* worlds */
+.world { display: grid; grid-template-columns: 330px 1fr; align-items: center; gap: 20px; padding: 18px 0; border-top: 1px dashed rgba(255,255,255,.1); position: relative; }
+.world:first-of-type { border-top: 0; }
+.world p { color: var(--dim); font-size: 18px; line-height: 1.4; }
+.world img { width: 780px; justify-self: center; filter: drop-shadow(0 18px 22px rgba(0,0,0,.5)); }
+
+/* grids */
+.grid { display: grid; gap: 6px 26px; margin-top: 26px; }
+.grid img { width: 100%; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.colhead { margin-bottom: 4px; }
+.cell { position: relative; padding: 10px 6px; }
+.cell .label { position: absolute; left: 6px; top: 2px; font: 700 13px 'JetBrains Mono', monospace; color: var(--dim); letter-spacing: 1px; }
+
+/* exploded */
+#exploded .stage { position: relative; width: 1088px; margin-top: 30px; }
+#exploded .stage img { width: 100%; filter: drop-shadow(0 16px 18px rgba(0,0,0,.5)); }
+.tag { position: absolute; font-family: 'Caveat', cursive; font-weight: 700; font-size: 30px; color: var(--yellow); white-space: nowrap; transform: rotate(-3deg); }
+.tag::before { content: '↙ '; }
+.tag.r::before { content: ''; } .tag.r::after { content: ' ↘'; }
+.tag.d::before { content: '↖ '; }
+.tag.n::before { content: ''; }
+
+/* stats */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 30px; }
+.stat { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 20px; padding: 22px 24px; }
+.stat .n { font-size: 54px; font-weight: 700; letter-spacing: -2px; color: var(--ink); }
+.stat .n small { font-size: 26px; color: var(--dim); letter-spacing: 0; }
+.stat .t { color: var(--dim); font-size: 17px; line-height: 1.35; margin-top: 4px; }
+.stat.hot { border-color: rgba(255,107,61,.5); background: rgba(255,107,61,.08); }
+.stat.hot .n { color: var(--orange); }
+
+.fam { display: grid; grid-template-columns: 140px repeat(3, 1fr); gap: 4px 18px; align-items: center; margin-top: 26px; }
+.fam .rowlab { font: 700 15px 'JetBrains Mono', monospace; letter-spacing: 2px; color: var(--dim); text-transform: uppercase; }
+.fam img { width: 100%; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.fam .cell { height: 128px; display: flex; align-items: center; justify-content: center; }
+.fam .cell img { max-height: 120px; width: auto; max-width: 100%; }
+.trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 30px; align-items: end; }
+.trio .item img { width: 100%; filter: drop-shadow(0 14px 16px rgba(0,0,0,.5)); }
+.trio .item h3 { font-size: 26px; margin: 14px 0 4px; letter-spacing: -.5px; }
+.trio .item p { color: var(--dim); font-size: 16px; line-height: 1.4; }
+.xb { display: grid; gap: 4px; margin-top: 20px; }
+.xb .row { display: grid; grid-template-columns: 300px 1fr; gap: 20px; align-items: center; }
+.xb .row img { width: 100%; filter: drop-shadow(0 16px 18px rgba(0,0,0,.5)); }
+.xb .row p { color: var(--dim); font-size: 17px; line-height: 1.4; }
+.xb .row h3 { font-size: 28px; margin: 10px 0 6px; }
+.cat { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 30px; margin-top: 26px; }
+.cat .c { position: relative; padding-top: 34px; }
+.cat .c img { width: 100%; filter: drop-shadow(0 12px 14px rgba(0,0,0,.5)); }
+.cat .c .note { position: absolute; left: 4px; top: 0; font-size: 28px; transform: rotate(-2deg); }
+#banner2 { height: 560px; }
+#banner2 .g { position: absolute; filter: drop-shadow(0 26px 26px rgba(0,0,0,.5)); }
+
+.ba { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 26px; }
+.ba .col h3 { font: 700 15px 'JetBrains Mono', monospace; letter-spacing: 3px; margin: 0 0 6px; }
+.ba .col .sub2 { color: var(--dim); font-size: 17px; margin-bottom: 10px; }
+.ba .col img { width: 100%; display: block; margin: 4px 0; filter: drop-shadow(0 8px 10px rgba(0,0,0,.5)); }
+.ba .before { opacity: .92; }
+.bows { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 24px; align-items: start; }
+.bows .b { text-align: center; }
+.bows .b img { height: 520px; width: 100%; object-fit: contain; filter: drop-shadow(0 14px 14px rgba(0,0,0,.5)); }
+.bows .b h3 { font-size: 22px; margin: 10px 0 2px; }
+.bows .b p { color: var(--dim); font-size: 14px; margin: 0; line-height: 1.35; }
+.quad { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 30px; margin-top: 24px; }
+.quad .c { position: relative; padding-top: 36px; }
+.quad .c img { width: 100%; filter: drop-shadow(0 12px 14px rgba(0,0,0,.5)); }
+.quad .c .note { position: absolute; left: 4px; top: 0; font-size: 28px; transform: rotate(-2deg); }
+#banner3 { height: 560px; }
+#banner3 .g { position: absolute; filter: drop-shadow(0 26px 26px rgba(0,0,0,.5)); }
+
+.fam8 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px 22px; margin-top: 24px; align-items: center; }
+.fam8 .c { text-align: center; }
+.fam8 .c img { width: 100%; max-height: 150px; object-fit: contain; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.fam8 .c span { font: 700 13px 'JetBrains Mono', monospace; letter-spacing: 2px; color: var(--dim); }
+.pals { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 30px; margin-top: 24px; }
+.pals .c img { width: 100%; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.pals .c span { font: 700 14px 'JetBrains Mono', monospace; letter-spacing: 2px; }
+.heroes { display: grid; grid-template-columns: 1.6fr 1fr 0.55fr; gap: 20px; align-items: center; margin-top: 20px; }
+.heroes img { width: 100%; filter: drop-shadow(0 16px 18px rgba(0,0,0,.5)); }
+.heroes .note { font-size: 26px; display: block; margin-bottom: 6px; transform: rotate(-2deg); }
+#banner4 { height: 560px; }
+#banner4 .g { position: absolute; filter: drop-shadow(0 26px 26px rgba(0,0,0,.5)); }
+
+.eras { display: grid; grid-template-columns: 120px repeat(3, 1fr); gap: 4px 26px; margin-top: 24px; align-items: center; }
+.eras .rowlab { font: 700 15px 'JetBrains Mono', monospace; letter-spacing: 2px; color: var(--dim); }
+.eras .rowlab small { display: block; font-weight: 500; font-size: 11px; letter-spacing: 1px; margin-top: 2px; }
+.eras .cell { height: 120px; display: flex; align-items: center; justify-content: center; }
+.eras .cell img.pistol { max-height: 86px; }
+.eras .cell img { max-width: 100%; max-height: 112px; filter: drop-shadow(0 8px 10px rgba(0,0,0,.5)); }
+.eras .colhead { font: 700 12px 'JetBrains Mono', monospace; letter-spacing: 2px; color: #6b717c; text-align: center; }
+#banner5 { height: 560px; }
+#banner5 .g { position: absolute; filter: drop-shadow(0 26px 26px rgba(0,0,0,.5)); }
+.cat .c img.small { width: auto; max-height: 200px; margin-left: 60px; }
+
+.fgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px 26px; margin-top: 26px; }
+.fcard { background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.08); border-radius: 22px; padding: 16px 18px 14px; display: flex; flex-direction: column; }
+.fcard .top { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
+.fcard h3 { font-size: 21px; margin: 0; letter-spacing: -.4px; line-height: 1.15; }
+.fcard .meta { font: 600 11px 'JetBrains Mono', monospace; color: var(--dim); letter-spacing: 1px; text-transform: uppercase; margin-top: 3px; }
+.fcard .lineup { height: 330px; display: flex; align-items: center; justify-content: center; }
+.fcard .lineup img { max-width: 100%; max-height: 330px; filter: drop-shadow(0 10px 12px rgba(0,0,0,.5)); }
+.fcard .doc { font: 500 12px 'JetBrains Mono', monospace; color: #9aa0aa; margin-top: 6px; line-height: 1.5; }
+.anat { display: grid; grid-template-columns: 1.15fr 1fr; gap: 30px; margin-top: 20px; align-items: center; }
+.anat img { width: 100%; filter: drop-shadow(0 14px 16px rgba(0,0,0,.5)); }
+.anat ol { margin: 0; padding-left: 22px; font-size: 19px; line-height: 1.45; color: #d9d6cf; }
+.anat ol li { margin: 0 0 12px; }
+.anat ol b { color: #fff; }
+.swatch { display: inline-block; width: 16px; height: 16px; border-radius: 4px; vertical-align: -2px; margin-right: 4px; }
+.badges { display: flex; gap: 16px; margin-top: 8px; }
+#banner6 { height: 560px; }
+#banner6 .g { position: absolute; filter: drop-shadow(0 22px 22px rgba(0,0,0,.5)); }
+
+#banner12 { height: 560px; }
+#banner12 .g { position: absolute; filter: drop-shadow(0 22px 22px rgba(0,0,0,.5)); }
+.grid12 { display: grid; gap: 10px 14px; margin-top: 20px; }
+.grid12 .c { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07); border-radius: 14px; padding: 8px 10px; display: flex; flex-direction: column; }
+.grid12 .c .img { flex: 1; display: flex; align-items: center; justify-content: center; }
+.grid12 .c img { max-width: 100%; filter: drop-shadow(0 8px 10px rgba(0,0,0,.5)); }
+.grid12 .c span { font: 700 12px 'JetBrains Mono', monospace; color: var(--dim); letter-spacing: 1px; text-transform: uppercase; }
+.grid12 .c b { color: var(--yellow); }
+h3.sec { font: 700 14px 'JetBrains Mono', monospace; letter-spacing: 3px; color: var(--orange); margin: 26px 0 0; text-transform: uppercase; }
+.lo { display: grid; grid-template-columns: 1.1fr 1fr; gap: 26px; margin-top: 18px; align-items: center; }
+.lo img { width: 100%; filter: drop-shadow(0 14px 16px rgba(0,0,0,.5)); }
+.lo table { width: 100%; border-collapse: collapse; font: 500 14px 'JetBrains Mono', monospace; }
+.lo td { padding: 7px 8px; border-bottom: 1px solid rgba(255,255,255,.08); color: #d9d6cf; vertical-align: top; }
+.lo td:first-child { color: var(--yellow); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+.lo td:nth-child(2) { color: #fff; font-weight: 700; }
+.lo .cap { font: 700 15px 'JetBrains Mono', monospace; color: var(--orange); margin-bottom: 8px; }
+</style></head><body>
+<section class="card" id="banner12">
+  <div class="kicker">Bad Ideas Works · Devlog #012</div>
+  <h1>Make It<br><em>Yours.</em></h1>
+  <p class="sub" style="max-width:420px">Real shapes for scopes and attachments, bayonets, magazines, and stats for every piece.</p>
+  <img class="g" src="renders/c_hero.png" style="width:700px; right:20px; top:70px;">
+  <div style="position:absolute; left:56px; bottom:48px; display:flex; gap:10px;">
+    <span class="chip" style="color:var(--yellow)">99 ATTACHMENTS</span><span class="chip" style="color:var(--orange)">6 SLOTS</span><span class="chip" style="color:#c9ccd2">LOADOUT STATS</span>
+  </div>
+</section>
+<section class="card" id="optics12">
+  <div class="kicker">Sights</div>
+  <h2>14 new optics, actually different shapes.</h2>
+  <div class="grid12" style="grid-template-columns:repeat(5,1fr)"><div class="c" style="height:170px"><span>prism</span><div class="img"><img src="renders/c_o_prism.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>long range</span><div class="img"><img src="renders/c_o_longrange.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>digital</span><div class="img"><img src="renders/c_o_digital.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>thermal</span><div class="img"><img src="renders/c_o_thermal.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>night vision</span><div class="img"><img src="renders/c_o_nightvision.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>dot + magnifier</span><div class="img"><img src="renders/c_o_magnifier.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>offset</span><div class="img"><img src="renders/c_o_offset.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>tube dot</span><div class="img"><img src="renders/c_o_tubedot.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>mini dot</span><div class="img"><img src="renders/c_o_minidot.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>periscope</span><div class="img"><img src="renders/c_o_periscope.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>crystal eye</span><div class="img"><img src="renders/c_o_eye.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>tin can</span><div class="img"><img src="renders/c_o_tincan.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>hud panel</span><div class="img"><img src="renders/c_o_hud.png" style="max-height:120px"></div></div></div>
+  <h3 class="sec">Same "scope", six lucky numbers</h3>
+  <div class="grid12" style="grid-template-columns:repeat(6,1fr)"><div class="c" style="height:130px"><span>scope <b>seed 1</b></span><div class="img"><img src="renders/c_scope_1.png" style="max-height:90px"></div></div><div class="c" style="height:130px"><span>scope <b>seed 2</b></span><div class="img"><img src="renders/c_scope_2.png" style="max-height:90px"></div></div><div class="c" style="height:130px"><span>scope <b>seed 3</b></span><div class="img"><img src="renders/c_scope_3.png" style="max-height:90px"></div></div><div class="c" style="height:130px"><span>scope <b>seed 4</b></span><div class="img"><img src="renders/c_scope_4.png" style="max-height:90px"></div></div><div class="c" style="height:130px"><span>scope <b>seed 5</b></span><div class="img"><img src="renders/c_scope_5.png" style="max-height:90px"></div></div><div class="c" style="height:130px"><span>scope <b>seed 6</b></span><div class="img"><img src="renders/c_scope_6.png" style="max-height:90px"></div></div></div>
+</section>
+<section class="card" id="muzzle12">
+  <div class="kicker">The pointy end</div>
+  <h2>10 new muzzle devices.</h2>
+  <div class="grid12" style="grid-template-columns:repeat(5,1fr)"><div class="c" style="height:170px"><span>birdcage</span><div class="img"><img src="renders/c_m_birdcage.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>slab brake</span><div class="img"><img src="renders/c_m_tribrake.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>flash cone</span><div class="img"><img src="renders/c_m_flashcone.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>square can</span><div class="img"><img src="renders/c_m_shroud.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>box brake</span><div class="img"><img src="renders/c_m_boxbrake.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>oil filter</span><div class="img"><img src="renders/c_m_oilcan.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>baffle stack</span><div class="img"><img src="renders/c_m_baffle.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>dragon head</span><div class="img"><img src="renders/c_m_dragon.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>brass horn</span><div class="img"><img src="renders/c_m_flute.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>vented block</span><div class="img"><img src="renders/c_m_vented.png" style="max-height:120px"></div></div></div>
+</section>
+<section class="card" id="under12">
+  <div class="kicker">Underneath and on the side</div>
+  <h2>11 new grips, lights and gadgets.</h2>
+  <div class="grid12" style="grid-template-columns:repeat(4,1fr)"><div class="c" style="height:170px"><span>bipod grip</span><div class="img"><img src="renders/c_u_bipodgrip.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>thumb stop</span><div class="img"><img src="renders/c_u_barricade.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>underbarrel shotgun</span><div class="img"><img src="renders/c_u_shotgun.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>skeleton grip</span><div class="img"><img src="renders/c_u_skeleton.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>stick grip</span><div class="img"><img src="renders/c_u_wrapped.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>strobe light</span><div class="img"><img src="renders/c_s_strobe.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>rangefinder</span><div class="img"><img src="renders/c_s_rangefinder.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>ir illuminator</span><div class="img"><img src="renders/c_s_ir.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>uv bar</span><div class="img"><img src="renders/c_s_uvlamp.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>headlamp</span><div class="img"><img src="renders/c_s_headlamp.png" style="max-height:120px"></div></div><div class="c" style="height:170px"><span>torch</span><div class="img"><img src="renders/c_s_torch.png" style="max-height:120px"></div></div></div>
+</section>
+<section class="card" id="bay12">
+  <div class="kicker">New slots</div>
+  <h2>Bayonets and magazines.</h2>
+  <div class="grid12" style="grid-template-columns:repeat(5,1fr)"><div class="c" style="height:150px"><span>knife</span><div class="img"><img src="renders/c_b_knife.png" style="max-height:110px"></div></div><div class="c" style="height:150px"><span>spike</span><div class="img"><img src="renders/c_b_spike.png" style="max-height:110px"></div></div><div class="c" style="height:150px"><span>sword</span><div class="img"><img src="renders/c_b_sword.png" style="max-height:110px"></div></div><div class="c" style="height:150px"><span>blade</span><div class="img"><img src="renders/c_b_blade.png" style="max-height:110px"></div></div><div class="c" style="height:150px"><span>energy</span><div class="img"><img src="renders/c_b_energy.png" style="max-height:110px"></div></div><div class="c" style="height:150px"><span>rune</span><div class="img"><img src="renders/c_b_rune.png" style="max-height:110px"></div></div><div class="c" style="height:150px"><span>kitchen knife</span><div class="img"><img src="renders/c_b_kitchen.png" style="max-height:110px"></div></div><div class="c" style="height:150px"><span>saw</span><div class="img"><img src="renders/c_b_saw.png" style="max-height:110px"></div></div><div class="c" style="height:150px"><span>cleaver</span><div class="img"><img src="renders/c_b_cleaver.png" style="max-height:110px"></div></div></div>
+  <div style="height:10px"></div>
+  <div class="grid12" style="grid-template-columns:repeat(4,1fr)"><div class="c" style="height:170px"><span>extended</span><div class="img"><img src="renders/c_g_extended.png" style="max-height:130px"></div></div><div class="c" style="height:170px"><span>casket</span><div class="img"><img src="renders/c_g_casket.png" style="max-height:130px"></div></div><div class="c" style="height:170px"><span>coupled</span><div class="img"><img src="renders/c_g_coupled.png" style="max-height:130px"></div></div><div class="c" style="height:170px"><span>windowed</span><div class="img"><img src="renders/c_g_windowed.png" style="max-height:130px"></div></div><div class="c" style="height:170px"><span>pull tab</span><div class="img"><img src="renders/c_g_pullloop.png" style="max-height:130px"></div></div><div class="c" style="height:170px"><span>helical</span><div class="img"><img src="renders/c_g_helical.png" style="max-height:130px"></div></div><div class="c" style="height:170px"><span>banana</span><div class="img"><img src="renders/c_g_banana.png" style="max-height:130px"></div></div><div class="c" style="height:170px"><span>ribbed</span><div class="img"><img src="renders/c_g_ribbed.png" style="max-height:130px"></div></div></div>
+</section>
+<section class="card" id="lo12">
+  <div class="kicker">For game designers</div>
+  <h2>Every piece comes with stats.</h2>
+  <div class="lo">
+    <img src="renders/c_hero_side.png">
+    <div><div class="cap">LOADOUT · 50 ROUNDS</div><table><tr><td>optic</td><td>prism</td><td>2.5× zoom · aim 1.18× slower · sway 1.1×</td></tr><tr><td>muzzle</td><td>square can</td><td>suppressed · recoil 0.9× · flash 0.1×</td></tr><tr><td>underbarrel</td><td>shotgun</td><td>4 extra shells · aim 1.15× slower</td></tr><tr><td>side</td><td>strobe light</td><td>flashlight</td></tr><tr><td>bayonet</td><td>knife</td><td>0.2 m reach · 70 damage</td></tr><tr><td>magazine</td><td>casket</td><td>50 rounds · 2.6 s reload</td></tr></table></div>
+  </div>
+</section>
+<section class="card" id="stats12">
+  <div class="kicker">By the numbers</div>
+  <h2>Devlog #012, in digits.</h2>
+  <div class="stats">
+    <div class="stat hot"><div class="n">99</div><div class="t">attachments you can swap, each also its own 3D file</div></div>
+    <div class="stat"><div class="n">6</div><div class="t">slots: sight, muzzle, underneath, side, bayonet, magazine</div></div>
+    <div class="stat"><div class="n">8×</div><div class="t">zoom on the new long-range scope</div></div>
+    <div class="stat"><div class="n">295</div><div class="t">parts on the shelf, plus 24 sights</div></div>
+    <div class="stat"><div class="n">7,400</div><div class="t">test weapons built and checked on every change</div></div>
+    <div class="stat hot"><div class="n">0</div><div class="t">bee launchers. Not even in the underbarrel slot.</div></div>
+  </div>
+  <div class="logo">BAD IDEAS <b>WORKS</b></div>
+</section>
+</body></html>

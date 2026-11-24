@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/011/banner.webp" alt="BadGun Devlog" width="100%">
+  <img src="assets/012/banner.webp" alt="BadGun Devlog" width="100%">
 </p>
 
 # 📓 The BadGun Devlog
@@ -10,6 +10,7 @@ Behind-the-scenes stories from building **BadGun**, a factory that designs weapo
 
 | # | Entry | In one sentence |
 |---|-------|-----------------|
+| 012 | [**Make It Yours**](012-make-it-yours.md) | Real shapes for scopes and attachments, bayonets, swappable magazines and loadout stats. |
 | 011 | [**The Big Expansion**](011-the-big-expansion.md) | Revolvers, rocket launchers, harpoons, tasers, a nail gun and dozens of new bodies. |
 | 010 | [**Snap It On**](010-snap-it-on.md) | Attachments as separate pieces that snap onto any gun, plus a kit for every world. |
 | 009 | [**Lights, Camera, Reload**](009-lights-camera-reload.md) | The guns finally move: firing, reloading, pumping, drawing. |

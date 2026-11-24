@@ -116,5 +116,5 @@ Try the new weapon types in the **[playground](https://badsadcode.github.io/BadG
 ---
 
 <p align="center">
-  <a href="README.md">← All devlogs</a> · <a href="../README.md">BadGun home</a>
+  <a href="README.md">← All devlogs</a> · <a href="../README.md">BadGun home</a> · <a href="012-make-it-yours.md">Next: #012 →</a>
 </p>

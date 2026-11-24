@@ -1,0 +1,3 @@
+# How the Devlog #012 images were made
+
+Same recipe as [#001](../../001/source/README.md), plus: every attachment was exported on its own with `generateAttachment({ type, variant, style, seed: 3 })` and `toGLB`, then photographed with `attachment-view.html?glb=<file>.glb` (three.js, transparent background) and cropped. The hero rifle is `{"archetype":"rifle","style":"modern","seed":2,"optic":"prism","parts":{"config":"standard","muzzle":"shroud","underbarrel":"shotgun","side":"strobe","bayonet":"knife","magazine":"casket"}}` rendered with `tools/render.mjs`. `cards.html` expects the cropped images in a `renders/` folder next to it.
