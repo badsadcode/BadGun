@@ -29,9 +29,9 @@ function outline(shape: Insignia['shape'], r: number): Vec2[] {
 /** Where the badge goes: [component, z, y, x (side face)]. */
 function anchor(ctx: BuildContext): { comp: string; z: number; y: number; x: number; r: number } {
   const { L, b, archetype } = ctx;
-  if (archetype === 'pistol') {
+  if (archetype === 'pistol' || archetype === 'revolver') {
     const [z, y] = raked([L.grip.z, L.grip.y], L.grip.angle, [[L.grip.length * 0.45, -(L.extra.gripDepth ?? 0.04) * 0.5]])[0];
-    return { comp: 'Grip', z, y, x: 0.0158, r: 0.0065 };
+    return { comp: 'Grip', z, y, x: L.extra.insigniaX ?? 0.0158, r: 0.0065 };
   }
   if (archetype === 'bow') return { comp: b.rootName, z: 0.003, y: -L.extra.riser * 0.62, x: 0.0162, r: 0.007 };
   const z = L.rec.z0 + (L.rec.z1 - L.rec.z0) * (archetype === 'crossbow' ? 0.35 : 0.24);

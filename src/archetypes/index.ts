@@ -1,16 +1,17 @@
 import type { ArchetypeDef } from './archetype.js';
 import { rifle, smg, shotgun, sniper, lmg } from './longgun.js';
 import { pistol } from './pistol.js';
+import { revolver } from './revolver.js';
 import { crossbow } from './crossbow.js';
 import { bow } from './bow.js';
 
 export type { ArchetypeDef } from './archetype.js';
 
 /** Registry of weapon archetypes, in menu order. */
-export const ARCHETYPES: Record<string, ArchetypeDef> = { rifle, smg, shotgun, sniper, lmg, pistol, crossbow, bow };
+export const ARCHETYPES: Record<string, ArchetypeDef> = { rifle, smg, shotgun, sniper, lmg, pistol, revolver, crossbow, bow };
 
 /** Name of each archetype's root component. */
-export const ROOT_NAMES: Record<string, string> = { pistol: 'Frame', crossbow: 'Tiller', bow: 'Riser' };
+export const ROOT_NAMES: Record<string, string> = { pistol: 'Frame', revolver: 'Frame', crossbow: 'Tiller', bow: 'Riser' };
 
 export function getArchetype(id: string): ArchetypeDef {
   const a = ARCHETYPES[id];
