@@ -78,7 +78,7 @@ export const cyber: StyleProfile = {
   },
   byArchetype: {
     pistol: {
-      frame: { smartgun: 2.5, slide: 1, loop: 0.6, cannon: 0.8 },
+      frame: { smartgun: 2, holdout: 1.2, polymer: 1, bullpup: 0.8, slide: 0.8, cannon: 0.6, loop: 0.5, taser: 0.5, compact: 0.5, coil: 0.4 },
       grip: { block: 1, swept: 1 },
       muzzle: { none: 2, smart: 1, compensator: 0.6, suppressor: 0.5 },
     },

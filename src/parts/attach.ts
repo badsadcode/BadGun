@@ -316,7 +316,7 @@ export function attachmentWeights(style: StyleProfile, kind: 'underbarrel' | 'si
 }
 
 /** Frames with a rail-like dust cover under the barrel, where a pistol light fits. */
-export const PISTOL_RAIL_FRAMES = ['slide', 'smartgun', 'blaster', 'deco'];
+export const PISTOL_RAIL_FRAMES = ['slide', 'smartgun', 'blaster', 'deco', 'compact', 'longslide', 'polymer', 'magnum', 'holdout'];
 const PISTOL_ATTACHMENTS = ['flashlight', 'laser', 'combo', 'taped', 'crystal'];
 
 /**

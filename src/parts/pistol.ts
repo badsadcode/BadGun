@@ -74,13 +74,27 @@ const slide: PartBuilder = (ctx) => {
     kind: 'slide', variant: 'serrated', pivot: [0, 0, z0],
     motion: { type: 'translate', axis: [0, 0, -1], range: [0, 0.04], purpose: 'fire (recoil) / rack' },
   });
-  side(ctx, s, 'Body', [[z0, sb], [z1, sb], [z1, top - 0.005], [z1 - 0.007, top], [z0 + 0.004, top], [z0, top - 0.004]], w, 0.002);
+  // Seeded slide look: nose shape, serration pattern, top ports, optic plate.
+  const look = ctx.rng('frame:slide-look');
+  const nose = look.pick(['square', 'chamfer', 'round'] as const);
+  const pattern = look.pick(['fine', 'wide', 'angled'] as const);
+  const ports = look.chance(0.3) ? look.int(2, 3) : 0;
+  const plate = look.chance(0.3);
+  const front: Vec2[] = nose === 'chamfer'
+    ? [[z1 - 0.009, sb], [z1, sb + 0.007], [z1, top - 0.005], [z1 - 0.007, top]]
+    : nose === 'round'
+      ? [[z1, sb], [z1, top * 0.3], ...bezier([z1, top * 0.3], [z1, top - 0.002], [z1 - 0.004, top], [z1 - 0.012, top], 4).slice(1)]
+      : [[z1, sb], [z1, top - 0.005], [z1 - 0.007, top]];
+  side(ctx, s, 'Body', [[z0, sb], ...front, [z0 + 0.004, top], [z0, top - 0.004]], w, 0.002);
   // Rear (and maybe front) serrations.
-  const serr = 5 + Math.round(p.detail * 3);
+  const serr = pattern === 'wide' ? 3 + Math.round(p.detail * 2) : 5 + Math.round(p.detail * 3);
+  const pitch = pattern === 'wide' ? 0.0068 : 0.0045, thick = pattern === 'wide' ? 0.003 : 0.0018, lean = pattern === 'angled' ? 0.3 : 0;
   for (let i = 0; i < serr; i++) {
-    put(ctx, s, 'Detail', box([0, (sb + top) / 2 - 0.001, z0 + 0.008 + i * 0.0045], [w + 0.0012, top - sb - 0.008, 0.0018]));
-    if (p.detail > 0.55 && i < 4) put(ctx, s, 'Detail', box([0, (sb + top) / 2 - 0.001, z1 - 0.012 - i * 0.0045], [w + 0.0012, top - sb - 0.008, 0.0018]));
+    put(ctx, s, 'Detail', box([0, 0, 0], [w + 0.0012, top - sb - 0.008, thick]), [0, (sb + top) / 2 - 0.001, z0 + 0.008 + i * pitch], [-lean, 0, 0]);
+    if (p.detail > 0.55 && i < 4) put(ctx, s, 'Detail', box([0, 0, 0], [w + 0.0012, top - sb - 0.008, thick]), [0, (sb + top) / 2 - 0.001, z1 - 0.014 - i * pitch], [lean, 0, 0]);
   }
+  for (let i = 0; i < ports; i++) put(ctx, s, 'Detail', box([0, top + 0.0003, z1 - 0.022 - i * 0.008], [w * 0.5, 0.001, 0.004]));
+  if (plate) put(ctx, s, 'Accent', box([0, top + 0.0008, z0 + 0.03], [w * 0.62, 0.0016, 0.026], ctx.bevel(0.0005)));
   // Ejection port and sights.
   put(ctx, s, 'Barrel', box([-w * 0.2, top - 0.0015, z0 + (z1 - z0) * 0.55], [w * 0.62, 0.004, 0.034], ctx.bevel(0.0008)));
   for (const x of [0.005, -0.005]) put(ctx, s, 'Detail', box([x, top + 0.003, z0 + 0.008], [0.004, 0.006, 0.007], ctx.bevel(0.0008)));
