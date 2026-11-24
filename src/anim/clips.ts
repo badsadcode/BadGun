@@ -13,7 +13,7 @@
  *   Fire         trigger, hammer, cylinder, slide/toggle recoil; bows and
  *                crossbows release the string and launch the projectile
  *   Reload       magazine out and in, then charge (handle, slide, bolt or
- *                lever); break actions swing open; crossbows wind the crank
+ *                lever); break actions swing open; revolver cranes swing out; crossbows wind the crank
  *   Cycle        manual action: pump, lever, bolt, or racking the slide/handle
  *   Cock         pull the hammer back (and leave it cocked)
  *   Spin         spin a revolver's cylinder
@@ -85,6 +85,7 @@ export function weaponClips(w: Weapon): Clip[] {
   const trigger = c('Trigger'), hammer = c('Hammer'), cylinder = c('Cylinder'), slide = c('Slide'), toggle = c('Toggle');
   const mag = c('Magazine'), handle = c('ChargingHandle'), bolt = c('BoltHandle'), lever = c('Lever'), pump = w.components.find((x) => x.name === 'Handguard' && x.motion?.purpose === 'pump');
   const barrel = w.components.find((x) => x.name === 'Barrel' && x.motion?.purpose.startsWith('break open'));
+  const crane = c('Crane');
   const string = c('String'), crank = c('Crank'), arrow = c('Arrow'), crossBolt = c('Bolt');
   const limbs = ['LimbTop', 'LimbBottom'].map(c).filter((x): x is Component => !!x);
   const clips: (Clip | null)[] = [];
@@ -171,6 +172,9 @@ export function weaponClips(w: Weapon): Clip[] {
         events.chambered = round(t + 0.3);
       }
       clips.push(clip('Reload', 'Swap the magazine, then chamber a round.', tracks, events, 0.15));
+    } else if (crane) {
+      // Swing-out revolvers: the crane (cylinder on it) swings out, reload, swing back.
+      clips.push(clip('Reload', 'Swing the cylinder out, eject and reload, swing it back in.', [track(crane, k([0.1, 0], [0.35, 1], [1.2, 1], [1.4, 0]))], { open: 0.35, shellsIn: 0.9, close: 1.4 }, 0.15));
     }
 
     // ---- Cycle: the manual action, on its own.

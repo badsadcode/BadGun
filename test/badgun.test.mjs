@@ -57,13 +57,14 @@ const SOCKETS = {
   common: ['SOCKET_Muzzle', 'SOCKET_Optic', 'SOCKET_ADS', 'SOCKET_Hand_Grip', 'SOCKET_Hand_Support'],
   longgun: ['SOCKET_Magazine', 'SOCKET_Eject', 'SOCKET_Shoulder'],
   pistol: ['SOCKET_Magazine', 'SOCKET_Eject'],
+  revolver: ['SOCKET_Magazine', 'SOCKET_Eject'],
   crossbow: ['SOCKET_Nock', 'SOCKET_Shoulder'],
   bow: ['SOCKET_Hand_Draw', 'SOCKET_Nock'],
 };
-const family = (a) => (['pistol', 'crossbow', 'bow'].includes(a) ? a : 'longgun');
+const family = (a) => (['pistol', 'revolver', 'crossbow', 'bow'].includes(a) ? a : 'longgun');
 const required = (a) => (a === 'bow' ? ['SOCKET_Muzzle', 'SOCKET_Hand_Grip', 'SOCKET_ADS', ...SOCKETS.bow] : [...SOCKETS.common, ...SOCKETS[family(a)]]);
 /** Overall length range (meters) per archetype. */
-const LENGTH = { rifle: [0.6, 1.5], smg: [0.4, 1.1], shotgun: [0.45, 1.6], sniper: [0.8, 1.8], lmg: [0.8, 1.7], pistol: [0.15, 0.6], crossbow: [0.6, 1.3], bow: [0.7, 2.0] };
+const LENGTH = { rifle: [0.6, 1.5], smg: [0.4, 1.1], shotgun: [0.45, 1.6], sniper: [0.8, 1.8], lmg: [0.8, 1.7], pistol: [0.15, 0.6], revolver: [0.12, 0.5], crossbow: [0.6, 1.3], bow: [0.7, 2.0] };
 /** Bows stand upright, so their size is their height; everything else is measured along the barrel. */
 const size = (a, m) => (a === 'bow' ? m.bounds.size[1] : m.bounds.size[2]);
 
@@ -78,6 +79,26 @@ test('every weapon type has its sockets and moving parts', () => {
       if (family(archetype) === 'longgun') assert.ok(movers.some((m) => /reload|pump|cycle/.test(m)), `${archetype}/${style}: ${movers}`);
       if (archetype === 'bow') assert.ok(component(w, 'String').motion.purpose.startsWith('draw') && component(w, 'Arrow'), 'bow string + arrow');
       if (archetype === 'crossbow') assert.ok(component(w, 'String') && component(w, 'Bolt'), 'crossbow string + bolt');
+    }
+  }
+});
+
+test('revolvers: the cylinder advances one chamber, the hammer cocks, top-breaks and cranes reload', () => {
+  for (const frame of Object.keys(ARCHETYPES.revolver.parts.frame)) {
+    for (const style of Object.keys(STYLES)) {
+      const w = generate({ archetype: 'revolver', style, seed: 4, parts: { frame } });
+      const tag = `${frame}/${style}`;
+      const cyl = component(w, 'Cylinder');
+      assert.equal(cyl.motion.purpose, 'advance one chamber', tag);
+      assert.ok(Math.abs(cyl.motion.range[1] * [6, 5, 8].find((n) => Math.abs(cyl.motion.range[1] - (2 * Math.PI) / n) < 1e-9) - 2 * Math.PI) < 1e-9, `${tag}: one chamber`);
+      assert.equal(component(w, 'Hammer').motion.purpose, 'cock', tag);
+      assert.ok(component(w, 'Hammer').motion.range[1] < 0, `${tag}: cocking turns the hammer back`);
+      const names = weaponClips(w).map((c) => c.name);
+      for (const clip of ['Fire', 'Cock', 'Spin']) assert.ok(names.includes(clip), `${tag}: ${clip}`);
+      if (frame === 'topbreak') assert.ok(component(w, 'Barrel').motion.purpose.startsWith('break open') && cyl.parent === 'Barrel', `${tag}: breaks open`);
+      if (frame === 'topbreak' || component(w, 'Crane')) assert.ok(names.includes('Reload'), `${tag}: Reload`);
+      if (frame === 'pepperbox') assert.equal(w.parts.barrel, 'none', `${tag}: the barrels are the cylinder`);
+      if (frame === 'snub') assert.equal(w.parts.barrel, 'snub', `${tag}: snubs get short barrels`);
     }
   }
 });
